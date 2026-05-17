@@ -9,5 +9,8 @@ export default defineConfig({
         additionalData: '@import "@/styles/theme.scss";'
       }
     }
+  },
+  build: {
+    minify: 'esbuild'
   }
 })
