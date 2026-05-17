@@ -58,6 +58,17 @@ $spacing-xl: 48rpx;
 $spacing-2xl: 64rpx;
 
 // ============================================
+// 多行截断混用
+// ============================================
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ============================================
 // 发光按钮
 // ============================================
 .btn {
@@ -456,17 +467,6 @@ $spacing-2xl: 64rpx;
 .border-glow {
   border-color: $primary;
   box-shadow: $shadow-glow;
-}
-
-// ============================================
-// 多行截断
-// ============================================
-@mixin line-clamp($lines) {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: $lines;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 // ============================================
