@@ -28,18 +28,27 @@ jobs:
       - name: Build H5
         run: npm run build:h5
 
-      - name: Create tar archive
-        run: tar -czf dist.tar.gz -C dist/build/h5 .
+      - name: Find and package build output
+        run: |
+          set -e
+          if [ -d "unpackage/dist/build/h5" ]; then
+            echo "Using unpackage/dist/build/h5"
+            tar -czf sushang-qianduan-h5.tar.gz -C unpackage/dist/build/h5 .
+          elif [ -d "dist/build/h5" ]; then
+            echo "Using dist/build/h5"
+            tar -czf sushang-qianduan-h5.tar.gz -C dist/build/h5 .
+          elif [ -d "dist" ]; then
+            echo "Using dist"
+            tar -czf sushang-qianduan-h5.tar.gz -C dist .
+          else
+            echo "ERROR: No build output found"
+            ls -la
+            exit 1
+          fi
 
       - name: Deploy to Server
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          port: 22
-          username: root
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
-            set -e
-            mkdir -p /www/sushang-qianduan/h5
-            echo "${{ secrets.DEPLOY_SSH_KEY }}" > /tmp/deploy_key.pem && chmod 600 /tmp/deploy_key.pem
-            cat ${{ github.workspace }}/dist.tar.gz | ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@47.96.102.163 "cd /www/sushang-qianduan/h5 && tar -xz && nginx -s reload"
+        run: |
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > /tmp/deploy_key.pem
+          chmod 600 /tmp/deploy_key.pem
+          ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "mkdir -p /www/sushang-qianduan/h5"
+          cat sushang-qianduan-h5.tar.gz | ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "cd /www/sushang-qianduan/h5 && tar -xz && rm sushang-qianduan-h5.tar.gz && nginx -s reload"
