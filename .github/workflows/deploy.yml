@@ -51,4 +51,4 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > /tmp/deploy_key.pem
           chmod 600 /tmp/deploy_key.pem
           ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "mkdir -p /www/sushang-qianduan/h5"
-          cat sushang-qianduan-h5.tar.gz | ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "cd /www/sushang-qianduan/h5 && tar -xz && rm sushang-qianduan-h5.tar.gz && nginx -s reload"
+          cat sushang-qianduan-h5.tar.gz | ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "cd /www/sushang-qianduan/h5 && tar -xz && nginx -s reload"
