@@ -27,8 +27,9 @@ jobs:
 
       - name: Build H5
         run: npm run build:h5
-        env:
-          NODE_ENV: production
+
+      - name: Create tar archive
+        run: tar -czf /tmp/sushang-qianduan-h5.tar.gz -C unpackage/dist/build/h5 .
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@v0.1.10
@@ -39,6 +40,7 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           command: |
             set -e
-            # UniApp H5 输出在 unpackage/dist/build/h5/
-            rsync -avz --delete /home/runner/work/sushangshop-qianduan/sushangshop-qianduan/unpackage/dist/build/h5/ root@127.0.0.1:/www/sushang-qianduan/h5/
+            mkdir -p /www/sushang-qianduan/h5
+            tar -xzf - -C /www/sushang-qianduan/h5/
             nginx -s reload
+          tar: /tmp/sushang-qianduan-h5.tar.gz
