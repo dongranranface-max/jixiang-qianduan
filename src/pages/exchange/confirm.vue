@@ -1,0 +1,394 @@
+<template>
+  <view class="page-container">
+    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
+    <view class="page-header">
+      <text class="back" @click="goBack">&lt;</text>
+      <text class="page-title">确认换购</text>
+    </view>
+
+    <view v-if="product" class="confirm-body">
+      <!-- 商品信息 -->
+      <view class="product-card">
+        <image class="cover" :src="product.coverImage" mode="aspectFill" />
+        <view class="info">
+          <text class="name">{{ product.name }}</text>
+          <view class="price-row">
+            <text class="cash-price">¥{{ product.cashPrice }}</text>
+            <text class="points-price">+ {{ product.pointsPrice }}积分</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 银行卡信息 -->
+      <view class="section bank-section">
+        <view class="section-title">结算账户</view>
+        <view v-if="bankCard" class="bank-card">
+          <text class="bank-name">{{ bankCard.bankName }}</text>
+          <text class="card-no">{{ maskCard(bankCard.bankCard) }}</text>
+          <text class="bind-tip">已绑定</text>
+        </view>
+        <view v-else class="no-bank" @click="goBindCard">
+          <text>请先绑定银行卡</text>
+          <text class="arrow">&gt;</text>
+        </view>
+      </view>
+
+      <!-- 收货地址 -->
+      <view class="section address-section" @click="goSelectAddress">
+        <view class="section-title">收货地址</view>
+        <view v-if="address" class="address-info">
+          <text class="consignee">{{ address.consignee }} {{ address.phone }}</text>
+          <text class="addr-text">{{ address.province }} {{ address.city }} {{ address.district }} {{ address.detail }}</text>
+        </view>
+        <view v-else class="no-address">
+          <text>请选择收货地址</text>
+          <text class="arrow">&gt;</text>
+        </view>
+      </view>
+
+      <!-- 积分使用说明 -->
+      <view class="section points-info">
+        <view class="section-title">积分说明</view>
+        <view class="points-rules">
+          <view class="rule-item">
+            <text class="rule-icon">💡</text>
+            <text class="rule-text">使用 {{ product.pointsPrice }} 生态积分抵扣 {{ product.pointsPrice }} 元现金</text>
+          </view>
+          <view class="rule-item">
+            <text class="rule-icon">💳</text>
+            <text class="rule-text">实际支付：¥{{ product.cashPrice }} 现金 + {{ product.pointsPrice }} 积分</text>
+          </view>
+          <view class="rule-item">
+            <text class="rule-icon">🎁</text>
+            <text class="rule-text">换购成功后，支付金额的 30% 将转为消费积分</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 支付方式 -->
+      <view class="section pay-way">
+        <view class="section-title">支付方式</view>
+        <radio-group @change="payMethodChange">
+          <label class="pay-option">
+            <view class="pay-left">
+              <text class="pay-icon">💳</text>
+              <text>微信支付</text>
+            </view>
+            <radio value="wechat" checked="true" color="#00FF00" />
+          </label>
+          <label class="pay-option">
+            <view class="pay-left">
+              <text class="pay-icon">💰</text>
+              <text>支付宝</text>
+            </view>
+            <radio value="alipay" color="#00FF00" />
+          </label>
+        </radio-group>
+      </view>
+
+      <view class="safe-area-bottom"></view>
+    </view>
+
+    <!-- 底部提交栏 -->
+    <view v-if="product" class="submit-bar">
+      <view class="submit-info">
+        <text class="submit-label">合计：</text>
+        <text class="submit-cash">¥{{ product.cashPrice }}</text>
+        <text class="submit-points">+ {{ product.pointsPrice }}积分</text>
+      </view>
+      <view :class="['submit-btn', { disabled: !canSubmit }]" @click="doSubmit">
+        确认换购
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+
+const statusBarHeight = ref(20)
+const productId = ref('')
+const product = ref<any>(null)
+const bankCard = ref<any>(null)
+const address = ref<any>(null)
+const payMethod = ref('wechat')
+
+onMounted(() => {
+  const sys = uni.getSystemInfoSync()
+  statusBarHeight.value = sys.statusBarHeight || 20
+
+  const pages = getCurrentPages()
+  const current = pages[pages.length - 1]
+  const opts = (current as any).options || {}
+  productId.value = opts.productId || ''
+
+  if (productId.value) loadData()
+})
+
+async function loadData() {
+  // const res = await uni.request({ url: `/api/v1/products/${productId.value}` })
+  // product.value = res.data
+
+  product.value = {
+    id: productId.value,
+    name: '换购商品示例',
+    coverImage: 'https://picsum.photos/400/400?random=50',
+    cashPrice: 199,
+    pointsPrice: 2000,
+  }
+
+  // const bank = await uni.request({ url: '/api/v1/user/bank-card' })
+  // bankCard.value = bank.data
+
+  // const addr = await uni.request({ url: '/api/v1/address/default' })
+  // address.value = addr.data
+}
+
+const canSubmit = computed(() => !!bankCard.value && !!address.value)
+
+function goBack() { uni.navigateBack() }
+
+function goBindCard() {
+  uni.navigateTo({ url: '/pages/user/bank-card' })
+}
+
+function goSelectAddress() {
+  uni.navigateTo({ url: '/pages/address/list?mode=select' })
+}
+
+function payMethodChange(e: any) {
+  payMethod.value = e.detail.value
+}
+
+function maskCard(no: string) {
+  if (!no || no.length < 8) return no
+  return no.replace(/(\d{4})\d+(\d{4})/, '$1 **** **** $2')
+}
+
+async function doSubmit() {
+  if (!canSubmit.value) {
+    if (!bankCard.value) {
+      uni.showToast({ title: '请先绑定银行卡', icon: 'none' })
+      return
+    }
+    if (!address.value) {
+      uni.showToast({ title: '请选择收货地址', icon: 'none' })
+      return
+    }
+    return
+  }
+
+  uni.showLoading({ title: '提交中...' })
+  try {
+    // const res = await uni.request({
+    //   url: '/api/v1/orders/exchange',
+    //   method: 'POST',
+    //   data: {
+    //     productId: productId.value,
+    //     addressId: address.value.id,
+    //     payMethod: payMethod.value,
+    //   }
+    // })
+    uni.showToast({ title: '换购成功', icon: 'success' })
+    setTimeout(() => {
+      uni.redirectTo({ url: '/pages/order/list' })
+    }, 1500)
+  } catch (e: any) {
+    uni.showToast({ title: e.message || '提交失败', icon: 'none' })
+  } finally {
+    uni.hideLoading()
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+@import '@/styles/theme.scss';
+
+.page-container {
+  min-height: 100vh;
+  background: $bg-primary;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-base;
+  padding: $spacing-base $spacing-lg;
+  background: $bg-card;
+  border-bottom: 1rpx solid $border-color;
+
+  .back { font-size: 40rpx; color: $text-primary; }
+  .page-title { font-size: 36rpx; font-weight: 700; color: $text-primary; }
+}
+
+.confirm-body {
+  flex: 1;
+  padding: 0 $spacing-lg;
+  padding-bottom: 160rpx;
+}
+
+.product-card {
+  display: flex;
+  gap: $spacing-base;
+  background: $bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-base;
+  margin: $spacing-base 0;
+  border: 1rpx solid $border-color;
+
+  .cover {
+    width: 180rpx;
+    height: 180rpx;
+    border-radius: $radius-sm;
+    background: $bg-secondary;
+  }
+
+  .info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .name {
+      font-size: 28rpx;
+      color: $text-primary;
+      display: block;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: $spacing-base;
+      margin-top: 8rpx;
+
+      .cash-price {
+        font-size: 36rpx;
+        font-weight: 700;
+        color: $danger;
+      }
+
+      .points-price {
+        font-size: 26rpx;
+        color: $primary;
+      }
+    }
+  }
+}
+
+.section {
+  background: $bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-base $spacing-lg;
+  margin-bottom: $spacing-base;
+  border: 1rpx solid $border-color;
+
+  .section-title {
+    font-size: 26rpx;
+    color: $text-secondary;
+    display: block;
+    margin-bottom: $spacing-sm;
+  }
+}
+
+.bank-section {
+  .bank-card {
+    display: flex;
+    align-items: center;
+    gap: $spacing-base;
+
+    .bank-name { font-size: 30rpx; font-weight: 600; color: $text-primary; }
+    .card-no { font-size: 26rpx; color: $text-secondary; flex: 1; }
+    .bind-tip { font-size: 22rpx; color: $profit; }
+  }
+
+  .no-bank, .no-address {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-sm 0;
+    color: $text-muted;
+    font-size: 28rpx;
+
+    .arrow { color: $text-muted; }
+  }
+}
+
+.address-section {
+  .address-info {
+    .consignee { font-size: 28rpx; font-weight: 600; color: $text-primary; }
+    .addr-text { font-size: 24rpx; color: $text-secondary; display: block; margin-top: 4rpx; }
+  }
+}
+
+.points-info {
+  .points-rules {
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+  }
+
+  .rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8rpx;
+
+    .rule-icon { font-size: 24rpx; }
+    .rule-text { font-size: 24rpx; color: $text-secondary; line-height: 1.6; }
+  }
+}
+
+.pay-way {
+  .pay-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-sm 0;
+
+    .pay-left {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+
+      .pay-icon { font-size: 32rpx; }
+      text { font-size: 28rpx; color: $text-primary; }
+    }
+  }
+}
+
+.submit-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $bg-card;
+  border-top: 1rpx solid $border-color;
+  display: flex;
+  align-items: center;
+  padding: $spacing-base $spacing-lg;
+  padding-bottom: calc(#{$spacing-base} + constant(safe-area-inset-bottom));
+  padding-bottom: calc(#{$spacing-base} + env(safe-area-inset-bottom));
+
+  .submit-info {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+
+    .submit-label { font-size: 24rpx; color: $text-secondary; }
+    .submit-cash { font-size: 36rpx; font-weight: 700; color: $danger; }
+    .submit-points { font-size: 24rpx; color: $primary; margin-left: 8rpx; }
+  }
+
+  .submit-btn {
+    background: $primary;
+    color: #000;
+    font-size: 28rpx;
+    font-weight: 700;
+    padding: 16rpx 48rpx;
+    border-radius: 50rpx;
+
+    &.disabled { background: $bg-secondary; color: $text-muted; }
+  }
+}
+</style>

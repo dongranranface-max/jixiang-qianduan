@@ -2,33 +2,43 @@
   "pages": [
     {
       "path": "pages/index/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "style": { "navigationStyle": "custom" }
     },
     {
       "path": "pages/buy/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/exchange/list",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/exchange/confirm",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/redeem/list",
+      "style": { "navigationStyle": "custom" }
     },
     {
       "path": "pages/wealth/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/wealth/invest",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/wealth/my-invest",
+      "style": { "navigationStyle": "custom" }
     },
     {
       "path": "pages/user/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "style": { "navigationStyle": "custom" }
     },
     {
       "path": "pages/product/detail",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "style": { "navigationStyle": "custom" }
     },
     {
       "path": "pages/search/index",
@@ -40,27 +50,51 @@
     },
     {
       "path": "pages/cart/index",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "style": { "navigationStyle": "custom" }
     },
     {
       "path": "pages/order/confirm",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "style": { "navigationStyle": "custom" }
     },
     {
       "path": "pages/order/list",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "style": { "navigationStyle": "custom" }
     },
     {
       "path": "pages/auth/login",
-      "style": {
-        "navigationStyle": "custom"
-      }
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/auth/register",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/user/invite",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/user/bank-card",
+      "style": { "navigationBarTitleText": "绑定银行卡", "navigationBarBackgroundColor": "#0A0A0A", "navigationBarTextStyle": "white" }
+    },
+    {
+      "path": "pages/user/points-detail",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/user/sign-in",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/coupon/list",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/address/list",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
+      "path": "pages/address/edit",
+      "style": { "navigationStyle": "custom" }
     }
   ],
   "globalStyle": {
