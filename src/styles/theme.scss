@@ -1,0 +1,483 @@
+// ============================================
+// 电商商城 - Cyber-Tech 赛博科技风格
+// ============================================
+
+// 主色系（电路绿）
+$primary: #00FF00;
+$primary-light: #39FF14;
+$primary-dark: #00CC00;
+
+// 背景色
+$bg-primary: #0A0A0A;
+$bg-secondary: #0D0D0D;
+$bg-card: rgba(0, 255, 0, 0.05);
+$bg-card-hover: rgba(0, 255, 0, 0.08);
+$bg-overlay: rgba(0, 0, 0, 0.8);
+
+// 辅助色（青色）
+$accent: #00CED1;
+$accent-light: #20B4B4;
+
+// 强调色（霓虹绿）
+$neon: #39FF14;
+$neon-glow: 0 0 20px rgba($primary, 0.6);
+
+// 功能色
+$gold: #FFD700;
+$warning: #F59E0B;
+$danger: #EF4444;
+$success: #00FF00;
+
+// 文字色
+$text-primary: #FFFFFF;
+$text-secondary: #8A8A8A;
+$text-muted: #5A5A5A;
+$text-accent: #00FF00;
+
+// 边框色
+$border-color: rgba(0, 255, 0, 0.2);
+$border-light: rgba(0, 255, 0, 0.1);
+
+// 圆角
+$radius-sm: 8rpx;
+$radius-md: 16rpx;
+$radius-lg: 24rpx;
+$radius-full: 9999rpx;
+
+// 阴影 - 发光效果
+$shadow-glow: 0 0 30px rgba($primary, 0.4);
+$shadow-glow-strong: 0 0 60px rgba($primary, 0.6);
+$shadow-card: 0 4rpx 20rpx rgba(0, 0, 0, 0.5);
+
+// 间距
+$spacing-xs: 8rpx;
+$spacing-sm: 16rpx;
+$spacing-base: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 48rpx;
+$spacing-2xl: 64rpx;
+
+// ============================================
+// 发光按钮
+// ============================================
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  border-radius: $radius-full;
+  font-size: 32rpx;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.btn-primary {
+  @extend .btn;
+  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  color: #000;
+  box-shadow: $shadow-glow;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+  }
+  
+  &:active::before {
+    left: 100%;
+  }
+}
+
+.btn-secondary {
+  @extend .btn;
+  background: transparent;
+  border: 2rpx solid $primary;
+  color: $primary;
+  
+  &:active {
+    background: rgba($primary, 0.1);
+  }
+}
+
+.btn-ghost {
+  @extend .btn;
+  background: transparent;
+  color: $text-secondary;
+  
+  &:active {
+    color: $primary;
+  }
+}
+
+.btn-sm {
+  height: 64rpx;
+  font-size: 26rpx;
+  padding: 0 32rpx;
+}
+
+.btn-lg {
+  height: 96rpx;
+  font-size: 36rpx;
+}
+
+// ============================================
+// 赛博卡片
+// ============================================
+.glass-card {
+  background: $bg-card;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1rpx solid $border-color;
+  border-radius: $radius-md;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1rpx;
+    background: linear-gradient(90deg, transparent, $primary, transparent);
+    opacity: 0.5;
+  }
+}
+
+.glass-card-hover {
+  @extend .glass-card;
+  transition: all 0.3s ease;
+  
+  &:active {
+    background: $bg-card-hover;
+    border-color: rgba($primary, 0.5);
+    box-shadow: $shadow-glow;
+  }
+}
+
+.glass-card-accent {
+  @extend .glass-card;
+  border-color: rgba($accent, 0.3);
+  
+  &::before {
+    background: linear-gradient(90deg, transparent, $accent, transparent);
+  }
+}
+
+// ============================================
+// 标签
+// ============================================
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-sm;
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+.tag-primary {
+  @extend .tag;
+  background: rgba($primary, 0.2);
+  color: $primary;
+  border: 1rpx solid rgba($primary, 0.3);
+}
+
+.tag-accent {
+  @extend .tag;
+  background: rgba($accent, 0.2);
+  color: $accent;
+  border: 1rpx solid rgba($accent, 0.3);
+}
+
+.tag-gold {
+  @extend .tag;
+  background: rgba($gold, 0.2);
+  color: $gold;
+  border: 1rpx solid rgba($gold, 0.3);
+}
+
+.tag-outline {
+  @extend .tag;
+  background: transparent;
+  border: 1rpx solid $border-color;
+  color: $text-secondary;
+}
+
+// ============================================
+// 搜索栏
+// ============================================
+.search-bar {
+  display: flex;
+  align-items: center;
+  height: 80rpx;
+  background: rgba(0, 255, 0, 0.05);
+  border: 1rpx solid $border-color;
+  border-radius: $radius-full;
+  padding: 0 32rpx;
+  
+  .search-icon {
+    font-size: 32rpx;
+    color: $primary;
+    margin-right: 16rpx;
+  }
+  
+  .search-input {
+    flex: 1;
+    font-size: 28rpx;
+    color: #fff;
+    background: transparent;
+    
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+}
+
+// ============================================
+// 页面容器
+// ============================================
+.page-container {
+  min-height: 100vh;
+  background: $bg-primary;
+  padding: 0 $spacing-lg;
+}
+
+.page-header {
+  padding: $spacing-lg 0;
+}
+
+.page-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.page-subtitle {
+  font-size: 26rpx;
+  color: $text-secondary;
+  margin-top: 8rpx;
+}
+
+// ============================================
+// 区块
+// ============================================
+.section {
+  margin-bottom: $spacing-xl;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-base;
+  
+  .section-title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $text-primary;
+    
+    .title-accent {
+      color: $primary;
+    }
+  }
+  
+  .section-more {
+    display: flex;
+    align-items: center;
+    font-size: 26rpx;
+    color: $text-secondary;
+    
+    .arrow {
+      margin-left: 8rpx;
+      color: $primary;
+    }
+  }
+}
+
+// ============================================
+// 商品卡片
+// ============================================
+.product-card {
+  background: $bg-card;
+  border: 1rpx solid $border-color;
+  border-radius: $radius-md;
+  overflow: hidden;
+  
+  .product-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: rgba(0, 255, 0, 0.03);
+  }
+  
+  .product-info {
+    padding: $spacing-base;
+    
+    .product-name {
+      font-size: 28rpx;
+      color: $text-primary;
+      @include line-clamp(2);
+      line-height: 1.4;
+      margin-bottom: $spacing-xs;
+    }
+    
+    .product-desc {
+      font-size: 24rpx;
+      color: $text-secondary;
+      @include line-clamp(1);
+      margin-bottom: $spacing-sm;
+    }
+    
+    .product-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .product-price {
+      font-size: 36rpx;
+      font-weight: 700;
+      color: $primary;
+      
+      .symbol {
+        font-size: 24rpx;
+      }
+      
+      .points {
+        font-size: 22rpx;
+        color: $accent;
+        margin-left: 12rpx;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// ============================================
+// 列表项
+// ============================================
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: $spacing-base 0;
+  border-bottom: 1rpx solid $border-light;
+  
+  .list-icon {
+    font-size: 48rpx;
+    margin-right: $spacing-base;
+  }
+  
+  .list-content {
+    flex: 1;
+    
+    .list-title {
+      font-size: 30rpx;
+      color: $text-primary;
+    }
+    
+    .list-subtitle {
+      font-size: 24rpx;
+      color: $text-secondary;
+      margin-top: 4rpx;
+    }
+  }
+  
+  .list-arrow {
+    font-size: 28rpx;
+    color: $primary;
+  }
+}
+
+// ============================================
+// 空状态
+// ============================================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-2xl;
+  
+  .empty-icon {
+    font-size: 120rpx;
+    margin-bottom: $spacing-base;
+    filter: grayscale(1);
+    opacity: 0.3;
+  }
+  
+  .empty-text {
+    font-size: 28rpx;
+    color: $text-secondary;
+  }
+}
+
+// ============================================
+// 工具类
+// ============================================
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-col { display: flex; flex-direction: column; }
+.text-center { text-align: center; }
+.text-primary { color: $primary; }
+.text-accent { color: $accent; }
+.text-gold { color: $gold; }
+.text-secondary { color: $text-secondary; }
+.text-muted { color: $text-muted; }
+.text-sm { font-size: 24rpx; }
+.text-xs { font-size: 20rpx; }
+.font-bold { font-weight: 700; }
+
+.mt-sm { margin-top: $spacing-sm; }
+.mt-base { margin-top: $spacing-base; }
+.mt-lg { margin-top: $spacing-lg; }
+.mb-sm { margin-bottom: $spacing-sm; }
+.mb-base { margin-bottom: $spacing-base; }
+.mb-lg { margin-bottom: $spacing-lg; }
+
+// 发光文本
+.text-glow {
+  color: $primary;
+  text-shadow: 0 0 10px rgba($primary, 0.8);
+}
+
+// 发光边框
+.border-glow {
+  border-color: $primary;
+  box-shadow: $shadow-glow;
+}
+
+// ============================================
+// 多行截断
+// ============================================
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ============================================
+// 安全区域
+// ============================================
+.safe-area-top {
+  padding-top: constant(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
