@@ -167,58 +167,27 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { walletApi, levelApi, financialApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
 
-// 模拟数据
-const ecoPoints = ref(12580)
-const creditPoints = ref(350)
+// 真实数据（API 接通前显示兜底值）
+const ecoPoints = ref(0)
+const creditPoints = ref(0)
+const loadingAsset = ref(false)
+const loadingProducts = ref(false)
 
 const levelData = ref({
   badge: '🏆',
-  name: 'V3',
-  title: '铂金会员',
-  current: 35000,
-  target: 100000,
-  dailyDividend: 300,
-  nextLevel: {
-    name: 'V4 ⭐',
-    target: 100000
-  }
+  name: 'V1',
+  title: '普通会员',
+  current: 0,
+  target: 5000,
+  dailyDividend: '0',
+  nextLevel: null as { name: string; target: number } | null
 })
 
-const investProjects = ref([
-  {
-    id: 1,
-    name: '跨境电商理财',
-    icon: '🌐',
-    yield: 12,
-    cycle: 30,
-    minAmount: 1000,
-    progress: 75,
-    level: 'high'
-  },
-  {
-    id: 2,
-    name: '量化交易理财',
-    icon: '📊',
-    yield: 15,
-    cycle: 60,
-    minAmount: 5000,
-    progress: 45,
-    level: 'new'
-  },
-  {
-    id: 3,
-    name: '算力机房理财',
-    icon: '⚡',
-    yield: 18,
-    cycle: 90,
-    minAmount: 10000,
-    progress: 30,
-    level: 'safe'
-  }
-])
+const investProjects = ref<any[]>([])
 
 const rules = ref([
   { id: 1, icon: '💰', title: '收益计算', desc: '每日结算，自动到账' },
@@ -230,7 +199,65 @@ const rules = ref([
 onMounted(() => {
   const systemInfo = uni.getSystemInfoSync()
   statusBarHeight.value = systemInfo.statusBarHeight || 20
+  loadAssetData()
+  loadLevelData()
+  loadFinancialProducts()
 })
+
+async function loadAssetData() {
+  loadingAsset.value = true
+  try {
+    const bal = await walletApi.getBalance()
+    ecoPoints.value = Number(bal.ecoPoints || 0)
+    creditPoints.value = Number(bal.consumerPoints || 0)
+  } catch (e) {
+    console.error('加载资产失败', e)
+  } finally {
+    loadingAsset.value = false
+  }
+}
+
+async function loadLevelData() {
+  try {
+    const data = await levelApi.getMyLevel()
+    levelData.value = {
+      badge: data.icon || '🏆',
+      name: data.levelName || 'V1',
+      title: data.levelName || '普通会员',
+      current: Number(data.teamPerformance || 0),
+      target: Number(data.minPerformance || 5000),
+      dailyDividend: data.dailyBonus || '0',
+      nextLevel: data.nextLevelName
+        ? { name: data.nextLevelName, target: Number(data.nextMinPerformance || 0) }
+        : null,
+    }
+  } catch (e) {
+    console.error('加载等级失败', e)
+  }
+}
+
+async function loadFinancialProducts() {
+  loadingProducts.value = true
+  try {
+    const products = await financialApi.getProducts()
+    investProjects.value = (products || []).map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      icon: p.rateType === 1 ? '⚡' : p.rateType === 2 ? '📊' : '🌐',
+      yield: p.displayRate || p.rateValue,
+      cycle: p.cycleDays || p.cycle,
+      minAmount: p.minAmount,
+      progress: p.totalInvested && p.totalAmount
+        ? Math.round((Number(p.totalInvested) / Number(p.totalAmount)) * 100)
+        : 50,
+      level: p.riskLevel === 1 ? 'safe' : p.riskLevel === 2 ? 'new' : 'high',
+    }))
+  } catch (e) {
+    console.error('加载理财项目失败', e)
+  } finally {
+    loadingProducts.value = false
+  }
+}
 
 function goAssetDetail() {
   uni.navigateTo({ url: '/pages/user/points-detail' })
@@ -249,11 +276,11 @@ function goPointsDetail() {
 }
 
 function goInvestList() {
-  uni.navigateTo({ url: '/pages/wealth/invest-list' })
+  uni.navigateTo({ url: '/pages/wealth/invest' })
 }
 
 function goProjectDetail(project: any) {
-  uni.navigateTo({ url: `/pages/wealth/project-detail?id=${project.id}` })
+  uni.navigateTo({ url: `/pages/wealth/invest?productId=${project.id}` })
 }
 </script>
 

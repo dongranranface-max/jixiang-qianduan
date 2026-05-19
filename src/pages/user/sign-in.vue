@@ -10,7 +10,7 @@
     <!-- 签到卡片 -->
     <view class="sign-card">
       <view class="sign-header">
-        <text class="sign-date">{{ today }}</text>
+        <text class="sign-date">{{ todayStr }}</text>
         <view class="sign-status" :class="{ signed: isSigned }">
           {{ isSigned ? '✅ 已签到' : '📝 签到领积分' }}
         </view>
@@ -24,18 +24,18 @@
           :key="index"
           :class="{
             'is-today': day === todayDate,
-            'is-signed': signedDays.includes(day),
+            'is-signed': day > 0 && signedDays.includes(day),
             'is-future': day > todayDate
           }"
         >
           <text class="day-text">{{ day }}</text>
-          <text v-if="signedDays.includes(day)" class="sign-mark">✓</text>
+          <text v-if="day > 0 && signedDays.includes(day)" class="sign-mark">✓</text>
         </view>
       </view>
       
       <view class="reward-info">
         <text class="reward-icon">🎁</text>
-        <text class="reward-text">连续签到 {{ signedDays.length }} 天，本周已领 {{ signedDays.length * 10 }} 积分</text>
+        <text class="reward-text">连续签到 {{ signedDays.length }} 天，本周已领 {{ signedDays.length * signReward }} 积分</text>
       </view>
     </view>
     
@@ -82,34 +82,85 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const statusBarHeight = ref(20)
-const today = '2026年5月16日'
-const todayDate = 16
-const isSigned = ref(true)
-const signReward = 10
-const signedDays = ref([13, 14, 15, 16])
+const signReward = ref(10)
+const isSigned = ref(false)
+const signedDays = ref<number[]>([])
 const weekdays = ['一', '二', '三', '四', '五', '六', '日']
-const calendarDays = Array.from({ length: 35 }, (_, i) => i + 1)
 
-const signRecords = ref([
-  { date: '2026-05-16', points: 10 },
-  { date: '2026-05-15', points: 10 },
-  { date: '2026-05-14', points: 10 },
-  { date: '2026-05-13', points: 10 }
-])
+// 当前日历月
+const now = new Date()
+const currentYear = ref(now.getFullYear())
+const currentMonth = ref(now.getMonth() + 1)
+const todayDate = ref(now.getDate())
+const todayStr = computed(() => `${currentYear.value}年${currentMonth.value}月${todayDate.value}日`)
+
+// 生成当月日历格子
+const calendarDays = computed(() => {
+  const year = currentYear.value
+  const month = currentMonth.value
+  const firstDay = new Date(year, month - 1, 1)
+  let startWeekday = firstDay.getDay() - 1
+  if (startWeekday < 0) startWeekday = 6
+  const daysInMonth = new Date(year, month, 0).getDate()
+  const cells: number[] = []
+  for (let i = 0; i < startWeekday; i++) cells.push(0)
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+  while (cells.length % 7 !== 0) cells.push(0)
+  return cells
+})
+
+function loadSignedDays() {
+  const key = `signin_${currentYear.value}_${currentMonth.value}`
+  const saved = uni.getStorageSync(key)
+  if (saved) {
+    try { signedDays.value = JSON.parse(saved) } catch {}
+  }
+  isSigned.value = signedDays.value.includes(todayDate.value)
+}
+
+function saveSignedDays() {
+  const key = `signin_${currentYear.value}_${currentMonth.value}`
+  uni.setStorageSync(key, JSON.stringify(signedDays.value))
+}
+
+const signRecords = computed(() =>
+  signedDays.value.map(day => ({
+    date: `${currentYear.value}-${String(currentMonth.value).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+    points: signReward.value,
+  })).reverse()
+)
+
+onMounted(() => {
+  const sys = uni.getSystemInfoSync()
+  statusBarHeight.value = sys.statusBarHeight || 20
+  loadSignedDays()
+})
 
 function goBack() {
   uni.navigateBack()
 }
 
-function doSign() {
+async function doSign() {
   if (isSigned.value) return
-  
-  isSigned.value = true
-  signedDays.value.push(todayDate)
-  uni.showToast({ title: `签到成功！+${signReward}积分`, icon: 'success' })
+
+  uni.showLoading({ title: '签到中...' })
+  try {
+    // TODO: 后端需提供签到接口 POST /api/v1/sign-in
+    // 目前本地模拟
+    isSigned.value = true
+    if (!signedDays.value.includes(todayDate.value)) {
+      signedDays.value.push(todayDate.value)
+      saveSignedDays()
+    }
+    uni.showToast({ title: `签到成功！+${signReward.value}积分`, icon: 'success' })
+  } catch {
+    uni.showToast({ title: '签到失败，请稍后重试', icon: 'none' })
+  } finally {
+    uni.hideLoading()
+  }
 }
 </script>
 

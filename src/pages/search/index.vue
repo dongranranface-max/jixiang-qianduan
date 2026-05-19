@@ -70,12 +70,12 @@
           :key="product.id"
           @click="goProduct(product.id)"
         >
-          <image class="result-image" :src="product.image" mode="aspectFill" />
+          <image class="result-image" :src="product.coverImage" mode="aspectFill" />
           <view class="result-info">
             <text class="result-name">{{ product.name }}</text>
             <view class="result-bottom">
               <text class="result-price">¥{{ product.price }}</text>
-              <text class="result-points">+{{ product.points }}积分</text>
+              <text class="result-points" v-if="product.requiredPoints">+{{ product.requiredPoints }}积分</text>
             </view>
           </view>
         </view>
@@ -105,11 +105,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, onMounted } from 'vue'
+import { productApi } from '@/utils/api'
 
 const keyword = ref('')
 const searching = ref(false)
-const historyList = ref(['iPhone', '华为', '戴森吹风机', 'AirPods'])
+const historyList = ref<string[]>([])
 const searchingTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 
 const hotList = ref([
@@ -124,35 +125,36 @@ const hotList = ref([
 const searchResult = ref<any[]>([])
 const suggestList = ref<string[]>([])
 
-const allProducts = [
-  { id: 1, name: 'iPhone 15 Pro Max 256GB', price: 9999, points: 500, image: 'https://picsum.photos/200/200?random=100' },
-  { id: 2, name: '华为 Mate 60 Pro', price: 6999, points: 350, image: 'https://picsum.photos/200/200?random=101' },
-  { id: 3, name: '戴森吹风机 HD15', price: 2999, points: 150, image: 'https://picsum.photos/200/200?random=102' },
-  { id: 4, name: 'AirPods Pro 2', price: 1899, points: 95, image: 'https://picsum.photos/200/200?random=103' },
-  { id: 5, name: '小米手环 8 Pro', price: 399, points: 20, image: 'https://picsum.photos/200/200?random=104' },
-  { id: 6, name: '索尼 WH-1000XM5', price: 2499, points: 125, image: 'https://picsum.photos/200/200?random=105' }
-]
+onMounted(() => {
+  const history = uni.getStorageSync('searchHistory')
+  if (history) {
+    try { historyList.value = JSON.parse(history) } catch {}
+  }
+})
 
 function goBack() {
   uni.navigateBack()
 }
 
-function doSearch() {
+async function doSearch() {
   if (!keyword.value) return
   searching.value = true
-  
-  // 模拟搜索
-  setTimeout(() => {
-    searchResult.value = allProducts.filter(p => 
-      p.name.toLowerCase().includes(keyword.value.toLowerCase())
-    )
-    searching.value = false
-    
+  suggestList.value = []
+
+  try {
+    const res = await productApi.getList({ keyword: keyword.value, limit: 50 })
+    searchResult.value = res.list || []
+
     // 添加到历史
-    if (!historyList.value.includes(keyword.value)) {
+    if (keyword.value && !historyList.value.includes(keyword.value)) {
       historyList.value.unshift(keyword.value)
+      uni.setStorageSync('searchHistory', JSON.stringify(historyList.value))
     }
-  }, 500)
+  } catch {
+    searchResult.value = []
+  } finally {
+    searching.value = false
+  }
 }
 
 function searchWithKeyword(kw: string) {
@@ -162,29 +164,31 @@ function searchWithKeyword(kw: string) {
 
 function clearHistory() {
   historyList.value = []
+  uni.removeStorageSync('searchHistory')
 }
 
-function goProduct(id: number) {
+function goProduct(id: string | number) {
   uni.navigateTo({ url: `/pages/product/detail?id=${id}` })
 }
 
-// 搜索建议
-import { watch } from 'vue'
-
+// 搜索建议（实时从商品列表拉取）
 watch(keyword, (newVal) => {
   if (searchingTimer.value) {
     clearTimeout(searchingTimer.value)
   }
-  
+
   if (!newVal) {
     suggestList.value = []
     return
   }
-  
-  searchingTimer.value = setTimeout(() => {
-    suggestList.value = allProducts
-      .filter(p => p.name.toLowerCase().includes(newVal.toLowerCase()))
-      .map(p => p.name)
+
+  searchingTimer.value = setTimeout(async () => {
+    try {
+      const res = await productApi.getList({ keyword: newVal, limit: 10 })
+      suggestList.value = (res.list || []).map((p: any) => p.name)
+    } catch {
+      suggestList.value = []
+    }
   }, 300)
 })
 </script>

@@ -44,6 +44,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { addressApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
 const addressId = ref('')
@@ -58,6 +59,7 @@ const form = ref({
 })
 
 const isEdit = computed(() => !!addressId.value)
+const submitting = ref(false)
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
@@ -74,9 +76,21 @@ onMounted(() => {
 })
 
 async function loadAddress() {
-  // const res = await uni.request({ url: `/api/v1/address/${addressId.value}` })
-  // const a = res.data
-  // form.value = { consignee: a.consignee, phone: a.phone, province: a.province, city: a.city, district: a.district, detail: a.detail, isDefault: a.isDefault === 1 }
+  try {
+    const list = await addressApi.list()
+    const addr = (list as any[]).find((a: any) => a.id === addressId.value)
+    if (addr) {
+      form.value = {
+        consignee: addr.consignee || '',
+        phone: addr.phone || '',
+        province: addr.province || '',
+        city: addr.city || '',
+        district: addr.district || '',
+        detail: addr.detail || '',
+        isDefault: addr.isDefault === 1,
+      }
+    }
+  } catch { /* ignore */ }
 }
 
 function goBack() { uni.navigateBack() }
@@ -93,11 +107,21 @@ async function doSubmit() {
   }
 
   uni.showLoading()
+  submitting.value = true
   try {
+    const payload = {
+      consignee: form.value.consignee,
+      phone: form.value.phone,
+      province: form.value.province,
+      city: form.value.city,
+      district: form.value.district,
+      detail: form.value.detail,
+      isDefault: form.value.isDefault ? 1 : 0,
+    }
     if (isEdit.value) {
-      // await uni.request({ url: `/api/v1/address/${addressId.value}`, method: 'PUT', data })
+      await addressApi.update(addressId.value, payload)
     } else {
-      // await uni.request({ url: '/api/v1/address', method: 'POST', data })
+      await addressApi.create(payload)
     }
     uni.showToast({ title: '保存成功', icon: 'success' })
     setTimeout(() => uni.navigateBack(), 1500)
@@ -105,6 +129,7 @@ async function doSubmit() {
     uni.showToast({ title: '保存失败', icon: 'none' })
   } finally {
     uni.hideLoading()
+    submitting.value = false
   }
 }
 </script>

@@ -166,16 +166,17 @@ onMounted(() => {
 async function loadData() {
   try {
     // 加载地址
-    const addrs = await addressApi.list(userId.value)
+    const addrs = await addressApi.list()
     address.value = addrs?.find((a: any) => a.isDefault) || addrs?.[0] || null
 
     // 加载商品详情
     if (productId.value) {
       product.value = await productApi.getDetail(productId.value)
+      const coverImg = (product.value.coverImages || [])[0] || product.value.coverImage || ''
       orderItems.value = [{
         productId: product.value.id,
         productName: product.value.name,
-        coverImage: product.value.coverImage,
+        coverImage: coverImg,
         price: product.value.price,
         quantity: 1,
         requiredPoints: product.value.requiredPoints,
@@ -183,7 +184,7 @@ async function loadData() {
     }
 
     // 加载积分
-    const bal = await walletApi.getBalance(userId.value)
+    const bal = await walletApi.getBalance()
     ecoPointsData.value = bal
     consumerPoints.value = Number(bal.consumerPoints || 0)
   } catch (e: any) {

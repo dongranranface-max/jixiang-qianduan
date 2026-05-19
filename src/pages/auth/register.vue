@@ -101,9 +101,7 @@ async function doRegister() {
   submitting.value = true
   uni.showLoading({ title: '注册中...' })
   try {
-    const res = await authApi.register(form.value.phone, form.value.password, form.value.inviteCode || 'DEFAULT')
-    uni.setStorageSync('token', res.token)
-    uni.setStorageSync('userId', res.user.id)
+    await authApi.register(form.value.phone, form.value.password, form.value.inviteCode || 'DEFAULT')
     uni.showToast({ title: '注册成功', icon: 'success' })
     setTimeout(() => uni.switchTab({ url: '/pages/index/index' }), 1500)
   } catch (e: any) {

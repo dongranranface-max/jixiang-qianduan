@@ -1,20 +1,48 @@
 // ============================================
-//  api.ts - API 请求封装
+//  api.ts - API 请求封装（严格遵循 API 契约）
+//  Base URL: http://47.96.102.163/api/v1
+//  认证方式: Bearer Token（从本地存储获取）
 // ============================================
 const BASE_URL = 'http://47.96.102.163/api/v1'
 
-// 获取本地存储的 token
+// --------------------------------------------
+//  Token 管理
+// --------------------------------------------
 function getToken(): string {
   return uni.getStorageSync('token') || ''
 }
 
-// 通用请求
-function request<T = any>(options: {
+function setToken(token: string) {
+  uni.setStorageSync('token', token)
+}
+
+function clearToken() {
+  uni.removeStorageSync('token')
+  uni.removeStorageSync('userId')
+}
+
+function getUserId(): string {
+  return uni.getStorageSync('userId') || ''
+}
+
+function setUserInfo(user: { id: string; phone: string; nickname?: string; avatar?: string; level?: number }) {
+  uni.setStorageSync('userId', user.id)
+  if (user.nickname) uni.setStorageSync('nickname', user.nickname)
+  if (user.avatar) uni.setStorageSync('avatar', user.avatar)
+  if (user.level !== undefined) uni.setStorageSync('level', user.level)
+}
+
+// --------------------------------------------
+//  请求核心
+// --------------------------------------------
+interface RequestOptions {
   url: string
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   data?: any
   header?: Record<string, string>
-}): Promise<T> {
+}
+
+function request<T = any>(options: RequestOptions): Promise<T> {
   return new Promise((resolve, reject) => {
     const header: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -30,132 +58,286 @@ function request<T = any>(options: {
       method: options.method || 'GET',
       data: options.data,
       header,
-      success: (res) => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data as T)
-        } else if (res.statusCode === 401) {
-          uni.removeStorageSync('token')
-          uni.removeStorageSync('userId')
-          uni.showToast({ title: '请重新登录', icon: 'none' })
-          setTimeout(() => uni.switchTab({ url: '/pages/auth/login' }), 1500)
-          reject(new Error('未授权'))
-        } else {
-          const msg = (res.data as any)?.message || `请求失败(${res.statusCode})`
-          reject(new Error(msg))
+      success: (res: any) => {
+        // 业务错误码判断（后端返回 { code, msg, data }）
+        const body = res.data
+        if (body && typeof body.code !== 'undefined') {
+          if (body.code === 0 || body.code === 200) {
+            resolve(body.data as T)
+            return
+          }
+          // 401 = 未登录 / Token 过期
+          if (res.statusCode === 401 || body.code === 401) {
+            clearToken()
+            uni.showToast({ title: '请重新登录', icon: 'none' })
+            setTimeout(() => uni.switchTab({ url: '/pages/auth/login' }), 1500)
+            reject(new Error(body.msg || '请重新登录'))
+            return
+          }
+          // 其他业务错误
+          reject(new Error(body.msg || `请求失败(${res.statusCode})`))
+          return
         }
+        // 无 code 字段的非标准响应（少数情况）
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(body as T)
+          return
+        }
+        reject(new Error(`HTTP ${res.statusCode}`))
       },
-      fail: (err) => {
+      fail: (err: any) => {
         reject(new Error(err.errMsg || '网络请求失败'))
       },
     })
   })
 }
 
-// ===== 认证 =====
+// --------------------------------------------
+//  认证模块 /auth
+// --------------------------------------------
 export const authApi = {
+  // 用户登录
   login: (phone: string, password: string) =>
-    request<{ token: string; user: { id: string; phone: string; nickname: string; avatar: string } }>({
+    request<{
+      token: string
+      userId: string
+      phone: string
+      level: number
+      nickname: string
+      avatar: string
+    }>({
       url: '/auth/login',
       method: 'POST',
       data: { phone, password },
+    }).then((res) => {
+      setToken(res.token)
+      setUserInfo({
+        id: res.userId,
+        phone: res.phone,
+        nickname: res.nickname,
+        avatar: res.avatar,
+        level: res.level,
+      })
+      return res
     }),
 
-  register: (phone: string, password: string, inviteCode: string) =>
-    request<{ token: string; user: { id: string; phone: string; nickname: string; avatar: string; inviteCode: string } }>({
+  // 用户注册
+  register: (phone: string, password: string, inviteCode: string, verifyCode?: string) =>
+    request<{
+      token: string
+      userId: string
+      phone: string
+      level: number
+      inviteCode: string
+    }>({
       url: '/auth/register',
       method: 'POST',
-      data: { phone, password, inviteCode },
+      data: { phone, password, inviteCode, verifyCode: verifyCode || '' },
+    }).then((res) => {
+      setToken(res.token)
+      setUserInfo({ id: res.userId, phone: res.phone, level: res.level })
+      return res
+    }),
+
+  // 管理员登录（不混用）
+  adminLogin: (username: string, password: string) =>
+    request<{ token: string; userId: string; username: string; role: string }>({
+      url: '/auth/admin/login',
+      method: 'POST',
+      data: { username, password },
     }),
 }
 
-// ===== 用户 =====
+// --------------------------------------------
+//  用户模块 /users
+// --------------------------------------------
 export const userApi = {
-  getInfo: (userId: string) =>
-    request<any>({ url: `/users/${userId}` }),
+  // 个人资料
+  getProfile: () =>
+    request<{
+      userId: string
+      phone: string
+      nickname: string
+      avatar: string
+      level: number
+      levelName: string
+      createdAt: string
+      teamPerformance: string
+      inviteCode: string
+      parentInviteCode: string
+      bankCard: { bankName: string; bankCard: string; realName: string } | null
+    }>({ url: '/users/profile' }),
+
+  // 更新资料
+  updateProfile: (data: { nickname?: string; avatar?: string }) =>
+    request<any>({ url: '/users/profile', method: 'PUT', data }),
+
+  // 个人资产
+  getAsset: () =>
+    request<{
+      ecoPoints: string
+      consumerPoints: string
+      balance: string
+      todayEarnings: string
+      totalEarnings: string
+    }>({ url: '/users/asset' }),
+
+  // 绑定银行卡
+  bindBankCard: (data: { bankName: string; bankCard: string; realName: string; phone: string }) =>
+    request<any>({ url: '/users/bank-card', method: 'POST', data }),
+
+  // 团队信息
+  getTeam: () =>
+    request<{
+      teamSize: number
+      directCount: number
+      teamPerformance: string
+      currentLevel: number
+      nextLevel: number
+      upgradeNeed: string
+      teamList: any[]
+    }>({ url: '/users/team' }),
 }
 
-// ===== 积分钱包 =====
+// --------------------------------------------
+//  积分钱包模块 /wallet
+// --------------------------------------------
 export const walletApi = {
-  getBalance: (userId: string) =>
-    request<{ balance: number; ecoPoints: string; consumerPoints: string; level: string; teamPerformance: string }>({
-      url: `/wallet/balance?userId=${userId}`,
-    }),
+  // 积分余额
+  getBalance: () =>
+    request<{
+      ecoPoints: string
+      consumerPoints: string
+      frozenEcoPoints: string
+    }>({ url: '/wallet/balance' }),
 
-  getLogs: (userId: string, page = 1, limit = 20) =>
-    request<any>({ url: `/wallet/logs?userId=${userId}&page=${page}&limit=${limit}` }),
+  // 积分变动明细
+  getLogs: (params: { type?: number; page?: number; limit?: number } = {}) => {
+    const q = new URLSearchParams()
+    if (params.type) q.append('type', String(params.type))
+    if (params.page) q.append('page', String(params.page))
+    if (params.limit) q.append('limit', String(params.limit))
+    return request<{
+      list: any[]
+      total: number
+      page: number
+      limit: number
+    }>({ url: `/wallet/logs?${q.toString()}` })
+  },
 }
 
-// ===== 商品 =====
+// --------------------------------------------
+//  商品模块 /products
+// --------------------------------------------
 export const productApi = {
-  getList: (params: { type?: number; categoryId?: string; keyword?: string; page?: number; limit?: number }) => {
+  // 分类列表
+  getCategories: () =>
+    request<any[]>({ url: '/products/categories' }),
+
+  // 商品列表
+  getList: (params: {
+    type?: number
+    categoryId?: string
+    keyword?: string
+    page?: number
+    limit?: number
+  } = {}) => {
     const q = new URLSearchParams()
     if (params.type) q.append('type', String(params.type))
     if (params.categoryId) q.append('categoryId', params.categoryId)
     if (params.keyword) q.append('keyword', params.keyword)
     if (params.page) q.append('page', String(params.page))
     if (params.limit) q.append('limit', String(params.limit))
-    return request<{ items: any[]; total: number; page: number; limit: number }>({
-      url: `/products?${q.toString()}`,
-    })
+    return request<{
+      list: any[]
+      total: number
+      page: number
+      limit: number
+    }>({ url: `/products?${q.toString()}` })
   },
 
+  // 商品详情
   getDetail: (id: string) =>
     request<any>({ url: `/products/${id}` }),
-
-  getCategories: () =>
-    request<any[]>({ url: '/products/categories' }),
 }
 
-// ===== 订单 =====
+// --------------------------------------------
+//  订单模块 /orders
+// --------------------------------------------
 export const orderApi = {
+  // 创建订单
   create: (data: {
-    userId: string
     orderType: number
     addressId: string
     items: Array<{
       productId: string
-      productName: string
-      coverImage: string
-      price: number
+      skuId?: string
       quantity: number
-      requiredPoints?: string
-      ecoPointsAmount?: string
     }>
     remark?: string
-  }) =>
-    request<any>({
-      url: '/orders',
-      method: 'POST',
-      data,
-    }),
+    couponId?: string
+  }) => request<{
+    orderNo: string
+    orderType: number
+    totalAmount: string
+    payAmount: string
+    pointsEarned: string
+    status: number
+    statusName: string
+    expireAt: string
+    qrCode: string
+  }>({ url: '/orders', method: 'POST', data }),
 
-  getList: (userId: string, params?: { type?: number; status?: number; page?: number; limit?: number }) => {
-    const q = new URLSearchParams({ userId })
-    if (params?.type) q.append('type', String(params.type))
-    if (params?.status) q.append('status', String(params.status))
-    if (params?.page) q.append('page', String(params.page))
-    if (params?.limit) q.append('limit', String(params.limit))
-    return request<{ items: any[]; total: number; page: number; limit: number }>({
-      url: `/orders?${q.toString()}`,
-    })
+  // 订单列表
+  getList: (params: {
+    type?: number
+    status?: number
+    page?: number
+    limit?: number
+  } = {}) => {
+    const q = new URLSearchParams()
+    if (params.type) q.append('type', String(params.type))
+    if (params.status) q.append('status', String(params.status))
+    if (params.page) q.append('page', String(params.page))
+    if (params.limit) q.append('limit', String(params.limit))
+    return request<{
+      list: any[]
+      total: number
+      page: number
+      limit: number
+    }>({ url: `/orders?${q.toString()}` })
   },
 
-  // 支付回调（模拟）
-  paymentCallback: (orderNo: string, payType: string) =>
-    request<any>({
-      url: `/orders/callback/${orderNo}`,
-      method: 'POST',
-      data: { payType },
-    }),
+  // 取消订单
+  cancel: (orderNo: string) =>
+    request<any>({ url: '/orders/cancel', method: 'POST', data: { orderNo } }),
+
+  // 确认收货
+  confirm: (orderNo: string) =>
+    request<any>({ url: '/orders/confirm', method: 'POST', data: { orderNo } }),
+
+  // 物流信息
+  getLogistics: (orderNo: string) =>
+    request<any>({ url: `/orders/${orderNo}/logistics` }),
+
+  // 申请退款
+  applyRefund: (orderNo: string, data: { reason: number; description?: string; images?: string[] }) =>
+    request<any>({ url: `/orders/${orderNo}/refund`, method: 'POST', data }),
+
+  // 退款详情
+  getRefundDetail: (orderNo: string) =>
+    request<any>({ url: `/orders/${orderNo}/refund` }),
 }
 
-// ===== 收货地址 =====
+// --------------------------------------------
+//  收货地址模块 /address
+// --------------------------------------------
 export const addressApi = {
-  list: (userId: string) =>
-    request<any[]>({ url: `/address?userId=${userId}` }),
+  // 地址列表
+  list: () => request<any[]>({ url: '/address' }),
 
+  // 新建地址
   create: (data: {
-    userId: string
     consignee: string
     phone: string
     province: string
@@ -163,49 +345,229 @@ export const addressApi = {
     district: string
     detail: string
     isDefault?: number
-  }) =>
-    request<any>({ url: '/address', method: 'POST', data }),
+  }) => request<any>({ url: '/address', method: 'POST', data }),
 
-  getDefault: (userId: string) =>
-    request<any>({ url: `/address/default?userId=${userId}` }),
+  // 更新地址
+  update: (id: string, data: Partial<{
+    consignee: string
+    phone: string
+    province: string
+    city: string
+    district: string
+    detail: string
+    isDefault: number
+  }>) => request<any>({ url: `/address/${id}`, method: 'PUT', data }),
 
-  setDefault: (id: string, userId: string) =>
-    request<any>({ url: `/address/${id}/default`, method: 'POST', data: { userId } }),
+  // 删除地址
+  delete: (id: string) => request<any>({ url: `/address/${id}`, method: 'DELETE' }),
+
+  // 设为默认
+  setDefault: (id: string) =>
+    request<any>({ url: `/address/${id}/default`, method: 'POST' }),
+
+  // 获取默认地址
+  getDefault: () => request<any>({ url: '/address/default' }),
 }
 
-// ===== 推荐关系 =====
-export const referralApi = {
-  getChildren: (userId: string) =>
-    request<any[]>({ url: `/referral/children?userId=${userId}` }),
-
-  getInviteCode: (userId: string) =>
-    request<{ inviteCode: string }>({ url: `/referral/invite-code?userId=${userId}` }),
-
-  getBonus: (userId: string, page = 1) =>
-    request<any>({ url: `/referral/bonus?userId=${userId}&page=${page}` }),
-}
-
-// ===== 会员等级 =====
-export const levelApi = {
-  getMyLevel: (userId: string) =>
-    request<any>({ url: `/level/my?userId=${userId}` }),
-
-  getConfigs: () =>
-    request<any[]>({ url: '/level/configs' }),
-}
-
-// ===== 理财 =====
+// --------------------------------------------
+//  理财模块 /financial
+// --------------------------------------------
 export const financialApi = {
+  // 理财项目列表
   getProducts: () =>
     request<any[]>({ url: '/financial/products' }),
 
-  getHoldings: (userId: string) =>
-    request<any[]>({ url: `/financial/holdings?userId=${userId}` }),
+  // 申购理财
+  subscribe: (data: { productId: string; amount: string; autoRenew?: boolean }) =>
+    request<{
+      holdingId: string
+      productName: string
+      amount: string
+      annualRate: string
+      dailyProfit: string
+      cycle: number
+      expectedProfit: string
+      expireAt: string
+      autoRenew: boolean
+      status: number
+      statusName: string
+    }>({ url: '/financial/subscribe', method: 'POST', data }),
 
-  subscribe: (userId: string, productId: string, amount: string) =>
-    request<any>({
-      url: '/financial/subscribe',
-      method: 'POST',
-      data: { userId, productId, amount },
+  // 我的持仓
+  getHoldings: (params: { page?: number; limit?: number } = {}) => {
+    const q = new URLSearchParams()
+    if (params.page) q.append('page', String(params.page))
+    if (params.limit) q.append('limit', String(params.limit))
+    return request<{
+      list: any[]
+      total: number
+      page: number
+      limit: number
+    }>({ url: `/financial/holdings?${q.toString()}` })
+  },
+
+  // 赎回理财
+  redeem: (data: { holdingId: string; early?: boolean }) =>
+    request<{
+      amount: string
+      profit: string
+      fee: string
+      actualAmount: string
+      arrivalType: string
+      arrivalAmount: string
+    }>({ url: '/financial/redeem', method: 'POST', data }),
+
+  // 收益记录
+  getEarnings: (params: { page?: number; limit?: number } = {}) => {
+    const q = new URLSearchParams()
+    if (params.page) q.append('page', String(params.page))
+    if (params.limit) q.append('limit', String(params.limit))
+    return request<{ list: any[]; total: number; page: number; limit: number }>(
+      { url: `/financial/earnings?${q.toString()}` }
+    )
+  },
+}
+
+// --------------------------------------------
+//  会员等级模块 /level
+// --------------------------------------------
+export const levelApi = {
+  // 等级配置
+  getConfigs: () =>
+    request<any[]>({ url: '/level/configs' }),
+
+  // 我的等级
+  getMyLevel: () =>
+    request<{
+      level: number
+      levelName: string
+      icon: string
+      teamPerformance: string
+      minPerformance: string
+      dailyBonus: string
+      totalBonus: string
+      nextLevel: number
+      nextLevelName: string
+      nextMinPerformance: string
+      upgradeNeed: string
+    }>({ url: '/level/my' }),
+}
+
+// --------------------------------------------
+//  推荐模块 /referral
+// --------------------------------------------
+export const referralApi = {
+  // 我的邀请码
+  getInviteCode: () =>
+    request<{ inviteCode: string; inviteUrl: string; qrCode: string }>({
+      url: '/referral/invite-code',
     }),
+
+  // 直属下级列表
+  getChildren: (params: { page?: number; limit?: number } = {}) => {
+    const q = new URLSearchParams()
+    if (params.page) q.append('page', String(params.page))
+    if (params.limit) q.append('limit', String(params.limit))
+    return request<{ list: any[]; total: number; page: number; limit: number }>(
+      { url: `/referral/children?${q.toString()}` }
+    )
+  },
+
+  // 推荐奖励明细
+  getBonus: (params: { page?: number; limit?: number } = {}) => {
+    const q = new URLSearchParams()
+    if (params.page) q.append('page', String(params.page))
+    if (params.limit) q.append('limit', String(params.limit))
+    return request<{ list: any[]; total: number; page: number; limit: number }>(
+      { url: `/referral/bonus?${q.toString()}` }
+    )
+  },
+
+  // 推荐关系树
+  getTree: () => request<any>({ url: '/referral/tree' }),
+
+  // 奖励规则
+  getRewardConfig: () =>
+    request<{
+      registerReward: string
+      registerRewardUnit: string
+      referralRewardRate: string
+      referralRewardUnit: string
+      referralRewardCondition: string
+    }>({ url: '/referral/reward-config' }),
+}
+
+// --------------------------------------------
+//  营销模块 /marketing
+// --------------------------------------------
+export const marketingApi = {
+  // 可领取优惠券列表
+  getAvailableCoupons: () => request<any[]>({ url: '/marketing/coupons' }),
+
+  // 领取优惠券
+  claimCoupon: (couponId: string) =>
+    request<any>({ url: '/marketing/coupons/claim', method: 'POST', data: { couponId } }),
+
+  // 我的优惠券
+  getMyCoupons: (params: { status?: number } = {}) => {
+    const q = new URLSearchParams()
+    if (params.status) q.append('status', String(params.status))
+    return request<{ list: any[]; total: number }>({
+      url: `/marketing/coupons/my?${q.toString()}`,
+    })
+  },
+}
+
+// --------------------------------------------
+//  工单模块 /tickets
+// --------------------------------------------
+export const ticketApi = {
+  // 提交工单
+  create: (data: {
+    type: number
+    title: string
+    content: string
+    orderNo?: string
+    images?: string[]
+  }) => request<{ ticketId: string; ticketNo: string }>({ url: '/tickets', method: 'POST', data }),
+
+  // 工单列表
+  getList: (params: { status?: number; type?: number; page?: number; limit?: number } = {}) => {
+    const q = new URLSearchParams()
+    if (params.status) q.append('status', String(params.status))
+    if (params.type) q.append('type', String(params.type))
+    if (params.page) q.append('page', String(params.page))
+    if (params.limit) q.append('limit', String(params.limit))
+    return request<{ list: any[]; total: number; page: number; limit: number }>(
+      { url: `/tickets?${q.toString()}` }
+    )
+  },
+
+  // 工单详情
+  getDetail: (id: string) => request<any>({ url: `/tickets/${id}` }),
+
+  // 回复工单
+  reply: (id: string, data: { content: string; images?: string[] }) =>
+    request<any>({ url: `/tickets/${id}/reply`, method: 'POST', data }),
+
+  // 确认解决
+  confirm: (id: string) =>
+    request<any>({ url: `/tickets/${id}/confirm`, method: 'POST' }),
+}
+
+// --------------------------------------------
+//  导出汇总
+// --------------------------------------------
+export const api = {
+  auth: authApi,
+  user: userApi,
+  wallet: walletApi,
+  product: productApi,
+  order: orderApi,
+  address: addressApi,
+  financial: financialApi,
+  level: levelApi,
+  referral: referralApi,
+  marketing: marketingApi,
+  ticket: ticketApi,
 }

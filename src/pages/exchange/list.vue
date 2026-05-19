@@ -92,12 +92,13 @@ async function loadProducts() {
   loading.value = true
   try {
     const res = await productApi.getList({ type: 2, page: page.value, limit: 20 })
+    const list = res.list || []
     if (page.value === 1) {
-      products.value = res.items || []
+      products.value = list
     } else {
-      products.value.push(...(res.items || []))
+      products.value.push(...list)
     }
-    hasMore.value = res.items?.length === 20
+    hasMore.value = list.length === 20
     page.value++
   } catch (e: any) {
     uni.showToast({ title: e.message || '加载失败', icon: 'none' })

@@ -95,11 +95,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { financialApi, walletApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
 const product = ref<any>(null)
 const amount = ref('')
 const ecoPoints = ref(0)
+const loading = ref(false)
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
@@ -108,54 +110,68 @@ onMounted(() => {
 })
 
 async function loadData() {
-  const pid = '1' // TODO: 从页面参数获取
-  // const res = await uni.request({ url: `/api/v1/financial/products` })
-  // product.value = res.data.find((p: any) => p.id === pid)
-  product.value = {
-    id: '1',
-    name: '跨境电商理财',
-    icon: '🌐',
-    type: '跨境电商',
-    annualRate: 0.12,
-    cycleDays: 30,
-    minAmount: '1000',
-    earlyRedeemFee: 0.02,
+  loading.value = true
+  try {
+    // 从页面参数获取 productId
+    const pages = getCurrentPages()
+    const current = pages[pages.length - 1] as any
+    const pid = current?.options?.productId || ''
+
+    const [products, bal] = await Promise.all([
+      financialApi.getProducts(),
+      walletApi.getBalance(),
+    ])
+
+    ecoPoints.value = Number(bal.ecoPoints || 0)
+
+    if (pid) {
+      product.value = (products || []).find((p: any) => p.id === pid) || null
+    } else {
+      product.value = products?.[0] || null
+    }
+
+    if (product.value) {
+      // 统一字段名，方便模板使用
+      product.value.displayRate = product.value.displayRate || product.value.rateValue || '0'
+      product.value.annualRate = parseFloat(product.value.displayRate) / 100
+      product.value.cycleDays = product.value.cycleDays || product.value.cycle || 30
+    }
+  } catch (e: any) {
+    uni.showToast({ title: e.message || '加载失败', icon: 'none' })
+  } finally {
+    loading.value = false
   }
-  // const balance = await uni.request({ url: '/api/v1/wallet/balance' })
-  ecoPoints.value = 0
 }
 
 const expectedEarning = computed(() => {
   if (!amount.value || !product.value) return 0
-  const a = parseInt(amount.value) || 0
-  return Math.floor(a * Number(product.value.annualRate) / 365 * product.value.cycleDays)
+  const a = parseFloat(amount.value) || 0
+  const rate = product.value.annualRate || parseFloat(product.value.displayRate || '0') / 100
+  const days = product.value.cycleDays || 30
+  return Math.floor(a * rate / 365 * days)
 })
 
 const canSubmit = computed(() => {
   if (!amount.value || !product.value) return false
-  const a = BigInt(amount.value)
-  const min = BigInt(product.value.minAmount)
-  const balance = BigInt(ecoPoints.value)
-  return a >= min && a <= balance
+  const a = parseFloat(amount.value)
+  const min = parseFloat(product.value.minAmount || 0)
+  const max = parseFloat(product.value.maxAmount || Infinity)
+  const balance = ecoPoints.value
+  return a >= min && a <= balance && a <= max
 })
-
-function onAmountChange() {
-  // 实时计算
-}
 
 async function doSubscribe() {
   if (!canSubmit.value) return
   uni.showLoading({ title: '提交中...' })
   try {
-    // const res = await uni.request({
-    //   url: '/api/v1/financial/subscribe',
-    //   method: 'POST',
-    //   data: { userId, productId: product.value.id, amount: amount.value }
-    // })
+    await financialApi.subscribe({
+      productId: product.value.id,
+      amount: amount.value,
+    })
     uni.showToast({ title: '申购成功', icon: 'success' })
     setTimeout(() => uni.navigateBack(), 1500)
-  } catch (e) {
-    uni.showToast({ title: '申购失败', icon: 'none' })
+  } catch (e: any) {
+    uni.showToast({ title: e.message || '申购失败', icon: 'none' })
   } finally {
     uni.hideLoading()
   }

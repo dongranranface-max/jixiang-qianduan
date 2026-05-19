@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { addressApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
 const addresses = ref<any[]>([])
@@ -56,9 +57,12 @@ onMounted(() => {
 })
 
 async function loadData() {
-  // const res = await uni.request({ url: '/api/v1/address' })
-  // addresses.value = res.data
-  addresses.value = []
+  try {
+    const list = await addressApi.list()
+    addresses.value = list || []
+  } catch (e: any) {
+    uni.showToast({ title: e.message || '加载失败', icon: 'none' })
+  }
 }
 
 function goBack() { uni.navigateBack() }
@@ -72,18 +76,19 @@ function goEdit(addr: any) {
 }
 
 function selectAddr(addr: any) {
-  const pages = getCurrentPages()
-  const prevPage = pages[pages.length - 2]
-  if (prevPage) {
-    prevPage.setData({ selectedAddress: addr })
-  }
+  // 通过 storage 传递给确认页
+  uni.setStorageSync('selectedAddress', addr)
   uni.navigateBack()
 }
 
 async function setDefault(addr: any) {
-  // await uni.request({ url: `/api/v1/address/${addr.id}/default`, method: 'POST' })
-  uni.showToast({ title: '设置成功', icon: 'success' })
-  loadData()
+  try {
+    await addressApi.setDefault(addr.id)
+    uni.showToast({ title: '设置成功', icon: 'success' })
+    loadData()
+  } catch (e: any) {
+    uni.showToast({ title: e.message || '设置失败', icon: 'none' })
+  }
 }
 
 async function deleteAddr(addr: any) {
@@ -92,9 +97,13 @@ async function deleteAddr(addr: any) {
     content: '确定删除该地址吗？',
     success: async (res) => {
       if (!res.confirm) return
-      // await uni.request({ url: `/api/v1/address/${addr.id}`, method: 'DELETE' })
-      uni.showToast({ title: '已删除', icon: 'success' })
-      loadData()
+      try {
+        await addressApi.delete(addr.id)
+        uni.showToast({ title: '已删除', icon: 'success' })
+        loadData()
+      } catch (e: any) {
+        uni.showToast({ title: e.message || '删除失败', icon: 'none' })
+      }
     },
   })
 }

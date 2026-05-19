@@ -94,15 +94,12 @@ const tabs = [
 ]
 
 const statusMap: Record<number, string> = {
-  0: '已取消', 1: '待付款', 2: '已付款', 3: '已完成', 4: '已退款',
-  // OrderStatus
+  0: '已取消', 1: '待付款', 2: '待发货', 3: '待收货', 4: '已完成',
+  5: '退款中', 6: '已退款', 7: '退款拒绝',
 }
 
 function getStatusText(status: number) {
-  const map: Record<number, string> = {
-    0: '已取消', 1: '待付款', 2: '待发货', 3: '已完成', 4: '已退款',
-  }
-  return map[status] || '未知'
+  return statusMap[status] || '未知'
 }
 
 function orderLabel(order: any): string {
@@ -130,18 +127,18 @@ async function loadOrders() {
   if (loading.value) return
   loading.value = true
   try {
-    const userId = getUserId()
     const params: any = { page: page.value, limit: 20 }
     if (currentTab.value !== 'all') {
       params.status = Number(currentTab.value)
     }
-    const res = await orderApi.getList(userId, params)
+    const res = await orderApi.getList(params)
+    const list = res.list || []
     if (page.value === 1) {
-      orders.value = res.items || []
+      orders.value = list
     } else {
-      orders.value.push(...(res.items || []))
+      orders.value.push(...list)
     }
-    hasMore.value = res.items?.length === 20
+    hasMore.value = list.length === 20
     page.value++
   } catch (e: any) {
     uni.showToast({ title: e.message || '加载失败', icon: 'none' })

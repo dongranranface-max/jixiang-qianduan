@@ -53,7 +53,7 @@
     </view>
     
     <!-- 明细列表 -->
-    <scroll-view class="record-list" scroll-y>
+    <scroll-view class="record-list" scroll-y @scrolltolower="loadRecords(false)">
       <view 
         class="record-item" 
         v-for="record in filteredRecords" 
@@ -81,28 +81,91 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 const statusBarHeight = ref(20)
-const filterType = ref('all')
+const filterType = ref<'all' | 'income' | 'expense'>('all')
+const loading = ref(false)
+const page = ref(1)
+const limit = ref(20)
+const hasMore = ref(true)
 
-const ecoPoints = ref(12580)
-const creditPoints = ref(350)
+const ecoPoints = ref('0')
+const creditPoints = ref('0')
 
-const records = ref([
-  { id: 1, type: 'income', title: '消费赠送', points: 500, time: '2026-05-15 14:30' },
-  { id: 2, type: 'income', title: '理财收益', points: 120, time: '2026-05-15 09:00' },
-  { id: 3, type: 'expense', title: '兑换商品', points: -2000, time: '2026-05-14 20:15' },
-  { id: 4, type: 'income', title: '推荐奖励', points: 50, time: '2026-05-14 10:00' },
-  { id: 5, type: 'expense', title: '申购理财', points: -5000, time: '2026-05-13 15:30' },
-  { id: 6, type: 'income', title: '会员分红', points: 300, time: '2026-05-13 00:00' },
-  { id: 7, type: 'income', title: '签到奖励', points: 10, time: '2026-05-12 08:00' }
-])
+interface PointsRecord {
+  id: string
+  type: number // 1=生态积分 2=消费积分
+  typeName: string
+  amount: string // "+499.95" or "-2000"
+  balance: string
+  source: string
+  sourceName: string
+  orderNo?: string
+  createdAt: string
+}
+
+const records = ref<PointsRecord[]>([])
+
+onMounted(() => {
+  const sys = uni.getSystemInfoSync()
+  statusBarHeight.value = sys.statusBarHeight || 20
+  loadAsset()
+  loadRecords(true)
+})
+
+async function loadAsset() {
+  try {
+    const res = await walletApi.getBalance()
+    ecoPoints.value = res.ecoPoints
+    creditPoints.value = res.consumerPoints
+  } catch { /* ignore */ }
+}
+
+async function loadRecords(reset = false) {
+  if (loading.value) return
+  if (!reset && !hasMore.value) return
+
+  loading.value = true
+  if (reset) {
+    page.value = 1
+    records.value = []
+    hasMore.value = true
+  }
+
+  try {
+    const typeMap: Record<string, number | undefined> = { all: undefined, income: 1, expense: 2 }
+    const res = await walletApi.getLogs({ type: typeMap[filterType.value], page: page.value, limit: limit.value })
+    const list = res.list || []
+    if (reset) {
+      records.value = list
+    } else {
+      records.value.push(...list)
+    }
+    hasMore.value = list.length >= limit.value
+    page.value++
+  } catch {
+    // ignore
+  } finally {
+    loading.value = false
+  }
+}
 
 const filteredRecords = computed(() => {
-  if (filterType.value === 'all') return records.value
-  return records.value.filter(r => r.type === filterType.value)
+  return records.value.map(r => {
+    const isIncome = r.amount.startsWith('+')
+    return {
+      id: r.id,
+      type: isIncome ? 'income' : 'expense',
+      title: r.sourceName,
+      time: r.createdAt ? new Date(r.createdAt).toLocaleString('zh-CN') : '',
+      points: Math.abs(parseFloat(r.amount)).toString(),
+      orderNo: r.orderNo,
+    }
+  })
 })
+
+watch(filterType, () => loadRecords(true))
 
 function goBack() {
   uni.navigateBack()

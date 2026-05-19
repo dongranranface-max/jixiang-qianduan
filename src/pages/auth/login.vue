@@ -95,9 +95,7 @@ async function doLogin() {
   submitting.value = true
   uni.showLoading({ title: '登录中...' })
   try {
-    const res = await authApi.login(form.value.phone, form.value.password)
-    uni.setStorageSync('token', res.token)
-    uni.setStorageSync('userId', res.user.id)
+    await authApi.login(form.value.phone, form.value.password)
     uni.showToast({ title: '登录成功', icon: 'success' })
     setTimeout(() => uni.switchTab({ url: '/pages/index/index' }), 1500)
   } catch (e: any) {

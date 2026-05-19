@@ -8,7 +8,7 @@
 
     <view class="invite-banner">
       <text class="banner-title">邀请好友加入</text>
-      <text class="banner-sub">好友消费，你躺赚10%积分奖励</text>
+      <text class="banner-sub">好友消费，你躺赚{{ rewardConfig?.referralRewardRate || '10' }}%积分奖励</text>
       <text class="banner-rule">无层级上限，永续收益</text>
     </view>
 
@@ -57,10 +57,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { referralApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
 const inviteCode = ref('')
 const shareUrl = ref('')
+const rewardConfig = ref<{ registerReward: string; referralRewardRate: string } | null>(null)
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
@@ -69,10 +71,18 @@ onMounted(() => {
 })
 
 async function loadData() {
-  // const res = await uni.request({ url: '/api/v1/referral/invite-code' })
-  // inviteCode.value = res.data.inviteCode
-  inviteCode.value = 'ABC12345'
-  shareUrl.value = `https://sus.shop/register?code=${inviteCode.value}`
+  try {
+    const [codeRes, configRes] = await Promise.all([
+      referralApi.getInviteCode(),
+      referralApi.getRewardConfig(),
+    ])
+    inviteCode.value = codeRes.inviteCode || ''
+    shareUrl.value = codeRes.inviteUrl || `https://jixiang.com/register?code=${inviteCode.value}`
+    rewardConfig.value = configRes
+  } catch {
+    inviteCode.value = ''
+    shareUrl.value = ''
+  }
 }
 
 function goBack() {

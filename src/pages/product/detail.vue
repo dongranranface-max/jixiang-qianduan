@@ -138,9 +138,11 @@ const product = ref<any>({
 })
 
 const productImages = computed(() => {
+  const imgs = product.value.coverImages || []
+  if (imgs.length > 0) return imgs
   const cover = product.value.coverImage
-  if (!cover) return ['https://picsum.photos/750/750?random=99']
-  return [cover]
+  if (cover) return [cover]
+  return ['https://picsum.photos/750/750?random=99']
 })
 
 const modeLabel = computed(() => ({

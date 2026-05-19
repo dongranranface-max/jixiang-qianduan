@@ -45,11 +45,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { userApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
 const hasCard = ref(false)
 const bankCard = ref('')
 const bankName = ref('')
+const loading = ref(false)
 
 const form = ref({
   realName: '',
@@ -65,12 +67,14 @@ onMounted(() => {
 })
 
 async function loadCurrentCard() {
-  // const res = await uni.request({ url: '/api/v1/user/profile' })
-  // if (res.data.bankCard) {
-  //   hasCard.value = true
-  //   bankCard.value = res.data.bankCard
-  //   bankName.value = res.data.bankName
-  // }
+  try {
+    const profile = await userApi.getProfile()
+    if (profile.bankCard) {
+      hasCard.value = true
+      bankCard.value = profile.bankCard.bankCard || ''
+      bankName.value = profile.bankCard.bankName || ''
+    }
+  } catch { /* ignore */ }
 }
 
 function goBack() {
@@ -92,18 +96,21 @@ async function doSubmit() {
   if (!form.value.bankName) return uni.showToast({ title: '请输入开户行', icon: 'none' })
 
   uni.showLoading()
+  loading.value = true
   try {
-    // await uni.request({
-    //   url: '/api/v1/user/bank-card',
-    //   method: 'POST',
-    //   data: { userId, ...form.value }
-    // })
+    await userApi.bindBankCard({
+      bankName: form.value.bankName,
+      bankCard: form.value.bankCard,
+      realName: form.value.realName,
+      phone: form.value.phone,
+    })
     uni.showToast({ title: '绑定成功', icon: 'success' })
     setTimeout(() => uni.navigateBack(), 1500)
   } catch {
     uni.showToast({ title: '绑定失败', icon: 'none' })
   } finally {
     uni.hideLoading()
+    loading.value = false
   }
 }
 </script>

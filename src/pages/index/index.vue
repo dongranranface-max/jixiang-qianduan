@@ -147,7 +147,7 @@ onMounted(() => {
 
 async function loadUserData(userId: string) {
   try {
-    const bal = await walletApi.getBalance(userId)
+    const bal = await walletApi.getBalance()
     userInfo.value = bal
     ecoPointsDisplay.value = Number(bal.ecoPoints || 0).toLocaleString()
     consumerPointsDisplay.value = Number(bal.consumerPoints || 0).toLocaleString()
@@ -162,8 +162,8 @@ async function loadProducts() {
       productApi.getList({ type: 2, limit: 10 }),
       productApi.getList({ type: 3, limit: 6 }),
     ])
-    exchangeProducts.value = exchangeRes.items || []
-    redeemProducts.value = redeemRes.items || []
+    exchangeProducts.value = exchangeRes.list || []
+    redeemProducts.value = redeemRes.list || []
   } catch (e) {
     console.error('加载商品失败', e)
   }

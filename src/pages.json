@@ -5,6 +5,10 @@
       "style": { "navigationStyle": "custom" }
     },
     {
+      "path": "pages/catalog/index",
+      "style": { "navigationStyle": "custom" }
+    },
+    {
       "path": "pages/buy/index",
       "style": { "navigationStyle": "custom" }
     },
@@ -115,6 +119,12 @@
         "text": "首页",
         "iconPath": "static/tabbar/home.png",
         "selectedIconPath": "static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/catalog/index",
+        "text": "分类",
+        "iconPath": "static/tabbar/catalog.png",
+        "selectedIconPath": "static/tabbar/catalog-active.png"
       },
       {
         "pagePath": "pages/buy/index",

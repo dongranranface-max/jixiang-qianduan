@@ -88,12 +88,13 @@ async function loadProducts() {
   try {
     const typeMap: Record<string, number> = { consume: 1, exchange: 2, redeem: 3 }
     const res = await productApi.getList({ type: typeMap[currentTab.value], page: page.value, limit: 20 })
+    const list = res.list || []
     if (page.value === 1) {
-      products.value = res.items || []
+      products.value = list
     } else {
-      products.value.push(...(res.items || []))
+      products.value.push(...list)
     }
-    noMore.value = (res.items || []).length < 20
+    noMore.value = list.length < 20
     page.value++
   } catch (e: any) {
     uni.showToast({ title: e.message || '加载失败', icon: 'none' })

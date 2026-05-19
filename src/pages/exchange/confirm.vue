@@ -9,7 +9,7 @@
     <view v-if="product" class="confirm-body">
       <!-- 商品信息 -->
       <view class="product-card">
-        <image class="cover" :src="product.coverImage" mode="aspectFill" />
+        <image class="cover" :src="product.coverImages?.[0]" mode="aspectFill" />
         <view class="info">
           <text class="name">{{ product.name }}</text>
           <view class="price-row">
@@ -105,6 +105,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { productApi, userApi, addressApi, orderApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
 const productId = ref('')
@@ -112,6 +113,8 @@ const product = ref<any>(null)
 const bankCard = ref<any>(null)
 const address = ref<any>(null)
 const payMethod = ref('wechat')
+const loading = ref(false)
+const submitting = ref(false)
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
@@ -126,25 +129,34 @@ onMounted(() => {
 })
 
 async function loadData() {
-  // const res = await uni.request({ url: `/api/v1/products/${productId.value}` })
-  // product.value = res.data
+  loading.value = true
+  try {
+    const [prodRes, profileRes] = await Promise.all([
+      productApi.getDetail(productId.value),
+      userApi.getProfile(),
+    ])
+    product.value = prodRes
+    if (profileRes.bankCard) {
+      bankCard.value = profileRes.bankCard
+    }
 
-  product.value = {
-    id: productId.value,
-    name: '换购商品示例',
-    coverImage: 'https://picsum.photos/400/400?random=50',
-    cashPrice: 199,
-    pointsPrice: 2000,
+    // 优先读 storage 中的选中地址
+    const savedAddr = uni.getStorageSync('selectedAddress')
+    if (savedAddr) {
+      try { address.value = JSON.parse(savedAddr) } catch {}
+    }
+    if (!address.value) {
+      try {
+        const defaultAddr = await addressApi.getDefault()
+        address.value = defaultAddr
+      } catch {}
+    }
+  } catch { /* ignore */ } finally {
+    loading.value = false
   }
-
-  // const bank = await uni.request({ url: '/api/v1/user/bank-card' })
-  // bankCard.value = bank.data
-
-  // const addr = await uni.request({ url: '/api/v1/address/default' })
-  // address.value = addr.data
 }
 
-const canSubmit = computed(() => !!bankCard.value && !!address.value)
+const canSubmit = computed(() => !!bankCard.value && !!address.value && !submitting.value)
 
 function goBack() { uni.navigateBack() }
 
@@ -178,17 +190,24 @@ async function doSubmit() {
     return
   }
 
+  if (!canSubmit.value) {
+    if (!bankCard.value) {
+      uni.showToast({ title: '请先绑定银行卡', icon: 'none' }); return
+    }
+    if (!address.value) {
+      uni.showToast({ title: '请选择收货地址', icon: 'none' }); return
+    }
+    return
+  }
+
   uni.showLoading({ title: '提交中...' })
+  submitting.value = true
   try {
-    // const res = await uni.request({
-    //   url: '/api/v1/orders/exchange',
-    //   method: 'POST',
-    //   data: {
-    //     productId: productId.value,
-    //     addressId: address.value.id,
-    //     payMethod: payMethod.value,
-    //   }
-    // })
+    await orderApi.create({
+      orderType: 2,
+      addressId: address.value.id,
+      items: [{ productId: productId.value, quantity: 1 }],
+    })
     uni.showToast({ title: '换购成功', icon: 'success' })
     setTimeout(() => {
       uni.redirectTo({ url: '/pages/order/list' })
@@ -197,6 +216,7 @@ async function doSubmit() {
     uni.showToast({ title: e.message || '提交失败', icon: 'none' })
   } finally {
     uni.hideLoading()
+    submitting.value = false
   }
 }
 </script>

@@ -142,34 +142,91 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { userApi, walletApi, levelApi, orderApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
+const loading = ref(false)
 
 const userInfo = ref({
-  name: '小明同学',
-  id: '88888888',
-  ecoPoints: 12580,
-  creditPoints: 350,
-  balance: 99.00
+  name: '',
+  id: '',
+  ecoPoints: 0,
+  creditPoints: 0,
+  balance: 0
 })
 
 const levelData = ref({
   badge: '🏆',
-  name: 'V3 铂金',
-  dailyDividend: 300
+  name: 'V1',
+  dailyDividend: '0'
 })
 
 const orderCounts = ref({
-  pending: 3,
-  shipped: 5,
-  received: 2,
-  completed: 10
+  pending: 0,
+  shipped: 0,
+  received: 0,
+  completed: 0
 })
 
 onMounted(() => {
   const systemInfo = uni.getSystemInfoSync()
   statusBarHeight.value = systemInfo.statusBarHeight || 20
+  loadUserData()
 })
+
+async function loadUserData() {
+  loading.value = true
+  try {
+    const token = uni.getStorageSync('token')
+    if (!token) return
+
+    const [profile, bal, level] = await Promise.all([
+      userApi.getProfile(),
+      walletApi.getBalance(),
+      levelApi.getMyLevel(),
+    ])
+
+    userInfo.value = {
+      name: profile.nickname || profile.phone || '用户',
+      id: profile.userId || '',
+      ecoPoints: Number(bal.ecoPoints || 0),
+      creditPoints: Number(bal.consumerPoints || 0),
+      balance: Number(bal.balance || 0),
+    }
+
+    levelData.value = {
+      badge: level.icon || '🏆',
+      name: level.levelName || 'V1',
+      dailyDividend: level.dailyBonus || '0',
+    }
+
+    // 加载订单数量
+    loadOrderCounts()
+  } catch (e) {
+    console.error('加载用户数据失败', e)
+  } finally {
+    loading.value = false
+  }
+}
+
+async function loadOrderCounts() {
+  try {
+    const [pending, shipped, received, completed] = await Promise.all([
+      orderApi.getList({ status: 1, limit: 1 }),
+      orderApi.getList({ status: 2, limit: 1 }),
+      orderApi.getList({ status: 3, limit: 1 }),
+      orderApi.getList({ status: 4, limit: 1 }),
+    ])
+    orderCounts.value = {
+      pending: pending.total || 0,
+      shipped: shipped.total || 0,
+      received: received.total || 0,
+      completed: completed.total || 0,
+    }
+  } catch (e) {
+    console.error('加载订单数失败', e)
+  }
+}
 
 function goOrderList(status?: string) {
   uni.navigateTo({ url: `/pages/order/list?status=${status || ''}` })

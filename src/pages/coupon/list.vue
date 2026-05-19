@@ -45,14 +45,14 @@
           <view class="coupon-left">
             <view class="coupon-value">
               <text class="value-symbol">¥</text>
-              <text class="value-amount">{{ coupon.value }}</text>
+              <text class="value-amount">{{ coupon.amount }}</text>
             </view>
-            <text class="coupon-desc">{{ coupon.condition }}</text>
+            <text class="coupon-desc">满{{ coupon.minAmount }}可用</text>
           </view>
           <view class="coupon-right">
             <text class="coupon-name">{{ coupon.name }}</text>
-            <text class="coupon-range">{{ coupon.range }}</text>
-            <text class="coupon-date">有效期至 {{ coupon.expireDate }}</text>
+            <text class="coupon-range">{{ coupon.typeName }}</text>
+            <text class="coupon-date">有效期至 {{ formatDate(coupon.expireAt) }}</text>
             <view class="coupon-use-btn">立即使用</view>
           </view>
           <view class="coupon-status available">可用</view>
@@ -69,12 +69,12 @@
           <view class="coupon-left">
             <view class="coupon-value">
               <text class="value-symbol">¥</text>
-              <text class="value-amount">{{ coupon.value }}</text>
+              <text class="value-amount">{{ coupon.amount }}</text>
             </view>
           </view>
           <view class="coupon-right">
             <text class="coupon-name">{{ coupon.name }}</text>
-            <text class="coupon-date">使用时间 {{ coupon.usedDate }}</text>
+            <text class="coupon-date">使用时间 {{ formatDate(coupon.usedAt) }}</text>
           </view>
           <view class="coupon-status used">已使用</view>
         </view>
@@ -90,12 +90,12 @@
           <view class="coupon-left">
             <view class="coupon-value">
               <text class="value-symbol">¥</text>
-              <text class="value-amount">{{ coupon.value }}</text>
+              <text class="value-amount">{{ coupon.amount }}</text>
             </view>
           </view>
           <view class="coupon-right">
             <text class="coupon-name">{{ coupon.name }}</text>
-            <text class="coupon-date">过期时间 {{ coupon.expireDate }}</text>
+            <text class="coupon-date">过期时间 {{ formatDate(coupon.expireAt) }}</text>
           </view>
           <view class="coupon-status expired">已过期</view>
         </view>
@@ -113,34 +113,49 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { marketingApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
-const currentTab = ref('available')
+const currentTab = ref<'available' | 'used' | 'expired'>('available')
+const loading = ref(false)
 
 interface Coupon {
-  id: number
+  id: string
   name: string
-  value: number
-  condition: string
-  range: string
-  expireDate: string
-  usedDate?: string
+  amount: string
+  minAmount: string
+  expireAt: string
+  usedAt?: string
+  type: number
+  typeName: string
 }
 
-const availableCoupons = ref<Coupon[]>([
-  { id: 1, name: '新人专享券', value: 100, condition: '满500可用', range: '全场通用', expireDate: '2026-05-31' },
-  { id: 2, name: '限时满减券', value: 50, condition: '满300可用', range: '消费商城', expireDate: '2026-06-15' },
-  { id: 3, name: '会员专享券', value: 200, condition: '满1000可用', range: '全场通用', expireDate: '2026-06-30' }
-])
+const availableCoupons = ref<Coupon[]>([])
+const usedCoupons = ref<Coupon[]>([])
+const expiredCoupons = ref<Coupon[]>([])
 
-const usedCoupons = ref<Coupon[]>([
-  { id: 4, name: '五一活动券', value: 80, condition: '满400可用', range: '消费商城', expireDate: '2026-05-05', usedDate: '2026-05-03' }
-])
+onMounted(() => {
+  const sys = uni.getSystemInfoSync()
+  statusBarHeight.value = sys.statusBarHeight || 20
+  loadCoupons()
+})
 
-const expiredCoupons = ref<Coupon[]>([
-  { id: 5, name: '春节红包券', value: 100, condition: '满500可用', range: '全场通用', expireDate: '2026-02-28' }
-])
+async function loadCoupons() {
+  loading.value = true
+  try {
+    const [availRes, usedRes, expiredRes] = await Promise.all([
+      marketingApi.getMyCoupons({ status: 1 }),
+      marketingApi.getMyCoupons({ status: 2 }),
+      marketingApi.getMyCoupons({ status: 3 }),
+    ])
+    availableCoupons.value = availRes.list || []
+    usedCoupons.value = usedRes.list || []
+    expiredCoupons.value = expiredRes.list || []
+  } catch { /* ignore */ } finally {
+    loading.value = false
+  }
+}
 
 const currentList = computed(() => {
   switch (currentTab.value) {
@@ -155,8 +170,13 @@ function goBack() {
   uni.navigateBack()
 }
 
-function useCoupon(coupon: Coupon) {
+function useCoupon(_coupon: Coupon) {
   uni.switchTab({ url: '/pages/buy/index' })
+}
+
+function formatDate(dateStr: string | undefined): string {
+  if (!dateStr) return ''
+  return dateStr.split('T')[0]
 }
 </script>
 

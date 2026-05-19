@@ -54,9 +54,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { financialApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
 const holdings = ref<any[]>([])
+const loading = ref(false)
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
@@ -65,9 +67,15 @@ onMounted(() => {
 })
 
 async function loadData() {
-  // TODO: const res = await uni.request({ url: '/api/v1/financial/holdings' })
-  // holdings.value = res.data
-  holdings.value = []
+  loading.value = true
+  try {
+    const res = await financialApi.getHoldings({ limit: 50 })
+    holdings.value = res.list || []
+  } catch (e: any) {
+    uni.showToast({ title: e.message || '加载失败', icon: 'none' })
+  } finally {
+    loading.value = false
+  }
 }
 
 function formatDate(d: string) {
@@ -76,7 +84,7 @@ function formatDate(d: string) {
 }
 
 function goInvest() {
-  uni.switchTab({ url: '/pages/wealth/index' })
+  uni.navigateTo({ url: '/pages/wealth/invest' })
 }
 
 async function doRedeem(h: any, early: boolean) {
@@ -87,15 +95,11 @@ async function doRedeem(h: any, early: boolean) {
       if (!res.confirm) return
       uni.showLoading()
       try {
-        // const r = await uni.request({
-        //   url: '/api/v1/financial/redeem',
-        //   method: 'POST',
-        //   data: { holdingId: h.id, early }
-        // })
+        await financialApi.redeem({ holdingId: h.holdingId || h.id, early })
         uni.showToast({ title: '赎回成功', icon: 'success' })
         loadData()
-      } catch {
-        uni.showToast({ title: '赎回失败', icon: 'none' })
+      } catch (e: any) {
+        uni.showToast({ title: e.message || '赎回失败', icon: 'none' })
       } finally {
         uni.hideLoading()
       }
