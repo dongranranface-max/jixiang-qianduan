@@ -46,9 +46,9 @@ jobs:
 
       - name: Prepare private key
         env:
-          KEY_B64: ${{ secrets.DEPLOY_SSH_KEY }}
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
         run: |
-          echo "$KEY_B64" | base64 -d > /tmp/deploy_key.pem
+          printf '%s\n' "$SSH_KEY" > /tmp/deploy_key.pem
           chmod 600 /tmp/deploy_key.pem
 
       - name: Deploy to Server
