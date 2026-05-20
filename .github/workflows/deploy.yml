@@ -1,6 +1,6 @@
 # ============================================
 #  deploy.yml - 集享公社用户端自动化部署
-#  触发条件：push 到 main 分支
+#  使用 appleboy/ssh-action 处理 SSH 部署
 # ============================================
 name: Deploy Qianduan to Production
 
@@ -32,13 +32,10 @@ jobs:
         run: |
           set -e
           if [ -d "unpackage/dist/build/h5" ]; then
-            echo "Using unpackage/dist/build/h5"
             tar -czf jixiang-qianduan-h5.tar.gz -C unpackage/dist/build/h5 .
           elif [ -d "dist/build/h5" ]; then
-            echo "Using dist/build/h5"
             tar -czf jixiang-qianduan-h5.tar.gz -C dist/build/h5 .
           elif [ -d "dist" ]; then
-            echo "Using dist"
             tar -czf jixiang-qianduan-h5.tar.gz -C dist .
           else
             echo "ERROR: No build output found"
@@ -47,19 +44,17 @@ jobs:
           fi
 
       - name: Deploy to Server
-        env:
-          SSH_KEY_B64: ${{ secrets.DEPLOY_SSH_KEY }}
-        run: |
-          echo "$SSH_KEY_B64" | base64 -d > /tmp/deploy_key.pem
-          chmod 600 /tmp/deploy_key.pem
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "mkdir -p /www/jixiang-qianduan/h5"
-          cat jixiang-qianduan-h5.tar.gz | ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "cd /www/jixiang-qianduan/h5 && tar -xz && nginx -s reload"
-
-      - name: Health Check
-        env:
-          SSH_KEY_B64: ${{ secrets.DEPLOY_SSH_KEY }}
-        run: |
-          sleep 3
-          echo "$SSH_KEY_B64" | base64 -d > /tmp/deploy_key.pem
-          chmod 600 /tmp/deploy_key.pem
-          ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/mall/ || echo 'HEALTH_CHECK_FAILED'"
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: root
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command: |
+            mkdir -p /www/jixiang-qianduan/h5
+            cd /www/jixiang-qianduan/h5
+            tar -xz
+            nginx -s reload
+          tar: ./jixiang-qianduan-h5.tar.gz
+          dest: /www/jixiang-qianduan/h5
+          overwrite: true
+          debug: true
