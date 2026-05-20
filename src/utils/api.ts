@@ -555,6 +555,24 @@ export const ticketApi = {
 }
 
 // --------------------------------------------
+//  签到模块 /sign-in
+// --------------------------------------------
+export const signInApi = {
+  // 签到
+  signIn: () =>
+    request<{ success: boolean; message?: string; streak: number; points: number; bonus: number }>({
+      url: '/sign-in',
+      method: 'POST',
+    }),
+
+  // 获取当月签到记录
+  getMonthly: (params: { year: number; month: number }) =>
+    request<{ records: Array<{ date: string; points: number; bonus: number; streak: number }>; total: number }>({
+      url: `/sign-in/monthly?year=${params.year}&month=${params.month}`,
+    }),
+}
+
+// --------------------------------------------
 //  导出汇总
 // --------------------------------------------
 export const api = {
@@ -569,4 +587,5 @@ export const api = {
   referral: referralApi,
   marketing: marketingApi,
   ticket: ticketApi,
+  signIn: signInApi,
 }

@@ -84,6 +84,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { requireAuth } from '@/utils/auth'
+import { signInApi } from '@/utils/api'
 
 const statusBarHeight = ref(20)
 const signReward = ref(10)
@@ -113,16 +114,23 @@ const calendarDays = computed(() => {
   return cells
 })
 
-function loadSignedDays() {
-  const key = `signin_${currentYear.value}_${currentMonth.value}`
-  const saved = uni.getStorageSync(key)
-  if (saved) {
-    try { signedDays.value = JSON.parse(saved) } catch {}
+async function loadSignedDays() {
+  try {
+    const res = await signInApi.getMonthly({ year: currentYear.value, month: currentMonth.value })
+    signedDays.value = res.records.map(r => parseInt(r.date.split('-')[2], 10))
+    isSigned.value = signedDays.value.includes(todayDate.value)
+  } catch {
+    // 降级到本地存储
+    const key = `signin_${currentYear.value}_${currentMonth.value}`
+    const saved = uni.getStorageSync(key)
+    if (saved) {
+      try { signedDays.value = JSON.parse(saved) } catch {}
+    }
+    isSigned.value = signedDays.value.includes(todayDate.value)
   }
-  isSigned.value = signedDays.value.includes(todayDate.value)
 }
 
-function saveSignedDays() {
+async function saveSignedDays() {
   const key = `signin_${currentYear.value}_${currentMonth.value}`
   uni.setStorageSync(key, JSON.stringify(signedDays.value))
 }
@@ -150,14 +158,17 @@ async function doSign() {
 
   uni.showLoading({ title: '签到中...' })
   try {
-    // TODO: 后端需提供签到接口 POST /api/v1/sign-in
-    // 目前本地模拟
-    isSigned.value = true
-    if (!signedDays.value.includes(todayDate.value)) {
-      signedDays.value.push(todayDate.value)
-      saveSignedDays()
+    const res = await signInApi.signIn()
+    if (res.success) {
+      isSigned.value = true
+      if (!signedDays.value.includes(todayDate.value)) {
+        signedDays.value.push(todayDate.value)
+        saveSignedDays()
+      }
+      uni.showToast({ title: `签到成功！+${res.points}积分`, icon: 'success' })
+    } else {
+      uni.showToast({ title: res.message || '签到失败', icon: 'none' })
     }
-    uni.showToast({ title: `签到成功！+${signReward.value}积分`, icon: 'success' })
   } catch {
     uni.showToast({ title: '签到失败，请稍后重试', icon: 'none' })
   } finally {
