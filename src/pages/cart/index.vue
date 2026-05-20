@@ -1,7 +1,8 @@
 <template>
   <view class="page-container">
-    <!-- 顶部安全区 -->
-    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
+    <!-- 顶部沉浸式资产状态栏（已登录用户） -->
+    <AssetStatusBar v-if="isLoggedInFlag" />
+    <view v-else class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
     
     <!-- 页面标题 -->
     <view class="page-header">
@@ -97,24 +98,31 @@
     
     <!-- 底部操作栏 -->
     <view class="bottom-bar" v-if="cartItems.length > 0">
-      <view class="select-all" @click="toggleSelectAll('all')">
-        <text :class="isAllSelected('all') ? 'checkbox-checked' : 'checkbox'">✓</text>
-        <text class="select-label">全选</text>
+      <!-- 混合结算公式 -->
+      <view class="settlement-formula" v-if="selectedCount > 0">
+        <text class="formula-label">混合结算</text>
+        <text class="formula-value">{{ totalCashDisplay }}元现金 + {{ totalPointsDisplay }}积分</text>
       </view>
-      <view class="total-info">
-        <view class="total-row">
-          <text class="total-label">合计:</text>
-          <text class="total-price">¥{{ totalPrice }}</text>
+      <view class="bottom-inner">
+        <view class="select-all" @click="toggleSelectAll('all')">
+          <text :class="isAllSelected('all') ? 'checkbox-checked' : 'checkbox'">✓</text>
+          <text class="select-label">全选</text>
         </view>
-        <view class="points-row" v-if="totalPoints > 0">
-          <text class="points-label">+{{ totalPoints }}积分</text>
+        <view class="total-info">
+          <view class="total-row">
+            <text class="total-label">合计:</text>
+            <text class="total-price">¥{{ totalPrice }}</text>
+          </view>
+          <view class="points-row" v-if="totalPoints > 0">
+            <text class="points-label">+{{ totalPoints }}积分</text>
+          </view>
         </view>
-      </view>
-      <view class="submit-btn" @click="goCheckout">
-        <text>结算({{ selectedCount }})</text>
-      </view>
-      <view class="delete-btn" @click="deleteSelected" v-if="isEditMode">
-        <text>删除</text>
+        <view class="submit-btn" @click="goCheckout">
+          <text>结算({{ selectedCount }})</text>
+        </view>
+        <view class="delete-btn" @click="deleteSelected" v-if="isEditMode">
+          <text>删除</text>
+        </view>
       </view>
     </view>
     
@@ -124,8 +132,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { isLoggedIn } from '@/utils/auth'
+import AssetStatusBar from '@/components/AssetStatusBar.vue'
 
 const statusBarHeight = ref(20)
+const isLoggedInFlag = isLoggedIn()
 const isEditMode = ref(false)
 
 interface CartItem {
@@ -156,6 +167,19 @@ const totalPrice = computed(() => {
     .filter(i => i.selected)
     .reduce((sum, i) => sum + i.price * i.quantity, 0)
     .toFixed(2)
+})
+
+const totalCashDisplay = computed(() => {
+  return cartItems.value
+    .filter(i => i.selected)
+    .reduce((sum, i) => sum + i.price * i.quantity, 0)
+    .toFixed(2)
+})
+
+const totalPointsDisplay = computed(() => {
+  return cartItems.value
+    .filter(i => i.selected && i.mall === 'consume')
+    .reduce((sum, i) => sum + i.points * i.quantity, 0)
 })
 
 const totalPoints = computed(() => {

@@ -1,50 +1,11 @@
 <template>
   <view class="page-container">
-    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
-
-    <!-- ========== 一、冰川资产看板 (Ice-Blue Dashboard) ========== -->
-    <view class="dashboard-card" v-if="isLoggedIn">
-      <!-- 背景流光装饰 -->
-      <view class="dashboard-glow"></view>
-      <view class="dashboard-glow glow-2"></view>
-
-      <view class="dashboard-inner">
-        <!-- 左侧：资产态 -->
-        <view class="asset-panel">
-          <text class="asset-label">生态积分</text>
-          <text class="asset-number">{{ ecoPointsDisplay }}</text>
-          <view class="asset-sub">
-            <text class="asset-sub-text">消费积分 {{ consumerPointsDisplay }}</text>
-          </view>
-        </view>
-
-        <!-- 分隔线 -->
-        <view class="dashboard-divider"></view>
-
-        <!-- 右侧：动能态 -->
-        <view class="profit-panel">
-          <text class="asset-label">昨日分红</text>
-          <text class="asset-number-fire">+{{ yesterdayProfit }}</text>
-          <view class="asset-sub">
-            <text class="profit-rate">年化 {{ profitRate }}%</text>
-          </view>
-        </view>
-      </view>
-
-      <!-- 底部：业绩进度条 -->
-      <view class="progress-section">
-        <view class="progress-header">
-          <text class="progress-label">距离 V{{ nextLevel }} 等级</text>
-          <text class="progress-percent">{{ progressPercent }}%</text>
-        </view>
-        <view class="progress-bar">
-          <view class="progress-fill" :style="{ width: progressPercent + '%' }"></view>
-        </view>
-      </view>
-    </view>
+    <!-- ========== 顶部沉浸式资产状态栏 ========== -->
+    <AssetStatusBar v-if="isLoggedIn" />
+    <view v-else class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
 
     <!-- 未登录引导 -->
-    <view class="login-card" v-else @click="goLogin">
+    <view class="login-card" v-if="!isLoggedIn" @click="goLogin">
       <view class="login-card-inner">
         <text class="login-icon">🔐</text>
         <view class="login-text-group">
@@ -188,22 +149,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { walletApi, productApi } from '@/utils/api'
+import { ref, onMounted } from 'vue'
+import { productApi } from '@/utils/api'
 import { isLoggedIn, requireAuth } from '@/utils/auth'
+import { assetStore } from '@/store/asset'
+import AssetStatusBar from '@/components/AssetStatusBar.vue'
 
 const statusBarHeight = ref(20)
-const isLoggedIn = ref(false)
-const ecoPointsDisplay = ref('0')
-const consumerPointsDisplay = ref('0')
-const yesterdayProfit = ref('0.00')
-const profitRate = ref('0')
-const nextLevel = ref(2)
-const progressPercent = ref(0)
-const unreadCount = ref(0)
-const products = ref<any[]>([])
-const exchangeProducts = ref<any[]>([])
-const redeemProducts = ref<any[]>([])
+const loggedIn = isLoggedIn()
+const isLoggedIn = ref(loggedIn)
 
 const banners = ref([
   { id: 1, image: 'https://picsum.photos/750/400?random=10', link: '' },
@@ -212,39 +166,18 @@ const banners = ref([
 ])
 
 const portalEntries = [
-  { id: 1, name: '消费商城', icon: '🛍️', type: 'consume' },
-  { id: 2, name: '换购商城', icon: '🔄', type: 'exchange' },
-  { id: 3, name: '兑换商城', icon: '🎁', type: 'redeem' },
-  { id: 4, name: '增值专区', icon: '📈', type: 'wealth' },
+  { id: 1, name: '消费商城', icon: '🛍️', type: 'consume', color: 'primary' },
+  { id: 2, name: '换购商城', icon: '🔄', type: 'exchange', color: 'accent' },
+  { id: 3, name: '兑换商城', icon: '🎁', type: 'redeem', color: 'gold' },
+  { id: 4, name: '增值专区', icon: '📈', type: 'wealth', color: 'fire' },
 ]
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
   statusBarHeight.value = sys.statusBarHeight || 20
-
-  const loggedIn = isLoggedIn()
-  isLoggedIn.value = loggedIn
-
-  if (loggedIn) {
-    loadUserData()
-  }
+  if (loggedIn) assetStore.fetchBalance()
   loadProducts()
 })
-
-async function loadUserData() {
-  try {
-    const bal = await walletApi.getBalance()
-    ecoPointsDisplay.value = Number(bal.ecoPoints || 0).toLocaleString()
-    consumerPointsDisplay.value = Number(bal.consumerPoints || 0).toLocaleString()
-    // 模拟昨日分红（实际接口待接）
-    yesterdayProfit.value = bal.yesterdayProfit || '0.00'
-    profitRate.value = bal.profitRate || '0'
-    nextLevel.value = (bal.level || 1) + 1
-    progressPercent.value = bal.progressPercent || 0
-  } catch (e) {
-    console.error('加载用户数据失败', e)
-  }
-}
 
 async function loadProducts() {
   try {
