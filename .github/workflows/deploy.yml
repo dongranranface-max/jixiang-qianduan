@@ -1,6 +1,7 @@
 # ============================================
 #  deploy.yml - 集享公社用户端自动化部署
 #  使用 appleboy/ssh-action 处理 SSH 部署
+#  私钥通过 base64 编码传入，解决多行文本问题
 # ============================================
 name: Deploy Qianduan to Production
 
@@ -43,12 +44,19 @@ jobs:
             exit 1
           fi
 
+      - name: Prepare private key
+        env:
+          KEY_B64: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          echo "$KEY_B64" | base64 -d > /tmp/deploy_key.pem
+          chmod 600 /tmp/deploy_key.pem
+
       - name: Deploy to Server
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: root
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          key_path: /tmp/deploy_key.pem
           command: |
             mkdir -p /www/jixiang-qianduan/h5
             cd /www/jixiang-qianduan/h5
