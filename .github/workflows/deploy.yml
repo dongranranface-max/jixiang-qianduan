@@ -48,10 +48,14 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@${{ secrets.DEPLOY_HOST }} "mkdir -p /www/jixiang-qianduan/h5"
-          cat jixiang-qianduan-h5.tar.gz | ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} "cd /www/jixiang-qianduan/h5 && tar -xz && nginx -s reload"
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > /tmp/deploy_key.pem
+          chmod 600 /tmp/deploy_key.pem
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "mkdir -p /www/jixiang-qianduan/h5"
+          cat jixiang-qianduan-h5.tar.gz | ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "cd /www/jixiang-qianduan/h5 && tar -xz && nginx -s reload"
 
       - name: Health Check
         run: |
           sleep 3
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/mall/ || echo 'HEALTH_CHECK_FAILED'"
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > /tmp/deploy_key.pem
+          chmod 600 /tmp/deploy_key.pem
+          ssh -o StrictHostKeyChecking=no -i /tmp/deploy_key.pem root@${{ secrets.DEPLOY_HOST }} "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/mall/ || echo 'HEALTH_CHECK_FAILED'"
