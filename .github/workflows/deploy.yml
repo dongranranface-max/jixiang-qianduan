@@ -59,5 +59,6 @@ jobs:
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
           echo '${{ secrets.DEPLOY_SSH_KEY }}' | base64 -d > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
-          cat jixiang-qianduan-h5.tar.gz | ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/deploy_key -o BatchMode=yes -o ConnectTimeout=30 root@${{ secrets.DEPLOY_HOST }} 'mkdir -p /www/jixiang-qianduan/h5 && tar -xzC /www/jixiang-qianduan/h5 && nginx -s reload'
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/deploy_key -o ConnectTimeout=60 jixiang-qianduan-h5.tar.gz root@${{ secrets.DEPLOY_HOST }}:/tmp/jixiang-qianduan-h5.tar.gz
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/deploy_key root@${{ secrets.DEPLOY_HOST }} "mkdir -p /www/jixiang-qianduan/h5 && cd /www/jixiang-qianduan/h5 && tar -xzf /tmp/jixiang-qianduan-h5.tar.gz && rm /tmp/jixiang-qianduan-h5.tar.gz && nginx -s reload"
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/deploy_key root@${{ secrets.DEPLOY_HOST }} "mkdir -p /www/jixiang-qianduan/h5 && cd /www/jixiang-qianduan/h5 && tar -xz && nginx -s reload"
