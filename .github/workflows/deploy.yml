@@ -44,19 +44,12 @@ jobs:
             exit 1
           fi
 
-      - name: Prepare private key
-        env:
-          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-        run: |
-          printf '%s\n' "$SSH_KEY" > /tmp/deploy_key.pem
-          chmod 600 /tmp/deploy_key.pem
-
       - name: Deploy to Server
         uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: root
-          key_path: /tmp/deploy_key.pem
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
           command: |
             mkdir -p /www/jixiang-qianduan/h5
             cd /www/jixiang-qianduan/h5
@@ -65,4 +58,3 @@ jobs:
           tar: ./jixiang-qianduan-h5.tar.gz
           dest: /www/jixiang-qianduan/h5
           overwrite: true
-          debug: true
