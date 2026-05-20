@@ -1,7 +1,6 @@
 # ============================================
 #  deploy.yml - 集享公社用户端自动化部署
-#  使用 appleboy/ssh-action 处理 SSH 部署
-#  私钥通过 base64 编码传入，解决多行文本问题
+#  触发条件：push 到 main 分支
 # ============================================
 name: Deploy Qianduan to Production
 
@@ -45,16 +44,11 @@ jobs:
           fi
 
       - name: Deploy to Server
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: root
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          command: |
-            mkdir -p /www/jixiang-qianduan/h5
-            cd /www/jixiang-qianduan/h5
-            tar -xz
-            nginx -s reload
-          tar: ./jixiang-qianduan-h5.tar.gz
-          dest: /www/jixiang-qianduan/h5
-          overwrite: true
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          echo '${{ secrets.DEPLOY_SSH_KEY }}' > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/deploy_key jixiang-qianduan-h5.tar.gz root@${{ secrets.DEPLOY_HOST }}:/tmp/
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/deploy_key root@${{ secrets.DEPLOY_HOST }} "mkdir -p /www/jixiang-qianduan/h5 && cd /www/jixiang-qianduan/h5 && tar -xz && nginx -s reload"
