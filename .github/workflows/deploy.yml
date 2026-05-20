@@ -29,7 +29,9 @@ jobs:
         run: npm install --force
 
       - name: Build H5
-        run: npm run build:h5
+        run: |
+          rm -rf dist build
+          npm run build:h5
 
       - name: Find and package build output
         run: |
