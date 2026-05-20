@@ -233,8 +233,8 @@ async function submitOrder() {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
   padding-bottom: 140rpx;
 }
 
@@ -252,79 +252,79 @@ async function submitOrder() {
 .address-section {
   display: flex;
   align-items: center;
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-base;
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-base);
 
-  .address-icon { font-size: 48rpx; margin-right: $spacing-base; }
+  .address-icon { font-size: 48rpx; margin-right: var(--spacing-base); }
   .address-info { flex: 1;
-    .address-top { display: flex; align-items: center; gap: $spacing-sm; margin-bottom: 8rpx;
-      .address-name { font-size: 30rpx; font-weight: 600; color: $text-primary; }
-      .address-phone { font-size: 28rpx; color: $text-secondary; }
-      .address-tag { padding: 4rpx 12rpx; background: $primary; color: #fff; font-size: 20rpx; border-radius: 6rpx; }
+    .address-top { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 8rpx;
+      .address-name { font-size: 30rpx; font-weight: 600; color: var(--text-primary); }
+      .address-phone { font-size: 28rpx; color: var(--text-secondary); }
+      .address-tag { padding: 4rpx 12rpx; background: var(--primary); color: #fff; font-size: 20rpx; border-radius: 6rpx; }
     }
-    .address-detail { font-size: 26rpx; color: $text-secondary; }
+    .address-detail { font-size: 26rpx; color: var(--text-secondary); }
   }
-  .address-empty { flex: 1; text-align: center; font-size: 28rpx; color: $text-muted; }
-  .address-arrow { font-size: 36rpx; color: $text-muted; }
+  .address-empty { flex: 1; text-align: center; font-size: 28rpx; color: var(--text-muted); }
+  .address-arrow { font-size: 36rpx; color: var(--text-muted); }
 }
 
 .order-items {
-  margin-bottom: $spacing-base;
+  margin-bottom: var(--spacing-base);
   .order-item {
     display: flex;
-    background: $bg-card;
-    border-radius: $radius-md;
-    padding: $spacing-base;
-    margin-bottom: $spacing-sm;
-    border: 1rpx solid $border-color;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-base);
+    margin-bottom: var(--spacing-sm);
+    border: 1rpx solid var(--border-color);
 
-    .item-image { width: 160rpx; height: 160rpx; border-radius: $radius-sm; flex-shrink: 0; }
-    .item-info { flex: 1; margin-left: $spacing-base; display: flex; flex-direction: column;
-      .item-name { font-size: 28rpx; color: $text-primary; @include line-clamp(2); margin-bottom: $spacing-xs; }
-      .item-tags { margin-bottom: $spacing-sm;
-        .tag { font-size: 18rpx; padding: 2rpx 12rpx; border-radius: 6rpx; margin-right: $spacing-xs; }
-        .tag-purple { background: rgba($primary, 0.15); color: $primary; }
+    .item-image { width: 160rpx; height: 160rpx; border-radius: var(--radius)-sm; flex-shrink: 0; }
+    .item-info { flex: 1; margin-left: var(--spacing-base); display: flex; flex-direction: column;
+      .item-name { font-size: 28rpx; color: var(--text-primary); @include line-clamp(2); margin-bottom: var(--spacing-xs); }
+      .item-tags { margin-bottom: var(--spacing-sm);
+        .tag { font-size: 18rpx; padding: 2rpx 12rpx; border-radius: 6rpx; margin-right: var(--spacing-xs); }
+        .tag-purple { background: rgba(var(--primary), 0.15); color: var(--primary); }
         .tag-green { background: rgba(#52c41a, 0.15); color: #52c41a; }
       }
       .item-bottom { display: flex; align-items: center; justify-content: space-between;
-        .item-price { font-size: 30rpx; font-weight: 700; color: $primary; }
-        .item-quantity { font-size: 26rpx; color: $text-secondary; }
+        .item-price { font-size: 30rpx; font-weight: 700; color: var(--primary); }
+        .item-quantity { font-size: 26rpx; color: var(--text-secondary); }
       }
     }
   }
 }
 
 .order-info-section {
-  background: $bg-card;
-  border-radius: $radius-md;
-  padding: $spacing-base;
-  margin-bottom: $spacing-base;
-  border: 1rpx solid $border-color;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-base);
+  margin-bottom: var(--spacing-base);
+  border: 1rpx solid var(--border-color);
 
-  .info-row { display: flex; align-items: center; justify-content: space-between; padding: $spacing-sm 0;
-    .info-label { font-size: 28rpx; color: $text-secondary; }
-    .info-value { font-size: 28rpx; color: $text-primary;
+  .info-row { display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-sm) 0;
+    .info-label { font-size: 28rpx; color: var(--text-secondary); }
+    .info-value { font-size: 28rpx; color: var(--text-primary);
       &.info-free { color: #52c41a; }
-      &.info-points { color: $gold; }
-      &.info-primary { color: $primary; font-weight: 700; }
+      &.info-points { color: var(--gold); }
+      &.info-primary { color: var(--primary); font-weight: 700; }
     }
   }
 }
 
 .payment-section {
-  margin-bottom: $spacing-base;
-  .section-title { font-size: 30rpx; font-weight: 600; color: $text-primary; margin-bottom: $spacing-base; }
+  margin-bottom: var(--spacing-base);
+  .section-title { font-size: 30rpx; font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-base); }
   .payment-list {
-    .payment-item { display: flex; align-items: center; background: $bg-card; border-radius: $radius-md; padding: $spacing-base; margin-bottom: $spacing-sm; border: 2rpx solid transparent;
-      &.active { border-color: $primary; }
-      .payment-icon { font-size: 48rpx; margin-right: $spacing-base; }
-      .payment-name { flex: 1; font-size: 28rpx; color: $text-primary; }
-      .radio, .radio-checked { width: 40rpx; height: 40rpx; border: 2rpx solid $border-color; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24rpx; color: transparent; }
-      .radio-checked { background: $primary; border-color: $primary; color: #fff; }
+    .payment-item { display: flex; align-items: center; background: var(--bg-card); border-radius: var(--radius-md); padding: var(--spacing-base); margin-bottom: var(--spacing-sm); border: 2rpx solid transparent;
+      &.active { border-color: var(--primary); }
+      .payment-icon { font-size: 48rpx; margin-right: var(--spacing-base); }
+      .payment-name { flex: 1; font-size: 28rpx; color: var(--text-primary); }
+      .radio, .radio-checked { width: 40rpx; height: 40rpx; border: 2rpx solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24rpx; color: transparent; }
+      .radio-checked { background: var(--primary); border-color: var(--primary); color: #fff; }
     }
   }
 }
@@ -341,10 +341,10 @@ async function submitOrder() {
   border-top: 1rpx solid rgba(255,255,255,0.08);
 
   .total-info {
-    .total-label { font-size: 26rpx; color: $text-secondary; }
-    .total-price { font-size: 44rpx; font-weight: 800; background: linear-gradient(135deg, $accent-light, $accent-dark); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 8rpx rgba(255,140,0,0.4)); margin-left: $spacing-xs; }
+    .total-label { font-size: 26rpx; color: var(--text-secondary); }
+    .total-price { font-size: 44rpx; font-weight: 800; background: linear-gradient(135deg, var(--accent-light), var(--accent-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 8rpx rgba(255,140,0,0.4)); margin-left: var(--spacing-xs); }
   }
-  .submit-btn { background: $accent-fire; color: #fff; padding: 24rpx 64rpx; border-radius: 50rpx; font-size: 32rpx; font-weight: 700; box-shadow: $shadow-fire;
+  .submit-btn { background: var(--accent-fire); color: #fff; padding: 24rpx 64rpx; border-radius: 50rpx; font-size: 32rpx; font-weight: 700; box-shadow: var(--shadow-fire);
     &.loading { opacity: 0.6; }
   }
 }

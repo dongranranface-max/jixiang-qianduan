@@ -289,8 +289,8 @@ function goProjectDetail(project: any) {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
 }
 
 .safe-area-top {
@@ -298,12 +298,12 @@ function goProjectDetail(project: any) {
 }
 
 .page-header {
-  padding: $spacing-base 0;
+  padding: var(--spacing-base) 0;
   
   .page-title {
     font-size: 40rpx;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 }
 
@@ -315,9 +315,9 @@ function goProjectDetail(project: any) {
   );
   backdrop-filter: blur(20px);
   border: 1rpx solid rgba(77, 142, 255, 0.25);
-  border-radius: $radius-xl;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-lg;
+  border-radius: var(--radius)-xl;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
   
   .asset-header {
     display: flex;
@@ -326,13 +326,13 @@ function goProjectDetail(project: any) {
     
     .asset-label {
       font-size: 30rpx;
-      color: $text-primary;
+      color: var(--text-primary);
       font-weight: 600;
     }
     
     .asset-detail {
       font-size: 26rpx;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
   }
   
@@ -340,12 +340,12 @@ function goProjectDetail(project: any) {
     display: flex;
     align-items: center;
     justify-content: space-around;
-    margin: $spacing-lg 0;
+    margin: var(--spacing-lg) 0;
     
     .asset-divider {
       width: 1rpx;
       height: 80rpx;
-      background: $border-color;
+      background: var(--border-color);
     }
     
     .asset-item {
@@ -357,24 +357,24 @@ function goProjectDetail(project: any) {
         display: block;
         
         &.text-gold {
-          color: $gold;
+          color: var(--gold);
         }
         
         &.text-purple {
-          color: $primary;
+          color: var(--primary);
         }
       }
       
       .asset-name {
         font-size: 26rpx;
-        color: $text-secondary;
+        color: var(--text-secondary);
         margin-top: 8rpx;
         display: block;
       }
       
       .asset-sub {
         font-size: 22rpx;
-        color: $text-muted;
+        color: var(--text-muted);
         margin-top: 4rpx;
         display: block;
       }
@@ -384,7 +384,7 @@ function goProjectDetail(project: any) {
   .asset-actions {
     display: flex;
     justify-content: space-around;
-    margin-top: $spacing-base;
+    margin-top: var(--spacing-base);
     
     .action-btn {
       display: flex;
@@ -398,7 +398,7 @@ function goProjectDetail(project: any) {
       
       .action-text {
         font-size: 24rpx;
-        color: $text-secondary;
+        color: var(--text-secondary);
       }
     }
   }
@@ -412,9 +412,9 @@ function goProjectDetail(project: any) {
   );
   backdrop-filter: blur(20px);
   border: 1rpx solid rgba(77, 142, 255, 0.25);
-  border-radius: $radius-xl;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-lg;
+  border-radius: var(--radius)-xl;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
   
   .level-header {
     display: flex;
@@ -424,7 +424,7 @@ function goProjectDetail(project: any) {
     .level-info {
       display: flex;
       align-items: center;
-      gap: $spacing-base;
+      gap: var(--spacing-base);
       
       .level-badge {
         font-size: 64rpx;
@@ -434,13 +434,13 @@ function goProjectDetail(project: any) {
         .level-name {
           font-size: 40rpx;
           font-weight: 700;
-          color: $gold;
+          color: var(--gold);
           display: block;
         }
         
         .level-title {
           font-size: 24rpx;
-          color: $text-secondary;
+          color: var(--text-secondary);
         }
       }
     }
@@ -450,41 +450,41 @@ function goProjectDetail(project: any) {
       
       .dividend-label {
         font-size: 22rpx;
-        color: $text-muted;
+        color: var(--text-muted);
         display: block;
       }
       
       .dividend-value {
         font-size: 28rpx;
         font-weight: 600;
-        color: $profit;
+        color: var(--profit);
       }
     }
   }
   
   .level-progress {
-    margin-top: $spacing-lg;
+    margin-top: var(--spacing-lg);
     
     .progress-info {
       display: flex;
       align-items: baseline;
       gap: 4rpx;
-      margin-bottom: $spacing-sm;
+      margin-bottom: var(--spacing-sm);
       
       .progress-current {
         font-size: 32rpx;
         font-weight: 700;
-        color: $gold;
+        color: var(--gold);
       }
       
       .progress-separator {
         font-size: 24rpx;
-        color: $text-muted;
+        color: var(--text-muted);
       }
       
       .progress-target {
         font-size: 24rpx;
-        color: $text-muted;
+        color: var(--text-muted);
       }
     }
     
@@ -496,7 +496,7 @@ function goProjectDetail(project: any) {
       
       .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, $gold, #FFA500);
+        background: linear-gradient(90deg, var(--gold), #FFA500);
         border-radius: 8rpx;
         transition: width 0.3s ease;
       }
@@ -504,27 +504,27 @@ function goProjectDetail(project: any) {
     
     .progress-tip {
       font-size: 22rpx;
-      color: $text-secondary;
-      margin-top: $spacing-sm;
+      color: var(--text-secondary);
+      margin-top: var(--spacing-sm);
     }
   }
 }
 
 .section {
-  margin-bottom: $spacing-xl;
+  margin-bottom: var(--spacing-xl);
 }
 
 .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $spacing-base;
+  margin-bottom: var(--spacing-base);
 }
 
 .section-title-row {
   display: flex;
   align-items: center;
-  gap: $spacing-xs;
+  gap: var(--spacing-xs);
   
   .section-icon {
     font-size: 36rpx;
@@ -533,7 +533,7 @@ function goProjectDetail(project: any) {
   .section-title {
     font-size: 32rpx;
     font-weight: 600;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 }
 
@@ -541,7 +541,7 @@ function goProjectDetail(project: any) {
   display: flex;
   align-items: center;
   font-size: 26rpx;
-  color: $text-secondary;
+  color: var(--text-secondary);
   
   .arrow {
     margin-left: 4rpx;
@@ -551,26 +551,26 @@ function goProjectDetail(project: any) {
 .invest-list {
   display: flex;
   flex-direction: column;
-  gap: $spacing-base;
+  gap: var(--spacing-base);
 }
 
 .invest-card {
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
-  border-radius: $radius-lg;
-  padding: $spacing-base;
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-base);
   
   .invest-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
     
     .invest-type {
       display: flex;
       align-items: center;
-      gap: $spacing-xs;
+      gap: var(--spacing-xs);
       
       .type-icon {
         font-size: 40rpx;
@@ -579,7 +579,7 @@ function goProjectDetail(project: any) {
       .type-name {
         font-size: 30rpx;
         font-weight: 600;
-        color: $text-primary;
+        color: var(--text-primary);
       }
     }
     
@@ -589,17 +589,17 @@ function goProjectDetail(project: any) {
       border-radius: 8rpx;
       
       &.tag-high {
-        background: linear-gradient(135deg, $danger, #DC2626);
+        background: linear-gradient(135deg, var(--danger), #DC2626);
         color: #fff;
       }
       
       &.tag-new {
-        background: linear-gradient(135deg, $profit, #00CC00);
+        background: linear-gradient(135deg, var(--profit), #00CC00);
         color: #000;
       }
       
       &.tag-safe {
-        background: linear-gradient(135deg, $primary, $primary-dark);
+        background: linear-gradient(135deg, var(--primary), var(--primary)-dark);
         color: #fff;
       }
     }
@@ -608,7 +608,7 @@ function goProjectDetail(project: any) {
   .invest-stats {
     display: flex;
     justify-content: space-around;
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
     
     .stat-item {
       text-align: center;
@@ -620,7 +620,7 @@ function goProjectDetail(project: any) {
         letter-spacing: -1rpx;
 
         &.profit {
-          background: linear-gradient(135deg, $accent-light 0%, $accent-dark 100%);
+          background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-dark) 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -630,7 +630,7 @@ function goProjectDetail(project: any) {
       
       .stat-label {
         font-size: 22rpx;
-        color: $text-secondary;
+        color: var(--text-secondary);
       }
     }
   }
@@ -651,60 +651,60 @@ function goProjectDetail(project: any) {
         
         .progress-fill-small {
           height: 100%;
-          background: $primary;
+          background: var(--primary);
           border-radius: 4rpx;
         }
       }
       
       .progress-text {
         font-size: 20rpx;
-        color: $text-muted;
+        color: var(--text-muted);
         margin-top: 4rpx;
         display: block;
       }
     }
     
     .invest-btn {
-      background: $accent-fire;
+      background: var(--accent-fire);
       color: #fff;
       font-size: 26rpx;
       font-weight: 700;
       padding: 12rpx 32rpx;
       border-radius: 50rpx;
-      margin-left: $spacing-base;
-      box-shadow: $shadow-fire;
+      margin-left: var(--spacing-base);
+      box-shadow: var(--shadow-fire);
       text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.2);
     }
   }
 }
 
 .rules-section {
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
-  border-radius: $radius-lg;
-  padding: $spacing-base;
-  margin-bottom: $spacing-xl;
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-base);
+  margin-bottom: var(--spacing-xl);
   
   .rules-header {
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
     
     .rules-title {
       font-size: 28rpx;
       font-weight: 600;
-      color: $text-primary;
+      color: var(--text-primary);
     }
   }
   
   .rules-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: $spacing-base;
+    gap: var(--spacing-base);
     
     .rule-item {
       display: flex;
       align-items: flex-start;
-      gap: $spacing-sm;
+      gap: var(--spacing-sm);
       
       .rule-icon {
         font-size: 32rpx;
@@ -713,14 +713,14 @@ function goProjectDetail(project: any) {
       .rule-content {
         .rule-title {
           font-size: 26rpx;
-          color: $text-primary;
+          color: var(--text-primary);
           font-weight: 600;
           display: block;
         }
         
         .rule-desc {
           font-size: 22rpx;
-          color: $text-secondary;
+          color: var(--text-secondary);
         }
       }
     }

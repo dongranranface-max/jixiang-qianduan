@@ -252,8 +252,8 @@ function goCheckout() {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
   padding-bottom: 120rpx;
 }
 
@@ -261,17 +261,17 @@ function goCheckout() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $spacing-base 0;
+  padding: var(--spacing-base) 0;
   
   .page-title {
     font-size: 40rpx;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--text-primary);
   }
   
   .edit-btn {
     font-size: 28rpx;
-    color: $primary;
+    color: var(--primary);
   }
 }
 
@@ -280,28 +280,28 @@ function goCheckout() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: $spacing-2xl 0;
+  padding: var(--spacing-2xl) 0;
   
   .empty-icon {
     font-size: 160rpx;
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--spacing-lg);
   }
   
   .empty-text {
     font-size: 32rpx;
-    color: $text-primary;
-    margin-bottom: $spacing-sm;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
   }
   
   .empty-hint {
     font-size: 26rpx;
-    color: $text-secondary;
-    margin-bottom: $spacing-xl;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xl);
   }
   
   .empty-btn {
     padding: 20rpx 64rpx;
-    background: linear-gradient(135deg, $primary, $primary-dark);
+    background: linear-gradient(135deg, var(--primary), var(--primary)-dark);
     border-radius: 50rpx;
     font-size: 30rpx;
     color: #fff;
@@ -310,32 +310,32 @@ function goCheckout() {
 
 .cart-list {
   .cart-group {
-    margin-bottom: $spacing-xl;
+    margin-bottom: var(--spacing-xl);
     
     .group-header {
       display: flex;
       align-items: center;
-      gap: $spacing-sm;
-      padding: $spacing-base 0;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-base) 0;
       
       .group-title {
         font-size: 28rpx;
         font-weight: 600;
-        color: $text-primary;
+        color: var(--text-primary);
       }
     }
     
     .cart-item {
       display: flex;
       align-items: center;
-      background: $bg-card;
-      border-radius: $radius-md;
-      padding: $spacing-base;
-      margin-bottom: $spacing-sm;
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-base);
+      margin-bottom: var(--spacing-sm);
       position: relative;
       
       .item-select, .group-select {
-        margin-right: $spacing-sm;
+        margin-right: var(--spacing-sm);
         
         .checkbox, .checkbox-checked {
           display: flex;
@@ -343,15 +343,15 @@ function goCheckout() {
           justify-content: center;
           width: 40rpx;
           height: 40rpx;
-          border: 2rpx solid $border-color;
+          border: 2rpx solid var(--border-color);
           border-radius: 50%;
           font-size: 24rpx;
           color: transparent;
         }
         
         .checkbox-checked {
-          background: $primary;
-          border-color: $primary;
+          background: var(--primary);
+          border-color: var(--primary);
           color: #fff;
         }
       }
@@ -359,25 +359,25 @@ function goCheckout() {
       .item-image {
         width: 180rpx;
         height: 180rpx;
-        border-radius: $radius-sm;
+        border-radius: var(--radius)-sm;
         flex-shrink: 0;
       }
       
       .item-info {
         flex: 1;
-        margin-left: $spacing-base;
+        margin-left: var(--spacing-base);
         display: flex;
         flex-direction: column;
         
         .item-name {
           font-size: 28rpx;
-          color: $text-primary;
+          color: var(--text-primary);
           @include line-clamp(2);
-          margin-bottom: $spacing-xs;
+          margin-bottom: var(--spacing-xs);
         }
         
         .item-tags {
-          margin-bottom: $spacing-sm;
+          margin-bottom: var(--spacing-sm);
           
           .tag {
             font-size: 18rpx;
@@ -394,18 +394,18 @@ function goCheckout() {
           .item-price-row {
             display: flex;
             align-items: baseline;
-            gap: $spacing-sm;
+            gap: var(--spacing-sm);
           }
           
           .item-price {
             font-size: 32rpx;
             font-weight: 700;
-            color: $primary;
+            color: var(--primary);
           }
           
           .item-points {
             font-size: 22rpx;
-            color: $gold;
+            color: var(--gold);
           }
           
           .item-stepper {
@@ -419,14 +419,14 @@ function goCheckout() {
               align-items: center;
               justify-content: center;
               background: rgba(255,255,255,0.05);
-              border-radius: $radius-sm;
+              border-radius: var(--radius)-sm;
               font-size: 28rpx;
-              color: $text-primary;
+              color: var(--text-primary);
             }
             
             .stepper-value {
               font-size: 28rpx;
-              color: $text-primary;
+              color: var(--text-primary);
               min-width: 60rpx;
               text-align: center;
             }
@@ -436,17 +436,17 @@ function goCheckout() {
       
       .item-delete {
         position: absolute;
-        top: $spacing-sm;
-        right: $spacing-sm;
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
         width: 40rpx;
         height: 40rpx;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba($danger, 0.2);
+        background: rgba(var(--danger), 0.2);
         border-radius: 50%;
         font-size: 28rpx;
-        color: $danger;
+        color: var(--danger);
       }
     }
   }
@@ -469,11 +469,11 @@ function goCheckout() {
   .select-all {
     display: flex;
     align-items: center;
-    gap: $spacing-xs;
+    gap: var(--spacing-xs);
     
     .select-label {
       font-size: 28rpx;
-      color: $text-primary;
+      color: var(--text-primary);
     }
     
     .checkbox, .checkbox-checked {
@@ -482,15 +482,15 @@ function goCheckout() {
       justify-content: center;
       width: 40rpx;
       height: 40rpx;
-      border: 2rpx solid $border-color;
+      border: 2rpx solid var(--border-color);
       border-radius: 50%;
       font-size: 24rpx;
       color: transparent;
     }
     
     .checkbox-checked {
-      background: linear-gradient(135deg, $primary-light, $primary);
-      border-color: $primary;
+      background: linear-gradient(135deg, var(--primary)-light, var(--primary));
+      border-color: var(--primary);
       color: #fff;
       box-shadow: 0 0 12rpx rgba(77,142,255,0.4);
     }
@@ -498,52 +498,52 @@ function goCheckout() {
   
   .total-info {
     flex: 1;
-    margin: 0 $spacing-base;
+    margin: 0 var(--spacing-base);
     text-align: right;
     
     .total-row {
       display: flex;
       align-items: baseline;
       justify-content: flex-end;
-      gap: $spacing-xs;
+      gap: var(--spacing-xs);
       
       .total-label {
         font-size: 26rpx;
-        color: $text-secondary;
+        color: var(--text-secondary);
       }
       
       .total-price {
         font-size: 36rpx;
         font-weight: 700;
-        color: $primary;
+        color: var(--primary);
       }
     }
     
     .points-row {
       .points-label {
         font-size: 22rpx;
-        color: $gold;
+        color: var(--gold);
       }
     }
   }
   
   .submit-btn {
-    background: $accent-fire;
+    background: var(--accent-fire);
     color: #fff;
     padding: 20rpx 48rpx;
     border-radius: 50rpx;
     font-size: 30rpx;
     font-weight: 700;
-    box-shadow: $shadow-fire;
+    box-shadow: var(--shadow-fire);
   }
   
   .delete-btn {
-    background: $danger;
+    background: var(--danger);
     color: #fff;
     padding: 20rpx 32rpx;
     border-radius: 50rpx;
     font-size: 30rpx;
-    margin-left: $spacing-sm;
+    margin-left: var(--spacing-sm);
   }
 }
 

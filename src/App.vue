@@ -1,30 +1,25 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
-
-onLaunch(() => {
-  // App 启动
-})
-
-onShow(() => {
-  // App 显示
-})
-
-onHide(() => {
-  // App 隐藏
-})
 </script>
 
 <style lang="scss">
+@import './styles/theme.scss';
+
 /* ============================================
-   全局样式 - Futuristic FinTech 玻璃拟态
+   全局样式 - 冰火金融科技
+   冰蓝 #00D4FF × 火焰 #FF6B35 · 深邃科技
    ============================================ */
 
-/* 深邃深空背景：径向渐变 */
+/* 深空背景 + 顶部冰火渐变光效 */
 page {
-  background: radial-gradient(ellipse at 50% 0%, #0A1628 0%, #060B28 40%, #020510 100%);
+  background: radial-gradient(ellipse at 50% -20%,
+    rgba(0, 212, 255, 0.08) 0%,
+    rgba(255, 107, 53, 0.03) 30%,
+    #060B28 60%,
+    #020510 100%);
   background-attachment: fixed;
   background-color: #060B28;
-  color: #FFFFFF;
+  color: #E8F4FF;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
   font-size: 28rpx;
   line-height: 1.5;
@@ -37,17 +32,22 @@ page {
   height: 0;
 }
 
-/* 全局毛玻璃（legacy 兼容） */
+/* 全局毛玻璃 */
 .glass {
-  background: rgba(30, 41, 59, 0.55);
+  background: rgba(13, 27, 62, 0.60);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1rpx solid rgba(255, 255, 255, 0.12);
+  border: 1rpx solid rgba(0, 212, 255, 0.15);
 }
 
-/* 发光效果 */
+/* 冰蓝发光 */
 .glow {
-  box-shadow: 0 0 30px rgba(77, 142, 255, 0.4);
+  box-shadow: 0 0 30rpx rgba(0, 212, 255, 0.40);
+}
+
+/* 火焰发光 */
+.glow-fire {
+  box-shadow: 0 0 30rpx rgba(255, 107, 53, 0.50);
 }
 
 /* 安全区域 */
@@ -63,27 +63,43 @@ page {
 
 /* 动画 */
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20rpx rgba(77, 142, 255, 0.4); }
-  50% { box-shadow: 0 0 40rpx rgba(77, 142, 255, 0.6); }
+  0%, 100% { box-shadow: 0 0 20rpx rgba(0, 212, 255, 0.40); }
+  50% { box-shadow: 0 0 40rpx rgba(0, 212, 255, 0.65); }
 }
 
 @keyframes fire-breathe {
   0%, 100% {
-    box-shadow: 0 0 20rpx rgba(255, 140, 0, 0.3);
+    box-shadow: 0 0 20rpx rgba(255, 107, 53, 0.35);
   }
   50% {
-    box-shadow: 0 0 40rpx rgba(255, 140, 0, 0.6);
+    box-shadow: 0 0 40rpx rgba(255, 69, 0, 0.60);
   }
 }
 
 @keyframes circuit-flow {
-  0% { opacity: 0.2; }
-  50% { opacity: 0.6; }
-  100% { opacity: 0.2; }
+  0% { opacity: 0.15; }
+  50% { opacity: 0.50; }
+  100% { opacity: 0.15; }
 }
 
-@keyframes badge-pulse {
-  0%, 100% { box-shadow: 0 0 20rpx rgba(255, 69, 0, 0.4); }
-  50% { box-shadow: 0 0 40rpx rgba(255, 69, 0, 0.7); }
+@keyframes badge-glow {
+  0%, 100% { box-shadow: 0 0 20rpx rgba(255, 215, 0, 0.35); }
+  50% { box-shadow: 0 0 40rpx rgba(255, 215, 0, 0.60); }
+}
+
+/* 顶部冰蓝光弧 */
+.top-arc {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2rpx;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0, 212, 255, 0.60) 20%,
+    rgba(255, 107, 53, 0.60) 80%,
+    transparent 100%);
+  z-index: 9999;
+  pointer-events: none;
 }
 </style>

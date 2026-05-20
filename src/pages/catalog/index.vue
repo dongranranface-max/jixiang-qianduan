@@ -232,38 +232,38 @@ function goProduct(p: any) {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
+  background: var(--bg-primary);
   display: flex;
   flex-direction: column;
 }
 
 .search-bar {
-  padding: $spacing-base $spacing-lg;
-  background: $bg-primary;
+  padding: var(--spacing-base) var(--spacing-lg);
+  background: var(--bg-primary);
 
   .search-input-wrap {
     display: flex;
     align-items: center;
-    background: $glass-bg;
+    background: var(--glass-bg);
     backdrop-filter: blur(20px);
-    border: 1rpx solid $glass-border;
+    border: 1rpx solid var(--glass-border);
     border-radius: 50rpx;
-    padding: 0 $spacing-base;
+    padding: 0 var(--spacing-base);
     height: 72rpx;
 
     .search-icon {
       font-size: 32rpx;
-      margin-right: $spacing-sm;
-      color: $primary-light;
+      margin-right: var(--spacing-sm);
+      color: var(--primary)-light;
     }
 
     .search-input {
       flex: 1;
       font-size: 28rpx;
-      color: $text-primary;
+      color: var(--text-primary);
 
       &::placeholder {
-        color: $text-muted;
+        color: var(--text-muted);
       }
     }
   }
@@ -271,9 +271,9 @@ function goProduct(p: any) {
 
 .mall-tabs {
   display: flex;
-  padding: 0 $spacing-lg $spacing-base;
-  gap: $spacing-base;
-  background: $bg-primary;
+  padding: 0 var(--spacing-lg) var(--spacing-base);
+  gap: var(--spacing-base);
+  background: var(--bg-primary);
 
   .mall-tab {
     flex: 1;
@@ -281,17 +281,17 @@ function goProduct(p: any) {
     flex-direction: column;
     align-items: center;
     gap: 4rpx;
-    padding: $spacing-sm 0;
-    border-radius: $radius-lg;
-    background: $glass-bg;
+    padding: var(--spacing-sm) 0;
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
     backdrop-filter: blur(20px);
-    border: 1rpx solid $glass-border;
+    border: 1rpx solid var(--glass-border);
     transition: all 0.3s;
 
     &.active {
-      border-color: $primary;
-      background: linear-gradient(135deg, rgba(77,142,255,0.15), rgba(77,142,255,0.08));
-      box-shadow: $shadow-glow;
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,212,255,0.08));
+      box-shadow: var(--shadow-glow);
     }
 
     .mall-tab-icon {
@@ -300,11 +300,11 @@ function goProduct(p: any) {
 
     .mall-tab-text {
       font-size: 24rpx;
-      color: $text-secondary;
+      color: var(--text-secondary);
       font-weight: 500;
 
       .active & {
-        color: $primary-light;
+        color: var(--primary-light);
         font-weight: 700;
       }
     }
@@ -321,7 +321,7 @@ function goProduct(p: any) {
   width: 160rpx;
   height: calc(100vh - 300rpx);
   background: rgba(10, 22, 40, 0.8);
-  border-right: 1rpx solid $border-light;
+  border-right: 1rpx solid var(--border-light);
 
   .category-item {
     display: flex;
@@ -329,14 +329,14 @@ function goProduct(p: any) {
     justify-content: center;
     height: 100rpx;
     font-size: 26rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
     border-left: 4rpx solid transparent;
     transition: all 0.2s;
 
     &.active {
-      background: $bg-primary;
-      color: $primary;
-      border-left-color: $primary;
+      background: var(--bg-primary);
+      color: var(--primary);
+      border-left-color: var(--primary);
       font-weight: 600;
     }
   }
@@ -345,7 +345,7 @@ function goProduct(p: any) {
 .product-list {
   flex: 1;
   height: calc(100vh - 300rpx);
-  padding: $spacing-base;
+  padding: var(--spacing-base);
 
   .loading-wrap,
   .empty-wrap {
@@ -357,17 +357,17 @@ function goProduct(p: any) {
 
     .loading-text {
       font-size: 28rpx;
-      color: $text-muted;
+      color: var(--text-muted);
     }
 
     .empty-icon {
       font-size: 80rpx;
-      margin-bottom: $spacing-base;
+      margin-bottom: var(--spacing-base);
     }
 
     .empty-text {
       font-size: 28rpx;
-      color: $text-muted;
+      color: var(--text-muted);
     }
   }
 }
@@ -375,19 +375,19 @@ function goProduct(p: any) {
 .product-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: $spacing-base;
+  gap: var(--spacing-base);
 }
 
 .product-card {
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
-  border-radius: $radius-lg;
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 
   &:active {
-    border-color: rgba(77,142,255,0.4);
-    box-shadow: $shadow-glow;
+    border-color: rgba(0,212,255,0.4);
+    box-shadow: var(--shadow-glow);
   }
 
   .product-image {
@@ -397,11 +397,11 @@ function goProduct(p: any) {
   }
 
   .product-info {
-    padding: $spacing-base;
+    padding: var(--spacing-base);
 
     .product-name {
       font-size: 26rpx;
-      color: $text-primary;
+      color: var(--text-primary);
       display: block;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -417,26 +417,26 @@ function goProduct(p: any) {
 
       .price-symbol {
         font-size: 22rpx;
-        color: $primary-light;
+        color: var(--primary-light);
       }
 
       .price-value {
         font-size: 30rpx;
         font-weight: 700;
-        color: $primary-light;
+        color: var(--primary-light);
       }
 
       .original-price {
         font-size: 22rpx;
-        color: $text-muted;
+        color: var(--text-muted);
         text-decoration: line-through;
         margin-left: 8rpx;
       }
 
       .points-tag {
         font-size: 20rpx;
-        color: $accent;
-        background: rgba($accent, 0.15);
+        color: var(--accent);
+        background: rgba(255,107,53,0.15);
         padding: 2rpx 10rpx;
         border-radius: 999rpx;
         margin-left: 8rpx;
@@ -445,9 +445,9 @@ function goProduct(p: any) {
 
       .points-tag-full {
         font-size: 24rpx;
-        color: $accent;
+        color: var(--accent);
         font-weight: 700;
-        text-shadow: 0 0 8rpx rgba($accent, 0.3);
+        text-shadow: 0 0 8rpx rgba(255,107,53,0.30);
       }
     }
   }
@@ -456,8 +456,8 @@ function goProduct(p: any) {
 .load-more,
 .no-more {
   text-align: center;
-  padding: $spacing-base 0;
+  padding: var(--spacing-base) 0;
   font-size: 26rpx;
-  color: $text-muted;
+  color: var(--text-muted);
 }
 </style>

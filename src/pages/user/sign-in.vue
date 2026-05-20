@@ -182,8 +182,8 @@ async function doSign() {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
 }
 
 .nav-bar {
@@ -207,34 +207,34 @@ async function doSign() {
 }
 
 .sign-card {
-  background: $bg-card;
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-lg;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
   
   .sign-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: $spacing-lg;
+    margin-bottom: var(--spacing-lg);
     
     .sign-date {
       font-size: 32rpx;
       font-weight: 600;
-      color: $text-primary;
+      color: var(--text-primary);
     }
     
     .sign-status {
       padding: 8rpx 24rpx;
-      background: rgba($primary, 0.2);
+      background: rgba(var(--primary), 0.2);
       border-radius: 50rpx;
       font-size: 24rpx;
-      color: $primary;
+      color: var(--primary);
       
       &.signed {
-        background: rgba($profit, 0.2);
-        color: $profit;
+        background: rgba(var(--profit), 0.2);
+        color: var(--profit);
       }
     }
   }
@@ -242,13 +242,13 @@ async function doSign() {
   .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: $spacing-sm;
-    margin-bottom: $spacing-base;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-base);
     
     .weekday {
       text-align: center;
       font-size: 24rpx;
-      color: $text-muted;
+      color: var(--text-muted);
       padding: 8rpx 0;
     }
     
@@ -258,32 +258,32 @@ async function doSign() {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: $bg-card;
-      border-radius: $radius-sm;
+      background: var(--bg-card);
+      border-radius: var(--radius)-sm;
       position: relative;
       
       .day-text {
         font-size: 28rpx;
-        color: $text-primary;
+        color: var(--text-primary);
       }
       
       .sign-mark {
         font-size: 16rpx;
-        color: $profit;
+        color: var(--profit);
         margin-top: 2rpx;
       }
       
       &.is-today {
-        background: rgba($primary, 0.2);
-        border: 2rpx solid $primary;
+        background: rgba(var(--primary), 0.2);
+        border: 2rpx solid var(--primary);
         
-        .day-text { color: $primary; font-weight: 600; }
+        .day-text { color: var(--primary); font-weight: 600; }
       }
       
       &.is-signed {
-        background: rgba($profit, 0.15);
+        background: rgba(var(--profit), 0.15);
         
-        .day-text { color: $profit; }
+        .day-text { color: var(--profit); }
       }
       
       &.is-future {
@@ -296,39 +296,39 @@ async function doSign() {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: $spacing-sm;
-    padding: $spacing-base;
-    background: rgba($gold, 0.1);
-    border-radius: $radius-sm;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-base);
+    background: rgba(var(--gold), 0.1);
+    border-radius: var(--radius)-sm;
     
     .reward-icon { font-size: 32rpx; }
     .reward-text {
       font-size: 26rpx;
-      color: $gold;
+      color: var(--gold);
     }
   }
 }
 
 .sign-btn-area {
-  margin-bottom: $spacing-lg;
+  margin-bottom: var(--spacing-lg);
   
   .sign-btn {
     width: 100%;
     height: 96rpx;
-    background: linear-gradient(135deg, $primary, $primary-dark);
+    background: linear-gradient(135deg, var(--primary), var(--primary)-dark);
     border-radius: 48rpx;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: $shadow-glow;
+    box-shadow: var(--shadow-glow);
     
     &.disabled {
-      background: $bg-card;
+      background: var(--bg-card);
       box-shadow: none;
       
-      .btn-text { color: $text-muted; }
-      .btn-reward { color: $text-muted; }
+      .btn-text { color: var(--text-muted); }
+      .btn-reward { color: var(--text-muted); }
     }
     
     .btn-text {
@@ -345,33 +345,33 @@ async function doSign() {
 }
 
 .rules-section {
-  background: $bg-card;
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
-  border-radius: $radius-md;
-  padding: $spacing-base;
-  margin-bottom: $spacing-lg;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-base);
+  margin-bottom: var(--spacing-lg);
   
   .rules-title {
     font-size: 28rpx;
     font-weight: 600;
-    color: $text-primary;
-    margin-bottom: $spacing-base;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-base);
   }
   
   .rules-list {
     .rule-item {
       display: flex;
       align-items: center;
-      gap: $spacing-sm;
-      margin-bottom: $spacing-sm;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-sm);
       
       .rule-num {
         width: 36rpx;
         height: 36rpx;
-        background: rgba($primary, 0.2);
+        background: rgba(var(--primary), 0.2);
         border-radius: 50%;
         font-size: 22rpx;
-        color: $primary;
+        color: var(--primary);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -379,7 +379,7 @@ async function doSign() {
       
       .rule-text {
         font-size: 26rpx;
-        color: $text-secondary;
+        color: var(--text-secondary);
       }
     }
   }
@@ -389,33 +389,33 @@ async function doSign() {
   .section-title {
     font-size: 28rpx;
     font-weight: 600;
-    color: $text-primary;
-    margin-bottom: $spacing-base;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-base);
   }
   
   .records-list {
-    background: $bg-card;
+    background: var(--bg-card);
     backdrop-filter: blur(20px);
-    border-radius: $radius-md;
-    padding: $spacing-base;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-base);
     
     .record-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: $spacing-sm 0;
-      border-bottom: 1rpx solid $border-light;
+      padding: var(--spacing-sm) 0;
+      border-bottom: 1rpx solid var(--border-light);
       
       &:last-child { border-bottom: none; }
       
       .record-date {
         font-size: 26rpx;
-        color: $text-secondary;
+        color: var(--text-secondary);
       }
       
       .record-points {
         font-size: 26rpx;
-        color: $profit;
+        color: var(--profit);
         font-weight: 600;
       }
     }

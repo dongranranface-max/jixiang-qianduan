@@ -115,17 +115,17 @@ async function doRedeem(h: any, early: boolean) {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
 }
 
 .page-header {
-  padding: $spacing-base 0;
+  padding: var(--spacing-base) 0;
 
   .page-title {
     font-size: 40rpx;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 }
 
@@ -140,22 +140,22 @@ async function doRedeem(h: any, early: boolean) {
 
   .empty-text {
     font-size: 32rpx;
-    color: $text-primary;
+    color: var(--text-primary);
     display: block;
-    margin-top: $spacing-base;
+    margin-top: var(--spacing-base);
   }
 
   .empty-sub {
     font-size: 26rpx;
-    color: $text-muted;
+    color: var(--text-muted);
     display: block;
     margin-top: 8rpx;
   }
 
   .go-invest {
     display: inline-block;
-    margin-top: $spacing-xl;
-    background: $primary;
+    margin-top: var(--spacing-xl);
+    background: var(--primary);
     color: #000;
     padding: 16rpx 48rpx;
     border-radius: 50rpx;
@@ -169,11 +169,11 @@ async function doRedeem(h: any, early: boolean) {
 }
 
 .holding-card {
-  background: $bg-card;
-  border: 1rpx solid $border-color;
-  border-radius: $radius-md;
-  padding: $spacing-base $spacing-lg;
-  margin-bottom: $spacing-base;
+  background: var(--bg-card);
+  border: 1rpx solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-base) var(--spacing-lg);
+  margin-bottom: var(--spacing-base);
 
   .card-header {
     display: flex;
@@ -183,7 +183,7 @@ async function doRedeem(h: any, early: boolean) {
     .product-name {
       font-size: 30rpx;
       font-weight: 600;
-      color: $text-primary;
+      color: var(--text-primary);
     }
 
     .status-tag {
@@ -192,13 +192,13 @@ async function doRedeem(h: any, early: boolean) {
       border-radius: 8rpx;
 
       &.active {
-        background: rgba($profit, 0.2);
-        color: $profit;
+        background: rgba(var(--profit), 0.2);
+        color: var(--profit);
       }
 
       &.inactive {
-        background: $bg-secondary;
-        color: $text-muted;
+        background: var(--bg-secondary);
+        color: var(--text-muted);
       }
     }
   }
@@ -206,26 +206,26 @@ async function doRedeem(h: any, early: boolean) {
   .card-stats {
     display: flex;
     justify-content: space-around;
-    margin: $spacing-base 0;
+    margin: var(--spacing-base) 0;
 
     .stat {
       text-align: center;
 
       .stat-label {
         font-size: 22rpx;
-        color: $text-muted;
+        color: var(--text-muted);
         display: block;
       }
 
       .stat-val {
         font-size: 28rpx;
         font-weight: 600;
-        color: $text-primary;
+        color: var(--text-primary);
         display: block;
         margin-top: 4rpx;
 
         &.profit {
-          color: $profit;
+          color: var(--profit);
         }
       }
     }
@@ -233,13 +233,13 @@ async function doRedeem(h: any, early: boolean) {
 
   .card-date {
     font-size: 22rpx;
-    color: $text-muted;
+    color: var(--text-muted);
   }
 
   .card-actions {
     display: flex;
-    gap: $spacing-base;
-    margin-top: $spacing-base;
+    gap: var(--spacing-base);
+    margin-top: var(--spacing-base);
 
     .redeem-btn, .early-btn {
       flex: 1;
@@ -251,13 +251,13 @@ async function doRedeem(h: any, early: boolean) {
     }
 
     .redeem-btn {
-      background: $profit;
+      background: var(--profit);
       color: #000;
     }
 
     .early-btn {
-      border: 1rpx solid $border-color;
-      color: $text-secondary;
+      border: 1rpx solid var(--border-color);
+      color: var(--text-secondary);
     }
   }
 }

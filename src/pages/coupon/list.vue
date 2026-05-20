@@ -187,7 +187,7 @@ function formatDate(dateStr: string | undefined): string {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
+  background: var(--bg-primary);
 }
 
 .nav-bar {
@@ -212,20 +212,20 @@ function formatDate(dateStr: string | undefined): string {
 
 .coupon-tabs {
   display: flex;
-  padding: 0 $spacing-lg;
-  border-bottom: 1rpx solid $border-color;
+  padding: 0 var(--spacing-lg);
+  border-bottom: 1rpx solid var(--border-color);
   
   .coupon-tab {
     flex: 1;
     text-align: center;
     font-size: 28rpx;
-    color: $text-secondary;
-    padding: $spacing-base 0;
+    color: var(--text-secondary);
+    padding: var(--spacing-base) 0;
     border-bottom: 4rpx solid transparent;
     
     &.active {
-      color: $primary;
-      border-bottom-color: $primary;
+      color: var(--primary);
+      border-bottom-color: var(--primary);
       font-weight: 600;
     }
   }
@@ -233,14 +233,14 @@ function formatDate(dateStr: string | undefined): string {
 
 .coupon-list {
   height: calc(100vh - 200rpx);
-  padding: $spacing-base $spacing-lg;
+  padding: var(--spacing-base) var(--spacing-lg);
 }
 
 .coupon-card {
   display: flex;
-  background: $bg-card;
-  border-radius: $radius-md;
-  margin-bottom: $spacing-base;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-base);
   overflow: hidden;
   position: relative;
   
@@ -248,18 +248,18 @@ function formatDate(dateStr: string | undefined): string {
     opacity: 0.6;
     
     .coupon-left {
-      .coupon-value { color: $text-muted; }
+      .coupon-value { color: var(--text-muted); }
     }
   }
   
   .coupon-left {
     width: 220rpx;
-    background: linear-gradient(135deg, $primary, $primary-dark);
+    background: linear-gradient(135deg, var(--primary), var(--primary)-dark);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: $spacing-base;
+    padding: var(--spacing-base);
     
     .coupon-value {
       display: flex;
@@ -286,7 +286,7 @@ function formatDate(dateStr: string | undefined): string {
   
   .coupon-right {
     flex: 1;
-    padding: $spacing-base;
+    padding: var(--spacing-base);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -294,23 +294,23 @@ function formatDate(dateStr: string | undefined): string {
     .coupon-name {
       font-size: 28rpx;
       font-weight: 600;
-      color: $text-primary;
+      color: var(--text-primary);
     }
     
     .coupon-range, .coupon-date {
       font-size: 22rpx;
-      color: $text-muted;
+      color: var(--text-muted);
       margin-top: 8rpx;
     }
     
     .coupon-use-btn {
       width: fit-content;
       padding: 8rpx 24rpx;
-      background: linear-gradient(135deg, $primary, $primary-dark);
+      background: linear-gradient(135deg, var(--primary), var(--primary)-dark);
       border-radius: 50rpx;
       font-size: 22rpx;
       color: #fff;
-      margin-top: $spacing-sm;
+      margin-top: var(--spacing-sm);
     }
   }
   
@@ -320,20 +320,20 @@ function formatDate(dateStr: string | undefined): string {
     right: 0;
     padding: 8rpx 24rpx;
     font-size: 20rpx;
-    border-radius: 0 $radius-md 0 $radius-sm;
+    border-radius: 0 var(--radius-md) 0 var(--radius)-sm;
     
     &.available {
-      background: $profit;
+      background: var(--profit);
       color: #000;
     }
     
     &.used {
-      background: $text-muted;
+      background: var(--text-muted);
       color: #fff;
     }
     
     &.expired {
-      background: $danger;
+      background: var(--danger);
       color: #fff;
     }
   }
@@ -343,16 +343,16 @@ function formatDate(dateStr: string | undefined): string {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: $spacing-2xl 0;
+  padding: var(--spacing-2xl) 0;
   
   .empty-icon {
     font-size: 120rpx;
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
   }
   
   .empty-text {
     font-size: 28rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 }
 </style>

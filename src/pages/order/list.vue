@@ -176,7 +176,7 @@ async function payOrder(order: any) {
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
 
-.page-container { min-height: 100vh; background: $bg-primary; }
+.page-container { min-height: 100vh; background: var(--bg-primary); }
 
 .nav-bar {
   display: flex; align-items: center; justify-content: space-between;
@@ -187,55 +187,55 @@ async function payOrder(order: any) {
 }
 
 .mall-tabs {
-  display: flex; padding: $spacing-base 32rpx; border-bottom: 1rpx solid $border-color;
-  .tab-item { flex: 1; text-align: center; font-size: 28rpx; color: $text-secondary; padding: $spacing-sm 0; border-bottom: 4rpx solid transparent;
-    &.active { color: $primary; border-bottom-color: $primary; }
+  display: flex; padding: var(--spacing-base) 32rpx; border-bottom: 1rpx solid var(--border-color);
+  .tab-item { flex: 1; text-align: center; font-size: 28rpx; color: var(--text-secondary); padding: var(--spacing-sm) 0; border-bottom: 4rpx solid transparent;
+    &.active { color: var(--primary); border-bottom-color: var(--primary); }
   }
 }
 
-.order-list { height: calc(100vh - 200rpx); padding: $spacing-base $spacing-lg; }
+.order-list { height: calc(100vh - 200rpx); padding: var(--spacing-base) var(--spacing-lg); }
 
 .order-card {
-  background: $bg-card; border-radius: $radius-md; padding: $spacing-base; margin-bottom: $spacing-base;
+  background: var(--bg-card); border-radius: var(--radius-md); padding: var(--spacing-base); margin-bottom: var(--spacing-base);
 
-  .order-header { display: flex; justify-content: space-between; margin-bottom: $spacing-base;
-    .order-no { font-size: 24rpx; color: $text-secondary; }
-    .order-status { font-size: 26rpx; font-weight: 600; color: $primary;
-      &.status-1 { color: $warning; }
-      &.status-4 { color: $text-muted; }
+  .order-header { display: flex; justify-content: space-between; margin-bottom: var(--spacing-base);
+    .order-no { font-size: 24rpx; color: var(--text-secondary); }
+    .order-status { font-size: 26rpx; font-weight: 600; color: var(--primary);
+      &.status-1 { color: var(--warning); }
+      &.status-4 { color: var(--text-muted); }
     }
   }
 
   .order-items {
-    .order-item { display: flex; align-items: center; padding: $spacing-xs 0;
-      .item-image { width: 120rpx; height: 120rpx; border-radius: $radius-sm; }
-      .item-info { flex: 1; margin-left: $spacing-sm;
-        .item-name { font-size: 26rpx; color: $text-primary; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .item-quantity { font-size: 24rpx; color: $text-muted; }
+    .order-item { display: flex; align-items: center; padding: var(--spacing-xs) 0;
+      .item-image { width: 120rpx; height: 120rpx; border-radius: var(--radius)-sm; }
+      .item-info { flex: 1; margin-left: var(--spacing-sm);
+        .item-name { font-size: 26rpx; color: var(--text-primary); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .item-quantity { font-size: 24rpx; color: var(--text-muted); }
       }
-      .item-price { font-size: 28rpx; color: $text-primary; }
+      .item-price { font-size: 28rpx; color: var(--text-primary); }
     }
   }
 
-  .order-footer { display: flex; justify-content: space-between; align-items: center; padding: $spacing-base 0; border-top: 1rpx solid $border-light; margin-top: $spacing-xs;
-    .order-time { font-size: 24rpx; color: $text-muted; }
+  .order-footer { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-base) 0; border-top: 1rpx solid var(--border-light); margin-top: var(--spacing-xs);
+    .order-time { font-size: 24rpx; color: var(--text-muted); }
     .order-amount { text-align: right;
-      .amount-label { font-size: 24rpx; color: $text-secondary; }
-      .amount-value { font-size: 32rpx; font-weight: 700; color: $primary; }
+      .amount-label { font-size: 24rpx; color: var(--text-secondary); }
+      .amount-value { font-size: 32rpx; font-weight: 700; color: var(--primary); }
     }
   }
 
-  .order-actions { display: flex; justify-content: flex-end; gap: $spacing-sm; padding-top: $spacing-base; border-top: 1rpx solid $border-light;
+  .order-actions { display: flex; justify-content: flex-end; gap: var(--spacing-sm); padding-top: var(--spacing-base); border-top: 1rpx solid var(--border-light);
     .action-btn { padding: 12rpx 32rpx; border-radius: 50rpx; font-size: 26rpx;
-      &.btn-pay { background: linear-gradient(135deg, $primary, darken($primary, 10%)); color: #0a0a0b; font-weight: 600; }
-      &.btn-remind, &.btn-confirm { background: transparent; border: 1rpx solid $primary; color: $primary; }
+      &.btn-pay { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #0a0a0b; font-weight: 600; }
+      &.btn-remind, &.btn-confirm { background: transparent; border: 1rpx solid var(--primary); color: var(--primary); }
     }
   }
 }
 
-.loading { text-align: center; padding: $spacing-base; color: $text-muted; font-size: 26rpx; }
+.loading { text-align: center; padding: var(--spacing-base); color: var(--text-muted); font-size: 26rpx; }
 .empty-state { display: flex; flex-direction: column; align-items: center; padding: 120rpx 0;
-  .empty-icon { font-size: 120rpx; margin-bottom: $spacing-base; }
-  .empty-text { font-size: 28rpx; color: $text-secondary; }
+  .empty-icon { font-size: 120rpx; margin-bottom: var(--spacing-base); }
+  .empty-text { font-size: 28rpx; color: var(--text-secondary); }
 }
 </style>

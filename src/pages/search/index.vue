@@ -198,69 +198,69 @@ watch(keyword, (newVal) => {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
 }
 
 .search-header {
   display: flex;
   align-items: center;
-  gap: $spacing-base;
-  padding: $spacing-base 0;
+  gap: var(--spacing-base);
+  padding: var(--spacing-base) 0;
   
   .search-bar {
     flex: 1;
     display: flex;
     align-items: center;
     height: 72rpx;
-    background: $bg-card;
+    background: var(--bg-card);
     backdrop-filter: blur(20px);
-    border: 1rpx solid $border-color;
+    border: 1rpx solid var(--border-color);
     border-radius: 36rpx;
-    padding: 0 $spacing-base;
+    padding: 0 var(--spacing-base);
     
     .search-icon {
       font-size: 32rpx;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
     
     .search-input {
       flex: 1;
       font-size: 28rpx;
       color: #fff;
-      margin: 0 $spacing-sm;
+      margin: 0 var(--spacing-sm);
     }
     
     .clear-icon {
       font-size: 36rpx;
-      color: $text-muted;
+      color: var(--text-muted);
     }
   }
   
   .cancel-btn {
     font-size: 28rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 }
 
 .history-section, .hot-section {
-  margin-top: $spacing-xl;
+  margin-top: var(--spacing-xl);
   
   .section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
     
     .section-title {
       font-size: 30rpx;
       font-weight: 600;
-      color: $text-primary;
+      color: var(--text-primary);
     }
     
     .clear-history {
       font-size: 26rpx;
-      color: $primary;
+      color: var(--primary);
     }
   }
 }
@@ -268,15 +268,15 @@ watch(keyword, (newVal) => {
 .history-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: $spacing-sm;
+  gap: var(--spacing-sm);
   
   .history-tag {
     padding: 12rpx 24rpx;
-    background: $bg-card;
-    border: 1rpx solid $border-color;
+    background: var(--bg-card);
+    border: 1rpx solid var(--border-color);
     border-radius: 50rpx;
     font-size: 26rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 }
 
@@ -284,8 +284,8 @@ watch(keyword, (newVal) => {
   .hot-item {
     display: flex;
     align-items: center;
-    padding: $spacing-base 0;
-    border-bottom: 1rpx solid $border-light;
+    padding: var(--spacing-base) 0;
+    border-bottom: 1rpx solid var(--border-light);
     
     .hot-rank {
       width: 48rpx;
@@ -295,35 +295,35 @@ watch(keyword, (newVal) => {
       justify-content: center;
       font-size: 28rpx;
       font-weight: 700;
-      color: $text-secondary;
-      background: $bg-card;
+      color: var(--text-secondary);
+      background: var(--bg-card);
       border-radius: 8rpx;
       
-      &.rank-1 { color: $gold; background: rgba($gold, 0.2); }
+      &.rank-1 { color: var(--gold); background: rgba(var(--gold), 0.2); }
       &.rank-2 { color: #C0C0C0; background: rgba(192, 192, 192, 0.2); }
       &.rank-3 { color: #CD7F32; background: rgba(205, 127, 50, 0.2); }
     }
     
     .hot-info {
       flex: 1;
-      margin-left: $spacing-base;
+      margin-left: var(--spacing-base);
       
       .hot-keyword {
         font-size: 28rpx;
-        color: $text-primary;
+        color: var(--text-primary);
         font-weight: 500;
       }
       
       .hot-desc {
         font-size: 22rpx;
-        color: $text-muted;
-        margin-left: $spacing-sm;
+        color: var(--text-muted);
+        margin-left: var(--spacing-sm);
       }
     }
     
     .hot-tag {
       padding: 4rpx 12rpx;
-      background: $danger;
+      background: var(--danger);
       color: #fff;
       font-size: 20rpx;
       border-radius: 6rpx;
@@ -332,62 +332,62 @@ watch(keyword, (newVal) => {
 }
 
 .result-section {
-  margin-top: $spacing-lg;
+  margin-top: var(--spacing-lg);
   
   .result-header {
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
     
     .result-count {
       font-size: 26rpx;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
   }
   
   .result-list {
     display: flex;
     flex-direction: column;
-    gap: $spacing-base;
+    gap: var(--spacing-base);
     
     .result-item {
       display: flex;
-      background: $bg-card;
-      border-radius: $radius-md;
+      background: var(--bg-card);
+      border-radius: var(--radius-md);
       overflow: hidden;
-      padding: $spacing-base;
+      padding: var(--spacing-base);
       
       .result-image {
         width: 180rpx;
         height: 180rpx;
-        border-radius: $radius-sm;
+        border-radius: var(--radius)-sm;
       }
       
       .result-info {
         flex: 1;
-        margin-left: $spacing-base;
+        margin-left: var(--spacing-base);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         
         .result-name {
           font-size: 28rpx;
-          color: $text-primary;
+          color: var(--text-primary);
           @include line-clamp(2);
         }
         
         .result-bottom {
           display: flex;
           align-items: baseline;
-          gap: $spacing-sm;
+          gap: var(--spacing-sm);
           
           .result-price {
             font-size: 32rpx;
             font-weight: 700;
-            color: $primary;
+            color: var(--primary);
           }
           
           .result-points {
             font-size: 22rpx;
-            color: $gold;
+            color: var(--gold);
           }
         }
       }
@@ -400,43 +400,43 @@ watch(keyword, (newVal) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: $spacing-2xl 0;
+  padding: var(--spacing-2xl) 0;
   
   .empty-icon {
     font-size: 120rpx;
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
   }
   
   .empty-text {
     font-size: 32rpx;
-    color: $text-primary;
-    margin-bottom: $spacing-sm;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
   }
   
   .empty-hint {
     font-size: 26rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 }
 
 .suggest-section {
-  margin-top: $spacing-lg;
+  margin-top: var(--spacing-lg);
   
   .suggest-item {
     display: flex;
     align-items: center;
-    padding: $spacing-base 0;
-    border-bottom: 1rpx solid $border-light;
+    padding: var(--spacing-base) 0;
+    border-bottom: 1rpx solid var(--border-light);
     
     .suggest-icon {
       font-size: 28rpx;
-      color: $text-secondary;
-      margin-right: $spacing-sm;
+      color: var(--text-secondary);
+      margin-right: var(--spacing-sm);
     }
     
     .suggest-text {
       font-size: 28rpx;
-      color: $text-primary;
+      color: var(--text-primary);
     }
   }
 }

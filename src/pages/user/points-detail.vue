@@ -179,7 +179,7 @@ function goBack() {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
+  background: var(--bg-primary);
 }
 
 .nav-bar {
@@ -204,20 +204,20 @@ function goBack() {
 
 .points-overview {
   display: flex;
-  gap: $spacing-base;
-  padding: 0 $spacing-lg;
-  margin-bottom: $spacing-lg;
+  gap: var(--spacing-base);
+  padding: 0 var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
   
   .points-card {
     flex: 1;
-    padding: $spacing-lg;
-    border-radius: $radius-md;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
     
     .card-header {
       display: flex;
       align-items: center;
-      gap: $spacing-sm;
-      margin-bottom: $spacing-sm;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-sm);
       
       .card-icon {
         font-size: 36rpx;
@@ -225,7 +225,7 @@ function goBack() {
       
       .card-title {
         font-size: 26rpx;
-        color: $text-secondary;
+        color: var(--text-secondary);
       }
     }
     
@@ -237,41 +237,41 @@ function goBack() {
     
     .points-tips {
       font-size: 22rpx;
-      color: $text-muted;
+      color: var(--text-muted);
       margin-top: 4rpx;
       display: block;
     }
     
     &.eco-card {
-      background: linear-gradient(135deg, rgba($gold, 0.2), rgba($gold, 0.05));
-      border: 1rpx solid rgba($gold, 0.3);
+      background: linear-gradient(135deg, rgba(var(--gold), 0.2), rgba(var(--gold), 0.05));
+      border: 1rpx solid rgba(var(--gold), 0.3);
       
-      .points-value { color: $gold; }
+      .points-value { color: var(--gold); }
     }
     
     &.credit-card {
-      background: linear-gradient(135deg, rgba($primary, 0.2), rgba($primary, 0.05));
-      border: 1rpx solid rgba($primary, 0.3);
+      background: linear-gradient(135deg, rgba(var(--primary), 0.2), rgba(var(--primary), 0.05));
+      border: 1rpx solid rgba(var(--primary), 0.3);
       
-      .points-value { color: $primary; }
+      .points-value { color: var(--primary); }
     }
   }
 }
 
 .filter-tabs {
   display: flex;
-  padding: 0 $spacing-lg;
-  margin-bottom: $spacing-base;
+  padding: 0 var(--spacing-lg);
+  margin-bottom: var(--spacing-base);
   
   .filter-tab {
     padding: 12rpx 32rpx;
     font-size: 28rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
     border-radius: 50rpx;
-    margin-right: $spacing-sm;
+    margin-right: var(--spacing-sm);
     
     &.active {
-      background: $primary;
+      background: var(--primary);
       color: #fff;
     }
   }
@@ -279,14 +279,14 @@ function goBack() {
 
 .record-list {
   height: calc(100vh - 400rpx);
-  padding: 0 $spacing-lg;
+  padding: 0 var(--spacing-lg);
 }
 
 .record-item {
   display: flex;
   align-items: center;
-  padding: $spacing-base 0;
-  border-bottom: 1rpx solid $border-light;
+  padding: var(--spacing-base) 0;
+  border-bottom: 1rpx solid var(--border-light);
   
   .record-icon {
     width: 64rpx;
@@ -297,16 +297,16 @@ function goBack() {
     justify-content: center;
     font-size: 28rpx;
     font-weight: 700;
-    margin-right: $spacing-base;
+    margin-right: var(--spacing-base);
     
     &.income {
-      background: rgba($profit, 0.2);
-      color: $profit;
+      background: rgba(var(--profit), 0.2);
+      color: var(--profit);
     }
     
     &.expense {
-      background: rgba($danger, 0.2);
-      color: $danger;
+      background: rgba(var(--danger), 0.2);
+      color: var(--danger);
     }
   }
   
@@ -315,13 +315,13 @@ function goBack() {
     
     .record-title {
       font-size: 28rpx;
-      color: $text-primary;
+      color: var(--text-primary);
       display: block;
     }
     
     .record-time {
       font-size: 22rpx;
-      color: $text-muted;
+      color: var(--text-muted);
     }
   }
   
@@ -329,14 +329,14 @@ function goBack() {
     font-size: 32rpx;
     font-weight: 700;
     
-    &.income { color: $profit; }
-    &.expense { color: $danger; }
+    &.income { color: var(--profit); }
+    &.expense { color: var(--danger); }
   }
 }
 
 .empty-state {
   text-align: center;
-  padding: $spacing-2xl;
-  color: $text-muted;
+  padding: var(--spacing-2xl);
+  color: var(--text-muted);
 }
 </style>

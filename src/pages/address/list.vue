@@ -116,32 +116,32 @@ async function deleteAddr(addr: any) {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
 }
 
 .page-header {
   display: flex;
   align-items: center;
-  gap: $spacing-base;
-  padding: $spacing-base 0;
+  gap: var(--spacing-base);
+  padding: var(--spacing-base) 0;
 
-  .back { font-size: 40rpx; color: $text-primary; }
-  .page-title { font-size: 36rpx; font-weight: 700; color: $text-primary; flex: 1; }
-  .add-btn { font-size: 28rpx; color: $primary; }
+  .back { font-size: 40rpx; color: var(--text-primary); }
+  .page-title { font-size: 36rpx; font-weight: 700; color: var(--text-primary); flex: 1; }
+  .add-btn { font-size: 28rpx; color: var(--primary); }
 }
 
 .empty {
   text-align: center;
   padding: 120rpx 0;
   font-size: 28rpx;
-  color: $text-muted;
+  color: var(--text-muted);
 
   .empty-icon { font-size: 120rpx; display: block; }
   .add-empty {
     display: inline-block;
-    margin-top: $spacing-xl;
-    background: $primary;
+    margin-top: var(--spacing-xl);
+    background: var(--primary);
     color: #000;
     padding: 16rpx 48rpx;
     border-radius: 50rpx;
@@ -152,39 +152,39 @@ async function deleteAddr(addr: any) {
 .address-list {
   display: flex;
   flex-direction: column;
-  gap: $spacing-base;
+  gap: var(--spacing-base);
 }
 
 .address-card {
-  background: $bg-card;
-  border-radius: $radius-md;
-  padding: $spacing-base $spacing-lg;
-  border: 1rpx solid $border-color;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-base) var(--spacing-lg);
+  border: 1rpx solid var(--border-color);
 
   &.default {
-    border-color: $primary;
+    border-color: var(--primary);
   }
 
   .addr-info {
-    padding-bottom: $spacing-sm;
-    border-bottom: 1rpx solid $border-color;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1rpx solid var(--border-color);
 
     .user-row {
       display: flex;
       align-items: center;
-      gap: $spacing-sm;
+      gap: var(--spacing-sm);
 
-      .name { font-size: 30rpx; font-weight: 600; color: $text-primary; }
-      .phone { font-size: 26rpx; color: $text-secondary; }
+      .name { font-size: 30rpx; font-weight: 600; color: var(--text-primary); }
+      .phone { font-size: 26rpx; color: var(--text-secondary); }
       .default-tag {
-        background: $primary; color: #000;
+        background: var(--primary); color: #000;
         font-size: 20rpx; padding: 2rpx 12rpx; border-radius: 8rpx;
       }
     }
 
     .address-text {
       font-size: 26rpx;
-      color: $text-secondary;
+      color: var(--text-secondary);
       display: block;
       margin-top: 8rpx;
       line-height: 1.6;
@@ -195,14 +195,14 @@ async function deleteAddr(addr: any) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: $spacing-sm;
+    padding-top: var(--spacing-sm);
     font-size: 26rpx;
-    color: $primary;
+    color: var(--primary);
 
     .action-right {
       display: flex;
-      gap: $spacing-lg;
-      color: $text-secondary;
+      gap: var(--spacing-lg);
+      color: var(--text-secondary);
     }
   }
 }

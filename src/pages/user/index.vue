@@ -297,8 +297,8 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
 }
 
 // =============================================
@@ -311,7 +311,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
     rgba(10,22,40,0.85) 100%);
   backdrop-filter: blur(20px);
   border: 1rpx solid rgba(77,142,255,0.22);
-  border-radius: $radius-xl;
+  border-radius: var(--radius)-xl;
   padding: 32rpx;
   margin-bottom: 20rpx;
   overflow: hidden;
@@ -361,7 +361,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, $primary, $primary-light, $primary);
+  background: conic-gradient(from 0deg, var(--primary), var(--primary)-light, var(--primary));
   animation: ring-spin 4s linear infinite;
 }
 
@@ -385,12 +385,12 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 .user-name {
   font-size: 36rpx;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
 }
 
 .user-id {
   font-size: 22rpx;
-  color: $text-muted;
+  color: var(--text-muted);
   display: block;
   margin-bottom: 10rpx;
 }
@@ -403,7 +403,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 
   .vip-label {
     font-size: 20rpx;
-    color: $text-muted;
+    color: var(--text-muted);
     flex-shrink: 0;
   }
 
@@ -416,7 +416,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 
     .mini-fill {
       height: 100%;
-      background: linear-gradient(90deg, $primary-dark, $primary-light);
+      background: linear-gradient(90deg, var(--primary)-dark, var(--primary)-light);
       border-radius: 999rpx;
     }
   }
@@ -430,12 +430,12 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   gap: 4rpx;
   background: rgba(255,140,0,0.15);
   border: 1rpx solid rgba(255,140,0,0.25);
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   padding: 16rpx 20rpx;
   flex-shrink: 0;
 
   .invite-icon { font-size: 40rpx; }
-  .invite-text { font-size: 20rpx; color: $accent; font-weight: 600; }
+  .invite-text { font-size: 20rpx; color: var(--accent); font-weight: 600; }
 }
 
 // 资产摘要行
@@ -454,23 +454,23 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
     display: block;
     font-size: 36rpx;
     font-weight: 800;
-    color: $text-primary;
+    color: var(--text-primary);
     letter-spacing: -1rpx;
 
     &.accent {
-      background: linear-gradient(135deg, $accent-light, $accent-dark);
+      background: linear-gradient(135deg, var(--accent-light), var(--accent-dark));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       filter: drop-shadow(0 0 8rpx rgba(255,140,0,0.4));
     }
 
-    &.gold { color: $gold; }
+    &.gold { color: var(--gold); }
   }
 
   .asset-mini-label {
     font-size: 20rpx;
-    color: $text-muted;
+    color: var(--text-muted);
     display: block;
     margin-top: 2rpx;
   }
@@ -487,7 +487,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 .dividend-banner {
   background: linear-gradient(135deg, rgba(255,140,0,0.15), rgba(255,69,0,0.08));
   border: 1rpx solid rgba(255,140,0,0.20);
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   padding: 24rpx;
   margin-bottom: 20rpx;
   animation: fire-breathe 3s ease-in-out infinite;
@@ -508,14 +508,14 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 
   .dividend-title {
     font-size: 22rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
     display: block;
   }
 
   .dividend-value {
     font-size: 40rpx;
     font-weight: 800;
-    background: linear-gradient(135deg, $accent-light, $accent-dark);
+    background: linear-gradient(135deg, var(--accent-light), var(--accent-dark));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -525,10 +525,10 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 }
 
 .dividend-btn {
-  background: $accent-fire;
+  background: var(--accent-fire);
   border-radius: 999rpx;
   padding: 14rpx 28rpx;
-  box-shadow: $shadow-fire;
+  box-shadow: var(--shadow-fire);
 
   .dividend-btn-text {
     font-size: 26rpx;
@@ -553,7 +553,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   .section-title {
     font-size: 32rpx;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 
   .section-more {
@@ -561,8 +561,8 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
     align-items: center;
     gap: 4rpx;
 
-    .more-text { font-size: 24rpx; color: $text-muted; }
-    .more-arrow { font-size: 28rpx; color: $primary; }
+    .more-text { font-size: 24rpx; color: var(--text-muted); }
+    .more-arrow { font-size: 28rpx; color: var(--primary); }
   }
 }
 
@@ -581,9 +581,9 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 .tab-icon-wrap {
   position: relative;
   width: 80rpx; height: 80rpx;
-  background: $glass-bg;
-  border: 1rpx solid $glass-border;
-  border-radius: $radius-lg;
+  background: var(--glass-bg);
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -595,7 +595,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   position: absolute;
   top: -10rpx; right: -10rpx;
   min-width: 32rpx; height: 32rpx;
-  background: linear-gradient(135deg, $accent, $accent-dark);
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
   border-radius: 999rpx;
   font-size: 20rpx;
   color: #fff;
@@ -609,7 +609,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 
 .tab-label {
   font-size: 22rpx;
-  color: $text-secondary;
+  color: var(--text-secondary);
 }
 
 // =============================================
@@ -629,10 +629,10 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   align-items: center;
   gap: 10rpx;
   padding: 20rpx 8rpx;
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
-  border-radius: $radius-lg;
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius-lg);
 
   &:active {
     border-color: rgba(77,142,255,0.4);
@@ -641,7 +641,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 
 .tool-icon-wrap {
   width: 72rpx; height: 72rpx;
-  border-radius: $radius-md;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -651,14 +651,14 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 
 .tool-label {
   font-size: 22rpx;
-  color: $text-secondary;
+  color: var(--text-secondary);
   text-align: center;
 }
 
 .tool-tag {
   position: absolute;
   top: 10rpx; right: 10rpx;
-  background: linear-gradient(135deg, $accent, $accent-dark);
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
   color: #fff;
   font-size: 18rpx;
   font-weight: 700;
@@ -689,7 +689,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   .vip-title {
     font-size: 32rpx;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 }
 
@@ -701,12 +701,12 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 
   &.v1, &.v2, &.v3 {
     background: rgba(77,142,255,0.2);
-    color: $primary-light;
+    color: var(--primary)-light;
     border: 1rpx solid rgba(77,142,255,0.4);
   }
   &.v4, &.v5, &.v6 {
     background: rgba(0,242,254,0.15);
-    color: $primary-light;
+    color: var(--primary)-light;
     border: 1rpx solid rgba(0,242,254,0.4);
   }
   &.v7, &.v8, &.v9 {
@@ -774,8 +774,8 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   align-items: center;
   margin-bottom: 10rpx;
 
-  .progress-label { font-size: 22rpx; color: $text-muted; }
-  .progress-value { font-size: 22rpx; color: $accent; font-weight: 600; }
+  .progress-label { font-size: 22rpx; color: var(--text-muted); }
+  .progress-value { font-size: 22rpx; color: var(--accent); font-weight: 600; }
 }
 
 .vip-perks {
@@ -786,7 +786,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
 
   .perk-tag {
     font-size: 20rpx;
-    color: $primary-light;
+    color: var(--primary)-light;
     background: rgba(77,142,255,0.1);
     border: 1rpx solid rgba(77,142,255,0.2);
     padding: 4rpx 12rpx;
@@ -807,11 +807,11 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   align-items: center;
   justify-content: space-between;
   padding: 28rpx 4rpx;
-  border-bottom: 1rpx solid $border-light;
+  border-bottom: 1rpx solid var(--border-light);
 
   &:last-child { border-bottom: none; }
 
-  &:active .menu-arrow { color: $primary-light; }
+  &:active .menu-arrow { color: var(--primary)-light; }
 }
 
 .menu-left {
@@ -820,7 +820,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   gap: 16rpx;
 
   .menu-icon { font-size: 40rpx; }
-  .menu-label { font-size: 30rpx; color: $text-primary; }
+  .menu-label { font-size: 30rpx; color: var(--text-primary); }
 }
 
 .menu-right {
@@ -828,7 +828,7 @@ function showComing() { uni.showToast({ title: '功能开发中', icon: 'none' }
   align-items: center;
   gap: 8rpx;
 
-  .menu-value { font-size: 26rpx; color: $text-muted; }
-  .menu-arrow { font-size: 28rpx; color: $text-muted; }
+  .menu-value { font-size: 26rpx; color: var(--text-muted); }
+  .menu-arrow { font-size: 28rpx; color: var(--text-muted); }
 }
 </style>

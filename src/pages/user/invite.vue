@@ -115,81 +115,81 @@ function shareInvite() {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
 }
 
 .page-header {
   display: flex;
   align-items: center;
-  gap: $spacing-base;
+  gap: var(--spacing-base);
 
   .back {
     font-size: 40rpx;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 
   .page-title {
     font-size: 36rpx;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 }
 
 .invite-banner {
-  background: linear-gradient(135deg, rgba($primary, 0.3) 0%, rgba($primary, 0.1) 100%);
-  border: 1rpx solid rgba($primary, 0.3);
-  border-radius: $radius-lg;
-  padding: $spacing-xl;
+  background: linear-gradient(135deg, rgba(var(--primary), 0.3) 0%, rgba(var(--primary), 0.1) 100%);
+  border: 1rpx solid rgba(var(--primary), 0.3);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
   text-align: center;
-  margin: $spacing-base 0;
+  margin: var(--spacing-base) 0;
 
   .banner-title {
     font-size: 40rpx;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--text-primary);
     display: block;
   }
 
   .banner-sub {
     font-size: 28rpx;
-    color: $primary;
+    color: var(--primary);
     display: block;
     margin-top: 8rpx;
   }
 
   .banner-rule {
     font-size: 24rpx;
-    color: $text-muted;
+    color: var(--text-muted);
     display: block;
     margin-top: 4rpx;
   }
 }
 
 .invite-code-card {
-  background: $bg-card;
-  border-radius: $radius-md;
-  padding: $spacing-xl;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xl);
   text-align: center;
-  border: 1rpx solid $border-color;
+  border: 1rpx solid var(--border-color);
 
   .card-label {
     font-size: 24rpx;
-    color: $text-muted;
+    color: var(--text-muted);
   }
 
   .invite-code {
     font-size: 56rpx;
     font-weight: 700;
-    color: $primary;
+    color: var(--primary);
     letter-spacing: 4rpx;
     display: block;
-    margin: $spacing-base 0;
+    margin: var(--spacing-base) 0;
   }
 
   .copy-btn {
     display: inline-block;
-    background: $primary;
+    background: var(--primary);
     color: #000;
     font-size: 26rpx;
     font-weight: 600;
@@ -199,28 +199,28 @@ function shareInvite() {
 }
 
 .share-section {
-  margin: $spacing-lg 0;
+  margin: var(--spacing-lg) 0;
 
   .section-title {
     font-size: 28rpx;
-    color: $text-primary;
+    color: var(--text-primary);
     font-weight: 600;
     display: block;
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
   }
 
   .share-url {
-    background: $bg-secondary;
-    border-radius: $radius-sm;
-    padding: $spacing-base;
+    background: var(--bg-secondary);
+    border-radius: var(--radius)-sm;
+    padding: var(--spacing-base);
     font-size: 22rpx;
-    color: $text-muted;
+    color: var(--text-muted);
     word-break: break-all;
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
   }
 
   .share-btn {
-    background: $primary;
+    background: var(--primary);
     color: #000;
     font-size: 28rpx;
     font-weight: 600;
@@ -233,25 +233,25 @@ function shareInvite() {
 .reward-rules {
   .section-title {
     font-size: 28rpx;
-    color: $text-primary;
+    color: var(--text-primary);
     font-weight: 600;
     display: block;
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
   }
 
   .rule-list {
     display: flex;
     flex-direction: column;
-    gap: $spacing-base;
+    gap: var(--spacing-base);
   }
 
   .rule-item {
     display: flex;
-    gap: $spacing-base;
-    background: $bg-card;
-    border-radius: $radius-md;
-    padding: $spacing-base;
-    border: 1rpx solid $border-color;
+    gap: var(--spacing-base);
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-base);
+    border: 1rpx solid var(--border-color);
 
     .rule-icon {
       font-size: 48rpx;
@@ -263,13 +263,13 @@ function shareInvite() {
       .rule-title {
         font-size: 28rpx;
         font-weight: 600;
-        color: $text-primary;
+        color: var(--text-primary);
         display: block;
       }
 
       .rule-desc {
         font-size: 24rpx;
-        color: $text-secondary;
+        color: var(--text-secondary);
         display: block;
         margin-top: 4rpx;
         line-height: 1.6;

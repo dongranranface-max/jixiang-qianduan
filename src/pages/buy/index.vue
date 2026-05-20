@@ -129,44 +129,44 @@ function addToCart(p: any) {
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
 
-.page-container { min-height: 100vh; background: $bg-primary; padding: 0 $spacing-lg; display: flex; flex-direction: column; }
+.page-container { min-height: 100vh; background: var(--bg-primary); padding: 0 var(--spacing-lg); display: flex; flex-direction: column; }
 
-.page-header { padding: $spacing-base 0;
-  .page-title { font-size: 40rpx; font-weight: 700; color: $text-primary; }
+.page-header { padding: var(--spacing-base) 0;
+  .page-title { font-size: 40rpx; font-weight: 700; color: var(--text-primary); }
 }
 
-.mall-tabs { display: flex; gap: $spacing-lg; padding: $spacing-base 0; border-bottom: 1rpx solid $border-color;
-  .mall-tab { font-size: 32rpx; color: $text-secondary; padding-bottom: $spacing-sm; border-bottom: 4rpx solid transparent;
-    &.active { color: $primary; border-bottom-color: $primary; font-weight: 600; }
+.mall-tabs { display: flex; gap: var(--spacing-lg); padding: var(--spacing-base) 0; border-bottom: 1rpx solid var(--border-color);
+  .mall-tab { font-size: 32rpx; color: var(--text-secondary); padding-bottom: var(--spacing-sm); border-bottom: 4rpx solid transparent;
+    &.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
   }
 }
 
-.product-list { flex: 1; padding-top: $spacing-base; height: calc(100vh - 200rpx); }
+.product-list { flex: 1; padding-top: var(--spacing-base); height: calc(100vh - 200rpx); }
 
-.product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: $spacing-base; padding-bottom: $spacing-lg; }
+.product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-base); padding-bottom: var(--spacing-lg); }
 
-.product-card { background: $bg-card; border: 1rpx solid $border-color; border-radius: $radius-md; overflow: hidden;
+.product-card { background: var(--bg-card); border: 1rpx solid var(--border-color); border-radius: var(--radius-md); overflow: hidden;
   .product-image { width: 100%; aspect-ratio: 1; }
-  .product-info { padding: $spacing-base;
-    .product-name { font-size: 28rpx; color: $text-primary; @include line-clamp(2); line-height: 1.4; display: block; }
-    .product-tags { margin-top: $spacing-xs;
+  .product-info { padding: var(--spacing-base);
+    .product-name { font-size: 28rpx; color: var(--text-primary); @include line-clamp(2); line-height: 1.4; display: block; }
+    .product-tags { margin-top: var(--spacing-xs);
       .tag { font-size: 18rpx; padding: 2rpx 12rpx; border-radius: 6rpx;
-        &.tag-purple { background: rgba($primary, 0.15); color: $primary; }
+        &.tag-purple { background: rgba(var(--primary), 0.15); color: var(--primary); }
         &.tag-green { background: rgba(#52c41a, 0.15); color: #52c41a; }
       }
     }
-    .product-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: $spacing-sm;
-      .price-row { display: flex; align-items: baseline; gap: $spacing-xs;
-        .product-price { font-size: 32rpx; font-weight: 700; color: $primary;
+    .product-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: var(--spacing-sm);
+      .price-row { display: flex; align-items: baseline; gap: var(--spacing-xs);
+        .product-price { font-size: 32rpx; font-weight: 700; color: var(--primary);
           .symbol { font-size: 24rpx; }
         }
-        .product-points { font-size: 22rpx; color: $gold; font-weight: 600; }
+        .product-points { font-size: 22rpx; color: var(--gold); font-weight: 600; }
         .points-label { font-size: 22rpx; color: #52c41a; font-weight: 600; }
       }
-      .add-cart-btn { width: 56rpx; height: 56rpx; background: linear-gradient(135deg, $primary, darken($primary, 10%)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28rpx; }
+      .add-cart-btn { width: 56rpx; height: 56rpx; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28rpx; }
     }
   }
 }
 
-.loading-more, .no-more, .empty { text-align: center; padding: $spacing-xl 0; color: $text-secondary; font-size: 26rpx; }
+.loading-more, .no-more, .empty { text-align: center; padding: var(--spacing-xl) 0; color: var(--text-secondary); font-size: 26rpx; }
 </style>

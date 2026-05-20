@@ -228,7 +228,7 @@ async function doSubmit() {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
+  background: var(--bg-primary);
   display: flex;
   flex-direction: column;
 }
@@ -236,35 +236,35 @@ async function doSubmit() {
 .page-header {
   display: flex;
   align-items: center;
-  gap: $spacing-base;
-  padding: $spacing-base $spacing-lg;
-  background: $bg-card;
-  border-bottom: 1rpx solid $border-color;
+  gap: var(--spacing-base);
+  padding: var(--spacing-base) var(--spacing-lg);
+  background: var(--bg-card);
+  border-bottom: 1rpx solid var(--border-color);
 
-  .back { font-size: 40rpx; color: $text-primary; }
-  .page-title { font-size: 36rpx; font-weight: 700; color: $text-primary; }
+  .back { font-size: 40rpx; color: var(--text-primary); }
+  .page-title { font-size: 36rpx; font-weight: 700; color: var(--text-primary); }
 }
 
 .confirm-body {
   flex: 1;
-  padding: 0 $spacing-lg;
+  padding: 0 var(--spacing-lg);
   padding-bottom: 160rpx;
 }
 
 .product-card {
   display: flex;
-  gap: $spacing-base;
-  background: $bg-card;
-  border-radius: $radius-md;
-  padding: $spacing-base;
-  margin: $spacing-base 0;
-  border: 1rpx solid $border-color;
+  gap: var(--spacing-base);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-base);
+  margin: var(--spacing-base) 0;
+  border: 1rpx solid var(--border-color);
 
   .cover {
     width: 180rpx;
     height: 180rpx;
-    border-radius: $radius-sm;
-    background: $bg-secondary;
+    border-radius: var(--radius)-sm;
+    background: var(--bg-secondary);
   }
 
   .info {
@@ -275,42 +275,42 @@ async function doSubmit() {
 
     .name {
       font-size: 28rpx;
-      color: $text-primary;
+      color: var(--text-primary);
       display: block;
     }
 
     .price-row {
       display: flex;
       align-items: baseline;
-      gap: $spacing-base;
+      gap: var(--spacing-base);
       margin-top: 8rpx;
 
       .cash-price {
         font-size: 36rpx;
         font-weight: 700;
-        color: $danger;
+        color: var(--danger);
       }
 
       .points-price {
         font-size: 26rpx;
-        color: $primary;
+        color: var(--primary);
       }
     }
   }
 }
 
 .section {
-  background: $bg-card;
-  border-radius: $radius-md;
-  padding: $spacing-base $spacing-lg;
-  margin-bottom: $spacing-base;
-  border: 1rpx solid $border-color;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-base) var(--spacing-lg);
+  margin-bottom: var(--spacing-base);
+  border: 1rpx solid var(--border-color);
 
   .section-title {
     font-size: 26rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
     display: block;
-    margin-bottom: $spacing-sm;
+    margin-bottom: var(--spacing-sm);
   }
 }
 
@@ -318,29 +318,29 @@ async function doSubmit() {
   .bank-card {
     display: flex;
     align-items: center;
-    gap: $spacing-base;
+    gap: var(--spacing-base);
 
-    .bank-name { font-size: 30rpx; font-weight: 600; color: $text-primary; }
-    .card-no { font-size: 26rpx; color: $text-secondary; flex: 1; }
-    .bind-tip { font-size: 22rpx; color: $profit; }
+    .bank-name { font-size: 30rpx; font-weight: 600; color: var(--text-primary); }
+    .card-no { font-size: 26rpx; color: var(--text-secondary); flex: 1; }
+    .bind-tip { font-size: 22rpx; color: var(--profit); }
   }
 
   .no-bank, .no-address {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: $spacing-sm 0;
-    color: $text-muted;
+    padding: var(--spacing-sm) 0;
+    color: var(--text-muted);
     font-size: 28rpx;
 
-    .arrow { color: $text-muted; }
+    .arrow { color: var(--text-muted); }
   }
 }
 
 .address-section {
   .address-info {
-    .consignee { font-size: 28rpx; font-weight: 600; color: $text-primary; }
-    .addr-text { font-size: 24rpx; color: $text-secondary; display: block; margin-top: 4rpx; }
+    .consignee { font-size: 28rpx; font-weight: 600; color: var(--text-primary); }
+    .addr-text { font-size: 24rpx; color: var(--text-secondary); display: block; margin-top: 4rpx; }
   }
 }
 
@@ -357,7 +357,7 @@ async function doSubmit() {
     gap: 8rpx;
 
     .rule-icon { font-size: 24rpx; }
-    .rule-text { font-size: 24rpx; color: $text-secondary; line-height: 1.6; }
+    .rule-text { font-size: 24rpx; color: var(--text-secondary); line-height: 1.6; }
   }
 }
 
@@ -366,15 +366,15 @@ async function doSubmit() {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: $spacing-sm 0;
+    padding: var(--spacing-sm) 0;
 
     .pay-left {
       display: flex;
       align-items: center;
-      gap: $spacing-sm;
+      gap: var(--spacing-sm);
 
       .pay-icon { font-size: 32rpx; }
-      text { font-size: 28rpx; color: $text-primary; }
+      text { font-size: 28rpx; color: var(--text-primary); }
     }
   }
 }
@@ -384,33 +384,33 @@ async function doSubmit() {
   bottom: 0;
   left: 0;
   right: 0;
-  background: $bg-card;
-  border-top: 1rpx solid $border-color;
+  background: var(--bg-card);
+  border-top: 1rpx solid var(--border-color);
   display: flex;
   align-items: center;
-  padding: $spacing-base $spacing-lg;
-  padding-bottom: calc(#{$spacing-base} + constant(safe-area-inset-bottom));
-  padding-bottom: calc(#{$spacing-base} + env(safe-area-inset-bottom));
+  padding: var(--spacing-base) var(--spacing-lg);
+  padding-bottom: calc(#{var(--spacing-base)} + constant(safe-area-inset-bottom));
+  padding-bottom: calc(#{var(--spacing-base)} + env(safe-area-inset-bottom));
 
   .submit-info {
     flex: 1;
     display: flex;
     align-items: baseline;
 
-    .submit-label { font-size: 24rpx; color: $text-secondary; }
-    .submit-cash { font-size: 36rpx; font-weight: 700; color: $danger; }
-    .submit-points { font-size: 24rpx; color: $primary; margin-left: 8rpx; }
+    .submit-label { font-size: 24rpx; color: var(--text-secondary); }
+    .submit-cash { font-size: 36rpx; font-weight: 700; color: var(--danger); }
+    .submit-points { font-size: 24rpx; color: var(--primary); margin-left: 8rpx; }
   }
 
   .submit-btn {
-    background: $primary;
+    background: var(--primary);
     color: #000;
     font-size: 28rpx;
     font-weight: 700;
     padding: 16rpx 48rpx;
     border-radius: 50rpx;
 
-    &.disabled { background: $bg-secondary; color: $text-muted; }
+    &.disabled { background: var(--bg-secondary); color: var(--text-muted); }
   }
 }
 </style>

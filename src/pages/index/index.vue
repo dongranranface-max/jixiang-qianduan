@@ -70,7 +70,7 @@
     <!-- ========== 三、Banner 轮播 ========== -->
     <view class="banner-wrapper">
       <swiper class="banner" :indicator-dots="true" :autoplay="true" :interval="4000" :circular="true"
-        indicator-color="rgba(255,255,255,0.2)" indicator-active-color="#4D8EFF">
+        indicator-color="rgba(0,212,255,0.2)" indicator-active-color="#00D4FF">
         <swiper-item v-for="(banner, index) in banners" :key="index">
           <image class="banner-image" :src="banner.image" mode="aspectFill" @click="onBannerClick(banner)" />
         </swiper-item>
@@ -314,7 +314,7 @@ function onEntryClick(entry: { type: string }) {
     rgba(30, 41, 59, 0.70) 0%,
     rgba(10, 22, 40, 0.85) 100%);
   backdrop-filter: blur(20px);
-  border: 1rpx solid rgba(77, 142, 255, 0.22);
+  border: 1rpx solid rgba(0, 212, 255, 0.22);
   border-radius: 32rpx;
   padding: 36rpx;
   margin-bottom: 24rpx;
@@ -327,7 +327,7 @@ function onEntryClick(entry: { type: string }) {
   top: -80rpx; right: -80rpx;
   width: 300rpx; height: 300rpx;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(77,142,255,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0,212,255,0.12) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -335,7 +335,7 @@ function onEntryClick(entry: { type: string }) {
   top: auto; right: auto;
   bottom: -60rpx; left: -60rpx;
   width: 240rpx; height: 240rpx;
-  background: radial-gradient(circle, rgba(0,242,254,0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
 }
 
 .dashboard-inner {
@@ -359,7 +359,7 @@ function onEntryClick(entry: { type: string }) {
 .asset-number {
   font-size: 56rpx;
   font-weight: 800;
-  background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%);
+  background: linear-gradient(135deg, #00D4FF 0%, #33DDFF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -371,7 +371,7 @@ function onEntryClick(entry: { type: string }) {
 .asset-number-fire {
   font-size: 56rpx;
   font-weight: 800;
-  background: linear-gradient(135deg, #FFB347 0%, #FF4500 100%);
+  background: linear-gradient(135deg, #FF6B35 0%, #FF4500 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -390,7 +390,7 @@ function onEntryClick(entry: { type: string }) {
 .dashboard-divider {
   width: 1rpx;
   height: 100rpx;
-  background: linear-gradient(180deg, transparent, rgba(77,142,255,0.4), transparent);
+  background: linear-gradient(180deg, transparent, rgba(0,212,255,0.40), transparent);
   margin: 0 24rpx;
 }
 
@@ -407,7 +407,7 @@ function onEntryClick(entry: { type: string }) {
   margin-bottom: 10rpx;
 
   .progress-label { font-size: 22rpx; color: rgba(255,255,255,0.5); }
-  .progress-percent { font-size: 22rpx; color: $primary-light; font-weight: 600; }
+  .progress-percent { font-size: 22rpx; color: var(--primary)-light; font-weight: 600; }
 }
 
 .progress-bar {
@@ -419,9 +419,9 @@ function onEntryClick(entry: { type: string }) {
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, $primary-dark, $primary-light);
+    background: linear-gradient(90deg, var(--primary)-dark, var(--primary)-light);
     border-radius: 999rpx;
-    box-shadow: 0 0 10rpx rgba(0,242,254,0.5);
+    box-shadow: 0 0 12rpx rgba(0,212,255,0.50);
     transition: width 0.8s ease;
   }
 }
@@ -430,10 +430,10 @@ function onEntryClick(entry: { type: string }) {
 // 未登录引导卡片
 // =============================================
 .login-card {
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
-  border-radius: $radius-xl;
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius)-xl;
   padding: 32rpx;
   margin-bottom: 24rpx;
 
@@ -450,11 +450,11 @@ function onEntryClick(entry: { type: string }) {
 .login-icon { font-size: 56rpx; margin-right: 20rpx; }
 
 .login-text-group { flex: 1;
-  .login-title { font-size: 32rpx; font-weight: 600; color: $text-primary; display: block; }
-  .login-subtitle { font-size: 24rpx; color: $text-secondary; display: block; margin-top: 4rpx; }
+  .login-title { font-size: 32rpx; font-weight: 600; color: var(--text-primary); display: block; }
+  .login-subtitle { font-size: 24rpx; color: var(--text-secondary); display: block; margin-top: 4rpx; }
 }
 
-.login-arrow { font-size: 40rpx; color: $primary; }
+.login-arrow { font-size: 40rpx; color: var(--primary); }
 
 // =============================================
 // 二、搜索栏
@@ -471,23 +471,23 @@ function onEntryClick(entry: { type: string }) {
   display: flex;
   align-items: center;
   height: 76rpx;
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
+  border: 1rpx solid var(--glass-border);
   border-radius: 999rpx;
   padding: 0 28rpx;
 
-  .search-icon { font-size: 30rpx; margin-right: 12rpx; color: $primary-light; }
-  .search-placeholder { font-size: 26rpx; color: $text-muted; }
+  .search-icon { font-size: 30rpx; margin-right: 12rpx; color: var(--primary)-light; }
+  .search-placeholder { font-size: 26rpx; color: var(--text-muted); }
 }
 
 .msg-btn {
   position: relative;
   width: 76rpx; height: 76rpx;
   display: flex; align-items: center; justify-content: center;
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
+  border: 1rpx solid var(--glass-border);
   border-radius: 50%;
 
   .msg-icon { font-size: 36rpx; }
@@ -497,9 +497,9 @@ function onEntryClick(entry: { type: string }) {
   position: absolute;
   top: 14rpx; right: 14rpx;
   width: 14rpx; height: 14rpx;
-  background: $accent;
+  background: var(--accent);
   border-radius: 50%;
-  border: 2rpx solid $bg-primary;
+  border: 2rpx solid var(--bg-primary);
 }
 
 // =============================================
@@ -511,9 +511,9 @@ function onEntryClick(entry: { type: string }) {
   .banner {
     width: 100%;
     height: 320rpx;
-    border-radius: $radius-xl;
+    border-radius: var(--radius)-xl;
     overflow: hidden;
-    border: 1rpx solid $glass-border;
+    border: 1rpx solid var(--glass-border);
   }
 
   .banner-image { width: 100%; height: 100%; }
@@ -535,14 +535,14 @@ function onEntryClick(entry: { type: string }) {
   flex-direction: column;
   align-items: center;
   padding: 24rpx 8rpx;
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
-  border-radius: $radius-lg;
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius-lg);
   gap: 10rpx;
 
   &:active {
-    background: $glass-bg-hover;
+    background: var(--glass-bg-hover);
     border-color: rgba(77,142,255,0.35);
   }
 }
@@ -559,13 +559,13 @@ function onEntryClick(entry: { type: string }) {
 
 .portal-name {
   font-size: 24rpx;
-  color: $text-secondary;
+  color: var(--text-secondary);
   font-weight: 500;
   text-align: center;
 }
 
 .portal-name-fire {
-  color: $accent;
+  color: var(--accent);
   font-weight: 700;
   text-shadow: 0 0 10rpx rgba(255,140,0,0.4);
   position: relative;
@@ -576,7 +576,7 @@ function onEntryClick(entry: { type: string }) {
 .portal-fire-ring {
   position: absolute;
   inset: 0;
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   background: linear-gradient(135deg, rgba(255,140,0,0.10), rgba(255,69,0,0.08));
   border: 1rpx solid rgba(255,140,0,0.25);
   animation: fire-breathe 2.5s ease-in-out infinite;
@@ -606,7 +606,7 @@ function onEntryClick(entry: { type: string }) {
 .section-title {
   font-size: 32rpx;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
 }
 
 .section-more {
@@ -614,8 +614,8 @@ function onEntryClick(entry: { type: string }) {
   align-items: center;
   gap: 4rpx;
 
-  .more-text { font-size: 24rpx; color: $text-muted; }
-  .more-arrow { font-size: 28rpx; color: $primary; }
+  .more-text { font-size: 24rpx; color: var(--text-muted); }
+  .more-arrow { font-size: 28rpx; color: var(--primary); }
 }
 
 // 双列商品网格
@@ -626,9 +626,9 @@ function onEntryClick(entry: { type: string }) {
 }
 
 .product-card {
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1rpx solid $glass-border;
+  border: 1rpx solid var(--glass-border);
 }
 
 .product-image {
@@ -644,7 +644,7 @@ function onEntryClick(entry: { type: string }) {
 .product-tag {
   position: absolute;
   top: 12rpx; left: 12rpx;
-  background: linear-gradient(135deg, $accent, $accent-dark);
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
   color: #fff;
   font-size: 20rpx;
   font-weight: 700;
@@ -659,7 +659,7 @@ function onEntryClick(entry: { type: string }) {
 
 .product-name {
   font-size: 26rpx;
-  color: $text-primary;
+  color: var(--text-primary);
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -680,7 +680,7 @@ function onEntryClick(entry: { type: string }) {
   height: 48rpx;
 
   .price-points {
-    background: $accent;
+    background: var(--accent);
     color: #fff;
     padding: 0 14rpx;
     font-size: 24rpx;
@@ -689,8 +689,8 @@ function onEntryClick(entry: { type: string }) {
 
   .price-cash {
     background: transparent;
-    color: $primary-light;
-    border: 1.5rpx solid $primary;
+    color: var(--primary)-light;
+    border: 1.5rpx solid var(--primary);
     padding: 0 12rpx;
     font-size: 20rpx;
     font-weight: 600;
@@ -706,7 +706,7 @@ function onEntryClick(entry: { type: string }) {
   border-radius: 999rpx;
   font-size: 20rpx;
   font-weight: 600;
-  color: $accent;
+  color: var(--accent);
   text-shadow: 0 0 8rpx rgba(255,140,0,0.4);
 }
 
@@ -719,6 +719,6 @@ function onEntryClick(entry: { type: string }) {
 .product-scroll-content .product-card {
   width: 260rpx;
   flex-shrink: 0;
-  border-radius: $radius-lg;
+  border-radius: var(--radius-lg);
 }
 </style>

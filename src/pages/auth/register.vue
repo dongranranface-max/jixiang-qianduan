@@ -189,7 +189,7 @@ async function doRegister() {
 .page-container {
   min-height: 100vh;
   background: radial-gradient(ellipse at 50% 0%, #0A1628 0%, #060B28 40%, #020510 100%);
-  padding: 0 $spacing-xl;
+  padding: 0 var(--spacing-xl);
   position: relative;
   overflow: hidden;
 }
@@ -232,7 +232,7 @@ async function doRegister() {
 .page-header {
   display: flex;
   align-items: center;
-  padding: $spacing-base 0;
+  padding: var(--spacing-base) 0;
   position: relative;
   z-index: 1;
 }
@@ -240,14 +240,14 @@ async function doRegister() {
 .back-btn {
   width: 72rpx; height: 72rpx;
   display: flex; align-items: center; justify-content: center;
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
+  border: 1rpx solid var(--glass-border);
   border-radius: 50%;
 
   .back-icon {
     font-size: 36rpx;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 }
 
@@ -256,7 +256,7 @@ async function doRegister() {
   text-align: center;
   font-size: 36rpx;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
   letter-spacing: 4rpx;
 }
 
@@ -275,7 +275,7 @@ async function doRegister() {
 .logo-wrap {
   width: 160rpx; height: 160rpx;
   border-radius: 40rpx;
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
   border: 1rpx solid rgba(77,142,255,0.25);
   box-shadow: 0 0 60rpx rgba(77,142,255,0.15);
@@ -304,7 +304,7 @@ async function doRegister() {
 
 .app-slogan {
   font-size: 26rpx;
-  color: $text-secondary;
+  color: var(--text-secondary);
   letter-spacing: 1rpx;
 }
 
@@ -318,16 +318,16 @@ async function doRegister() {
 }
 
 .input-wrap {
-  background: $glass-bg;
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
-  border: 1rpx solid $glass-border;
-  border-radius: $radius-xl;
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius)-xl;
   padding: 24rpx 28rpx;
   transition: all 0.3s ease;
 
   &.focused {
     border-color: rgba(77,142,255,0.5);
-    box-shadow: 0 0 0 4rpx rgba(77,142,255,0.10), $shadow-glow;
+    box-shadow: 0 0 0 4rpx rgba(77,142,255,0.10), var(--shadow-glow);
   }
 
   &.has-value {
@@ -338,7 +338,7 @@ async function doRegister() {
 .input-label {
   display: block;
   font-size: 22rpx;
-  color: $primary-light;
+  color: var(--primary)-light;
   font-weight: 600;
   letter-spacing: 2rpx;
   margin-bottom: 12rpx;
@@ -347,10 +347,10 @@ async function doRegister() {
 .input-field {
   width: 100%;
   font-size: 30rpx;
-  color: $text-primary;
+  color: var(--text-primary);
   letter-spacing: 2rpx;
 
-  &::placeholder { color: $text-muted; }
+  &::placeholder { color: var(--text-muted); }
 }
 
 .eye-btn {
@@ -370,7 +370,7 @@ async function doRegister() {
 
   .tip-text {
     font-size: 20rpx;
-    color: $text-muted;
+    color: var(--text-muted);
     background: rgba(255,140,0,0.1);
     padding: 4rpx 12rpx;
     border-radius: 999rpx;
@@ -381,7 +381,7 @@ async function doRegister() {
 // ========== 注册按钮 ==========
 .register-btn {
   height: 100rpx;
-  border-radius: $radius-xl;
+  border-radius: var(--radius)-xl;
   overflow: hidden;
   margin-top: 8rpx;
 
@@ -391,8 +391,8 @@ async function doRegister() {
 .btn-inner {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
-  background: $accent-fire;
-  box-shadow: $shadow-fire;
+  background: var(--accent-fire);
+  box-shadow: var(--shadow-fire);
 
   &::before {
     content: '';
@@ -422,12 +422,12 @@ async function doRegister() {
 
   .agreement-text {
     font-size: 22rpx;
-    color: $text-muted;
+    color: var(--text-muted);
     line-height: 1.6;
   }
 
   .link {
-    color: $primary-light;
+    color: var(--primary)-light;
     font-weight: 500;
   }
 }
@@ -441,10 +441,10 @@ async function doRegister() {
   margin-top: 4rpx;
 }
 
-.login-hint { font-size: 26rpx; color: $text-muted; }
+.login-hint { font-size: 26rpx; color: var(--text-muted); }
 .login-link {
   font-size: 26rpx;
-  color: $primary-light;
+  color: var(--primary)-light;
   font-weight: 600;
   text-shadow: 0 0 10rpx rgba(0,242,254,0.3);
 }
@@ -458,7 +458,7 @@ async function doRegister() {
 
   .footer-text {
     font-size: 22rpx;
-    color: $text-muted;
+    color: var(--text-muted);
     letter-spacing: 2rpx;
   }
 }

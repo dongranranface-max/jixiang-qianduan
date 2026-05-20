@@ -185,30 +185,30 @@ async function doSubscribe() {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
 }
 
 .page-header {
-  padding: $spacing-base 0;
+  padding: var(--spacing-base) 0;
 
   .page-title {
     font-size: 40rpx;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 }
 
 .invest-detail {
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
+  gap: var(--spacing-lg);
 }
 
 .product-header {
   display: flex;
   align-items: center;
-  gap: $spacing-base;
+  gap: var(--spacing-base);
 
   .product-icon {
     font-size: 80rpx;
@@ -218,22 +218,22 @@ async function doSubscribe() {
     .product-name {
       font-size: 36rpx;
       font-weight: 700;
-      color: $text-primary;
+      color: var(--text-primary);
       display: block;
     }
 
     .product-type {
       font-size: 24rpx;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
   }
 }
 
 .yield-card {
-  background: linear-gradient(135deg, rgba($profit, 0.2) 0%, rgba($profit, 0.05) 100%);
-  border: 1rpx solid rgba($profit, 0.3);
-  border-radius: $radius-lg;
-  padding: $spacing-xl;
+  background: linear-gradient(135deg, rgba(var(--profit), 0.2) 0%, rgba(var(--profit), 0.05) 100%);
+  border: 1rpx solid rgba(var(--profit), 0.3);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -242,19 +242,19 @@ async function doSubscribe() {
     .yield-value {
       font-size: 72rpx;
       font-weight: 700;
-      color: $profit;
+      color: var(--profit);
       display: block;
     }
 
     .yield-label {
       font-size: 24rpx;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
   }
 
   .yield-stats {
     display: flex;
-    gap: $spacing-xl;
+    gap: var(--spacing-xl);
 
     .stat-item {
       text-align: center;
@@ -262,75 +262,75 @@ async function doSubscribe() {
       .stat-val {
         font-size: 28rpx;
         font-weight: 600;
-        color: $text-primary;
+        color: var(--text-primary);
         display: block;
       }
 
       .stat-lbl {
         font-size: 22rpx;
-        color: $text-muted;
+        color: var(--text-muted);
       }
     }
   }
 }
 
 .amount-section, .expected-section {
-  background: $bg-card;
-  border-radius: $radius-md;
-  padding: $spacing-base $spacing-lg;
-  border: 1rpx solid $border-color;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-base) var(--spacing-lg);
+  border: 1rpx solid var(--border-color);
 
   .section-title {
     font-size: 26rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
     display: block;
-    margin-bottom: $spacing-base;
+    margin-bottom: var(--spacing-base);
   }
 }
 
 .amount-input {
   display: flex;
   align-items: center;
-  gap: $spacing-sm;
-  border-bottom: 2rpx solid $primary;
+  gap: var(--spacing-sm);
+  border-bottom: 2rpx solid var(--primary);
 
   .input {
     flex: 1;
     font-size: 48rpx;
     font-weight: 700;
-    color: $text-primary;
-    padding: $spacing-sm 0;
+    color: var(--text-primary);
+    padding: var(--spacing-sm) 0;
   }
 
   .unit {
     font-size: 28rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 }
 
 .quick-amounts {
   display: flex;
-  gap: $spacing-sm;
-  margin-top: $spacing-base;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-base);
 
   .quick-btn {
-    background: $bg-secondary;
+    background: var(--bg-secondary);
     padding: 8rpx 24rpx;
     border-radius: 20rpx;
     font-size: 24rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
 
     &.active {
-      background: rgba($primary, 0.2);
-      color: $primary;
+      background: rgba(var(--primary), 0.2);
+      color: var(--primary);
     }
   }
 }
 
 .balance-info {
-  margin-top: $spacing-base;
+  margin-top: var(--spacing-base);
   font-size: 24rpx;
-  color: $text-muted;
+  color: var(--text-muted);
   text-align: right;
 }
 
@@ -338,61 +338,61 @@ async function doSubscribe() {
   .earning {
     font-size: 56rpx;
     font-weight: 700;
-    color: $profit;
+    color: var(--profit);
   }
 
   .earning-label {
     font-size: 24rpx;
-    color: $text-secondary;
-    margin-left: $spacing-sm;
+    color: var(--text-secondary);
+    margin-left: var(--spacing-sm);
   }
 }
 
 .expected-tip {
   font-size: 22rpx;
-  color: $text-muted;
+  color: var(--text-muted);
   margin-top: 8rpx;
   display: block;
 }
 
 .agreement {
   font-size: 24rpx;
-  color: $text-muted;
+  color: var(--text-muted);
   text-align: center;
 
   .link {
-    color: $primary;
+    color: var(--primary);
   }
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, $profit, #00CC00);
+  background: linear-gradient(135deg, var(--profit), #00CC00);
   color: #000;
   font-size: 32rpx;
   font-weight: 700;
   text-align: center;
-  padding: $spacing-base;
+  padding: var(--spacing-base);
   border-radius: 50rpx;
 
   &.disabled {
-    background: $bg-secondary;
-    color: $text-muted;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
   }
 }
 
 .risk-notice {
-  background: rgba($danger, 0.1);
-  border: 1rpx solid rgba($danger, 0.3);
-  border-radius: $radius-sm;
-  padding: $spacing-sm $spacing-base;
+  background: rgba(var(--danger), 0.1);
+  border: 1rpx solid rgba(var(--danger), 0.3);
+  border-radius: var(--radius)-sm;
+  padding: var(--spacing-sm) var(--spacing-base);
   font-size: 22rpx;
-  color: $danger;
+  color: var(--danger);
   line-height: 1.6;
 }
 
 .loading {
   text-align: center;
-  padding: $spacing-xl;
-  color: $text-muted;
+  padding: var(--spacing-xl);
+  color: var(--text-muted);
 }
 </style>

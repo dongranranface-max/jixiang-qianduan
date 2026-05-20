@@ -131,23 +131,23 @@ function goDetail(item: any) {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-lg;
+  background: var(--bg-primary);
+  padding: 0 var(--spacing-lg);
 }
 
 .page-header {
-  padding: $spacing-base 0 $spacing-sm;
+  padding: var(--spacing-base) 0 var(--spacing-sm);
 
   .page-title {
     font-size: 40rpx;
     font-weight: 700;
-    color: $text-primary;
+    color: var(--text-primary);
     display: block;
   }
 
   .page-sub {
     font-size: 24rpx;
-    color: $primary;
+    color: var(--primary);
     display: block;
     margin-top: 4rpx;
   }
@@ -155,23 +155,23 @@ function goDetail(item: any) {
 
 .mall-tabs {
   display: flex;
-  gap: $spacing-base;
-  margin-bottom: $spacing-base;
+  gap: var(--spacing-base);
+  margin-bottom: var(--spacing-base);
   overflow-x: auto;
-  padding-bottom: $spacing-sm;
-  border-bottom: 1rpx solid $border-color;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1rpx solid var(--border-color);
 
   .tab-item {
     flex-shrink: 0;
-    padding-bottom: $spacing-sm;
+    padding-bottom: var(--spacing-sm);
     font-size: 28rpx;
-    color: $text-secondary;
+    color: var(--text-secondary);
     border-bottom: 4rpx solid transparent;
     transition: all 0.2s;
 
     &.active {
-      color: $primary;
-      border-bottom-color: $primary;
+      color: var(--primary);
+      border-bottom-color: var(--primary);
     }
   }
 }
@@ -183,12 +183,12 @@ function goDetail(item: any) {
 .product-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: $spacing-base;
+  gap: var(--spacing-base);
 }
 
 .product-card {
-  background: $bg-secondary;
-  border-radius: $radius-lg;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 
   .cover {
@@ -197,11 +197,11 @@ function goDetail(item: any) {
   }
 
   .info {
-    padding: $spacing-sm;
+    padding: var(--spacing-sm);
 
     .name {
       font-size: 28rpx;
-      color: $text-primary;
+      color: var(--text-primary);
       display: block;
       margin-bottom: 8rpx;
       overflow: hidden;
@@ -218,13 +218,13 @@ function goDetail(item: any) {
       .price {
         font-size: 32rpx;
         font-weight: 700;
-        color: $primary;
+        color: var(--primary);
       }
 
       .points-tag {
         font-size: 22rpx;
-        color: $text-secondary;
-        background: $bg-tertiary;
+        color: var(--text-secondary);
+        background: var(--bg-tertiary);
         padding: 2rpx 8rpx;
         border-radius: 4rpx;
       }
@@ -237,12 +237,12 @@ function goDetail(item: any) {
 
       .exchange-label {
         font-size: 22rpx;
-        color: $text-muted;
+        color: var(--text-muted);
       }
 
       .exchange-btn {
-        background: linear-gradient(135deg, $primary, darken($primary, 10%));
-        border-radius: $radius;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: var(--radius);
         font-size: 24rpx;
         font-weight: 600;
         color: #0a0a0b;
@@ -254,15 +254,15 @@ function goDetail(item: any) {
 
 .loading {
   text-align: center;
-  padding: $spacing-base;
-  color: $text-muted;
+  padding: var(--spacing-base);
+  color: var(--text-muted);
   font-size: 26rpx;
 }
 
 .empty {
   text-align: center;
   padding: 80rpx 0;
-  color: $text-muted;
+  color: var(--text-muted);
   font-size: 28rpx;
 }
 </style>
