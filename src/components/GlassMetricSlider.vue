@@ -2,7 +2,7 @@
   <view class="metric-slider">
     <swiper class="metric-slider__swiper" :current="idx" circular @change="onChange">
       <swiper-item v-for="(m, i) in metrics" :key="i">
-        <view class="metric-card clay-dashboard">
+        <view class="metric-card glass-dashboard">
           <text class="metric-card__label">{{ m.label }}</text>
           <view class="metric-card__row">
             <text class="metric-card__value" :class="m.theme">{{ m.value }}</text>
@@ -30,21 +30,21 @@ const metrics = computed(() => [
     value: assetStore.yesterdayProfitDisplay,
     unit: '积分',
     hint: '等级日分红自动到账',
-    theme: 'gold',
+    theme: 'fire',
   },
   {
     label: '累计收益',
     value: assetStore.stateRef.totalEarnings.toLocaleString('zh-CN'),
     unit: '积分',
     hint: '含理财与推荐奖励',
-    theme: 'navy',
+    theme: 'ice',
   },
   {
     label: '小区业绩',
     value: assetStore.stateRef.teamPerformance.toLocaleString('zh-CN'),
     unit: '积分',
     hint: `当前 ${assetStore.levelName} · 距升级还差 ${assetStore.stateRef.upgradeNeed}`,
-    theme: 'accent',
+    theme: 'gold',
   },
 ])
 
@@ -63,25 +63,25 @@ function onChange(e: { detail: { current: number } }) {
   padding: 28rpx 32rpx;
   height: 168rpx;
 }
-.metric-card__label { font-size: var(--font-sm); color: $text-muted; }
+.metric-card__label { font-size: 24rpx; color: $text-muted; }
 .metric-card__row {
   display: flex;
   align-items: baseline;
   margin-top: 12rpx;
 }
 .metric-card__value {
-  font-size: 48rpx;
-  font-weight: var(--weight-heavy);
-  &.navy { color: $navy; }
-  &.gold { color: $accent-dark; }
-  &.accent { color: $navy-light; }
+  font-size: 52rpx;
+  font-weight: 800;
+  &.ice { color: $primary-light; text-shadow: 0 0 20rpx rgba(0, 212, 255, 0.4); }
+  &.fire { color: $accent-light; text-shadow: 0 0 20rpx rgba(255, 107, 53, 0.4); }
+  &.gold { color: $gold-light; }
 }
 .metric-card__unit {
-  font-size: var(--font-sm);
+  font-size: 26rpx;
   color: $text-muted;
   margin-left: 8rpx;
 }
-.metric-card__hint { font-size: var(--font-xs); color: $text-muted; margin-top: 8rpx; }
+.metric-card__hint { font-size: 22rpx; color: $text-muted; margin-top: 8rpx; }
 .metric-slider__dots {
   display: flex;
   justify-content: center;
@@ -92,11 +92,11 @@ function onChange(e: { detail: { current: number } }) {
   width: 10rpx;
   height: 10rpx;
   border-radius: 50%;
-  background: $border-color;
+  background: rgba(0, 212, 255, 0.2);
   &.active {
     width: 24rpx;
     border-radius: 5rpx;
-    background: $accent;
+    background: $primary;
   }
 }
 </style>

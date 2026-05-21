@@ -20,7 +20,7 @@
     </view>
 
     <scroll-view class="order-scroll" scroll-y @scrolltolower="loadMore">
-      <view v-for="order in orders" :key="order.orderNo" class="order-card">
+      <view v-for="order in orders" :key="order.orderNo" class="order-card glass-card">
         <view class="order-card__head">
           <text class="order-card__type">{{ typeName(order.orderType) }}</text>
           <text class="order-card__status" :class="'s' + order.status">{{ statusName(order.status) }}</text>
@@ -57,7 +57,7 @@
 
       <view v-if="loading" class="hint">加载中...</view>
       <view v-if="!loading && !orders.length" class="empty">
-        <text class="empty__icon">单</text>
+        <text class="empty__icon">📦</text>
         <text class="empty__text">暂无订单</text>
         <view class="btn-primary btn-sm" @click="goHome">去逛逛</view>
       </view>
@@ -200,15 +200,10 @@ function goHome() {
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
-@import '@/styles/page-shell.scss';
-
-.page-container {
-  @include tab-page-shell;
-}
 
 .page-header {
-  padding: 16rpx 0 8rpx;
-  &__title { @include page-title-text; }
+  padding: 16rpx $spacing-base 8rpx;
+  &__title { font-size: 36rpx; font-weight: 800; color: $text-primary; }
 }
 
 .status-tabs {
@@ -224,10 +219,9 @@ function goHome() {
     border-radius: $radius-full;
     border: 1rpx solid transparent;
     &.active {
-      color: $navy;
-      background: $warm-yellow;
-      border-color: $border-primary;
-      font-weight: var(--weight-heavy);
+      color: $primary;
+      background: rgba(0, 212, 255, 0.1);
+      border-color: rgba(0, 212, 255, 0.35);
     }
   }
 }
@@ -238,17 +232,15 @@ function goHome() {
 }
 
 .order-card {
-  @include premium-surface($bg-secondary);
-  border-radius: $radius-lg;
   padding: $spacing-base;
   margin-bottom: $spacing-base;
   &__head { display: flex; justify-content: space-between; }
   &__type { font-size: 24rpx; color: $primary; font-weight: 600; }
-  &__status { font-size: 26rpx; font-weight: 700; color: $accent-dark; &.s4 { color: $text-muted; } }
+  &__status { font-size: 26rpx; font-weight: 700; color: $accent-light; &.s4 { color: $text-muted; } }
   &__no { font-size: 22rpx; color: $text-muted; margin: 8rpx 0 16rpx; display: block; }
   &__foot { display: flex; justify-content: space-between; margin-top: 16rpx; padding-top: 16rpx; border-top: 1rpx solid $border-light; }
   &__time { font-size: 22rpx; color: $text-muted; }
-  &__amount { font-size: 32rpx; font-weight: 700; color: $navy; }
+  &__amount { font-size: 32rpx; font-weight: 700; color: $primary-light; }
   &__reward { font-size: 22rpx; color: $success; margin-top: 8rpx; }
   &__actions { display: flex; justify-content: flex-end; gap: 12rpx; margin-top: 16rpx; }
 }
@@ -265,11 +257,6 @@ function goHome() {
 }
 
 .hint, .empty { text-align: center; padding: 80rpx 0; color: $text-muted; }
-.empty__icon {
-  width: 120rpx; height: 120rpx; line-height: 120rpx; text-align: center;
-  font-size: 48rpx; font-weight: var(--weight-heavy); color: $navy;
-  background: $warm-yellow; border-radius: 50%;
-  display: block; margin: 0 auto 16rpx;
-}
+.empty__icon { font-size: 100rpx; display: block; margin-bottom: 16rpx; }
 .empty__text { display: block; margin-bottom: 24rpx; }
 </style>

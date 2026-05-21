@@ -63,3 +63,10 @@
   @include premium-surface($bg-secondary);
   border-radius: $radius-full;
 }
+
+@mixin section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+}

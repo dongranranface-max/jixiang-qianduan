@@ -3,14 +3,10 @@
     <AssetStatusBar v-if="loggedIn" />
     <view v-else class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
 
-    <view class="page-header">
-      <BrandLogo size="sm" tagline="类目浏览 · 精选好物" />
-    </view>
-
     <!-- 搜索栏 -->
     <view class="search-bar">
       <view class="search-input-wrap">
-        <text class="search-icon">⌕</text>
+        <text class="search-icon">🔍</text>
         <input
           class="search-input"
           v-model="keyword"
@@ -20,13 +16,6 @@
       </view>
     </view>
 
-    <!-- 未登录时简化资产提示条 -->
-    <view v-if="!loggedIn" class="guest-asset-strip" @click="goLogin">
-      <text class="strip-icon">积</text>
-      <text class="strip-text">登录后查看资产，享积分抵现</text>
-      <text class="strip-arrow">›</text>
-    </view>
-
     <!-- 商城类型切换 -->
     <view class="mall-tabs">
       <view
@@ -34,7 +23,7 @@
         :class="{ active: currentType === 1 }"
         @click="switchType(1)"
       >
-        <text class="mall-tab-abbr">购</text>
+        <text class="mall-tab-icon">🛍️</text>
         <text class="mall-tab-text">消费商城</text>
       </view>
       <view
@@ -42,7 +31,7 @@
         :class="{ active: currentType === 2 }"
         @click="switchType(2)"
       >
-        <text class="mall-tab-abbr">换</text>
+        <text class="mall-tab-icon">🔄</text>
         <text class="mall-tab-text">换购商城</text>
       </view>
       <view
@@ -50,7 +39,7 @@
         :class="{ active: currentType === 3 }"
         @click="switchType(3)"
       >
-        <text class="mall-tab-abbr">兑</text>
+        <text class="mall-tab-icon">🎁</text>
         <text class="mall-tab-text">兑换商城</text>
       </view>
     </view>
@@ -79,12 +68,14 @@
 
       <!-- 右侧商品列表 -->
       <scroll-view class="product-list" scroll-y @scrolltolower="loadMore">
-        <!-- 加载中骨架屏 -->
-        <HomeProductSkeleton v-if="loading" :count="4" />
+        <!-- 加载中 -->
+        <view v-if="loading" class="loading-wrap">
+          <text class="loading-text">加载中...</text>
+        </view>
 
         <!-- 空状态 -->
         <view v-else-if="products.length === 0" class="empty-wrap">
-          <text class="empty-icon">空</text>
+          <text class="empty-icon">📦</text>
           <text class="empty-text">暂无商品</text>
         </view>
 
@@ -133,14 +124,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { productApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import AssetStatusBar from '@/components/AssetStatusBar.vue'
-import BrandLogo from '@/components/BrandLogo.vue'
-import HomeProductSkeleton from '@/components/HomeProductSkeleton.vue'
 
 const statusBarHeight = ref(20)
 const loggedIn = ref(checkAuth())
@@ -170,44 +159,16 @@ onMounted(() => {
   loadProducts(true)
 })
 
-const CATALOG_PRESET_KEY = 'catalog_preset'
-
 onShow(() => {
   loggedIn.value = checkAuth()
   if (loggedIn.value) assetStore.fetchBalance()
-  const preset = uni.getStorageSync(CATALOG_PRESET_KEY) as
-    | { type?: number; categoryId?: string }
-    | ''
-  if (preset && typeof preset === 'object') {
-    if (preset.type && preset.type !== currentType.value) {
-      currentType.value = preset.type
-    }
-    if (preset.categoryId !== undefined && preset.categoryId !== currentCategoryId.value) {
-      currentCategoryId.value = preset.categoryId
-    }
-    uni.removeStorageSync(CATALOG_PRESET_KEY)
-    loadProducts(true)
-  }
 })
-
-function flattenCategories(list: any[]): any[] {
-  const out: any[] = []
-  for (const c of list) {
-    out.push({ id: c.id, name: c.name })
-    if (c.children?.length) {
-      for (const ch of c.children) {
-        out.push({ id: ch.id, name: ch.name })
-      }
-    }
-  }
-  return out
-}
 
 async function loadCategories() {
   try {
     const res = await productApi.getCategories()
     if (res && res.length > 0) {
-      categories.value = flattenCategories(res)
+      categories.value = res
     } else {
       categories.value = mockCategories
     }
@@ -234,32 +195,18 @@ async function loadProducts(reset = false) {
       limit,
     })
     const list = res.list || []
-    const rows = list.length ? list : (reset ? getMockProducts(currentType.value) : [])
     if (reset) {
-      products.value = rows
+      products.value = list
     } else {
-      products.value.push(...rows)
+      products.value.push(...list)
     }
     hasMore.value = list.length === limit
     page.value++
   } catch (e: any) {
-    if (reset && products.value.length === 0) {
-      products.value = getMockProducts(currentType.value)
-    }
     uni.showToast({ title: e.message || '加载失败', icon: 'none' })
   } finally {
     loading.value = false
   }
-}
-
-function getMockProducts(type: number) {
-  const base = [
-    { id: 'mock-1', name: '智能养生壶', price: '299.00', coverImage: 'https://picsum.photos/300/300?random=11', requiredPoints: '2000' },
-    { id: 'mock-2', name: '有机山茶油', price: '168.00', coverImage: 'https://picsum.photos/300/300?random=12', requiredPoints: '1500' },
-    { id: 'mock-3', name: '蓝牙耳机', price: '199.00', coverImage: 'https://picsum.photos/300/300?random=13', requiredPoints: '8800' },
-    { id: 'mock-4', name: '生态大米 5kg', price: '89.00', coverImage: 'https://picsum.photos/300/300?random=14', requiredPoints: '1200' },
-  ]
-  return base.filter((_, i) => type !== 3 || i >= 2).slice(0, type === 3 ? 2 : 4)
 }
 
 function switchType(type: number) {
@@ -288,114 +235,88 @@ function loadMore() {
 function goProduct(p: any) {
   uni.navigateTo({ url: `/pages/product/detail?id=${p.id}&type=${currentType.value}` })
 }
-
-function goLogin() {
-  uni.navigateTo({ url: '/pages/auth/login' })
-}
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
-@import '@/styles/page-shell.scss';
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
+  background: var(--bg-primary);
   display: flex;
   flex-direction: column;
-  padding-bottom: calc(100rpx + env(safe-area-inset-bottom));
-}
-
-.page-header {
-  padding: 8rpx $spacing-base 0;
-}
-
-// 未登录资产感知条
-guest-asset-strip {
-  display: flex;
-  align-items: center;
-  margin: 0 $spacing-base $spacing-base;
-  padding: 16rpx 24rpx;
-  background: $warm-yellow;
-  border: 1rpx solid $border-primary;
-  border-radius: $radius-lg;
-
-  .strip-icon {
-    width: 40rpx;
-    height: 40rpx;
-    line-height: 40rpx;
-    text-align: center;
-    background: $navy;
-    color: $gold-light;
-    border-radius: 50%;
-    font-size: 20rpx;
-    font-weight: var(--weight-heavy);
-    flex-shrink: 0;
-    margin-right: 12rpx;
-  }
-
-  .strip-text {
-    flex: 1;
-    font-size: var(--font-sm);
-    color: $accent-dark;
-    font-weight: var(--weight-medium);
-  }
-
-  .strip-arrow {
-    font-size: 28rpx;
-    color: $accent-dark;
-    flex-shrink: 0;
-  }
 }
 
 .search-bar {
-  padding: 0 $spacing-base $spacing-base;
+  padding: var(--spacing-base) var(--spacing-lg);
+  background: var(--bg-primary);
 
   .search-input-wrap {
-    @include search-bar-shell;
-    padding: 0 $spacing-base;
-    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1rpx solid var(--glass-border);
+    border-radius: 50rpx;
+    padding: 0 var(--spacing-base);
     height: 72rpx;
 
     .search-icon {
-      font-size: 28rpx;
-      margin-right: $spacing-sm;
-      color: $text-accent;
+      font-size: 32rpx;
+      margin-right: var(--spacing-sm);
+      color: var(--primary)-light;
     }
 
     .search-input {
       flex: 1;
-      font-size: var(--font-md);
-      color: $text-primary;
+      font-size: 28rpx;
+      color: var(--text-primary);
+
+      &::placeholder {
+        color: var(--text-muted);
+      }
     }
   }
 }
 
 .mall-tabs {
   display: flex;
-  padding: 0 $spacing-base $spacing-base;
-  gap: 12rpx;
+  padding: 0 var(--spacing-lg) var(--spacing-base);
+  gap: var(--spacing-base);
+  background: var(--bg-primary);
 
   .mall-tab {
-    @include mall-tab-item;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rpx;
+    padding: var(--spacing-sm) 0;
+    border-radius: var(--radius-lg);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1rpx solid var(--glass-border);
+    transition: all 0.3s;
 
-    .mall-tab-abbr {
-      @include mall-tab-abbr;
+    &.active {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,212,255,0.08));
+      box-shadow: var(--shadow-glow);
+    }
+
+    .mall-tab-icon {
+      font-size: 40rpx;
     }
 
     .mall-tab-text {
-      font-size: var(--font-xs);
-      color: $text-secondary;
-    }
+      font-size: 24rpx;
+      color: var(--text-secondary);
+      font-weight: 500;
 
-    &.active .mall-tab-text {
-      color: $text-primary;
-      font-weight: var(--weight-bold);
-    }
-
-    &.active .mall-tab-abbr {
-      background: $navy;
-      color: $gold-light;
+      .active & {
+        color: var(--primary-light);
+        font-weight: 700;
+      }
     }
   }
 }
@@ -404,41 +325,37 @@ guest-asset-strip {
   flex: 1;
   display: flex;
   overflow: hidden;
-  min-height: 0;
-  height: calc(100vh - 360rpx);
-  max-height: calc(100vh - 360rpx);
 }
 
 .category-nav {
-  width: 180rpx;
-  flex-shrink: 0;
-  height: 100%;
-  background: $bg-tertiary;
-  border-right: 1rpx solid $border-light;
+  width: 160rpx;
+  height: calc(100vh - 300rpx);
+  background: rgba(10, 22, 40, 0.8);
+  border-right: 1rpx solid var(--border-light);
 
   .category-item {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100rpx;
-    font-size: var(--font-sm);
-    color: $text-secondary;
+    font-size: 26rpx;
+    color: var(--text-secondary);
     border-left: 4rpx solid transparent;
+    transition: all 0.2s;
 
     &.active {
-      background: $bg-secondary;
-      color: $navy;
-      border-left-color: $accent;
-      font-weight: var(--weight-semibold);
+      background: var(--bg-primary);
+      color: var(--primary);
+      border-left-color: var(--primary);
+      font-weight: 600;
     }
   }
 }
 
 .product-list {
   flex: 1;
-  height: 100%;
-  min-height: 0;
-  padding: $spacing-base;
+  height: calc(100vh - 300rpx);
+  padding: var(--spacing-base);
 
   .loading-wrap,
   .empty-wrap {
@@ -472,20 +389,21 @@ guest-asset-strip {
 }
 
 .product-card {
-  @include premium-surface($bg-secondary);
-  border-radius: $radius-lg;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1rpx solid var(--glass-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 
   &:active {
-    border-color: $border-primary;
-    box-shadow: $shadow-gold;
+    border-color: rgba(0,212,255,0.4);
+    box-shadow: var(--shadow-glow);
   }
 
   .product-image {
     width: 100%;
-    aspect-ratio: 4 / 3;
-    display: block;
-    background: $bg-tertiary;
+    height: 300rpx;
+    background: linear-gradient(135deg, #0A1628 0%, #1E293B 100%);
   }
 
   .product-info {
@@ -494,13 +412,10 @@ guest-asset-strip {
     .product-name {
       font-size: 26rpx;
       color: var(--text-primary);
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
+      display: block;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: normal;
-      line-height: 1.4;
+      white-space: nowrap;
       margin-bottom: 12rpx;
     }
 
@@ -512,13 +427,13 @@ guest-asset-strip {
 
       .price-symbol {
         font-size: 22rpx;
-        color: $text-primary;
+        color: var(--primary-light);
       }
 
       .price-value {
         font-size: 30rpx;
-        font-weight: var(--weight-heavy);
-        color: $text-primary;
+        font-weight: 700;
+        color: var(--primary-light);
       }
 
       .original-price {
@@ -530,18 +445,19 @@ guest-asset-strip {
 
       .points-tag {
         font-size: 20rpx;
-        color: $accent-dark;
-        background: $warm-yellow;
+        color: var(--accent);
+        background: rgba(255,107,53,0.15);
         padding: 2rpx 10rpx;
         border-radius: 999rpx;
         margin-left: 8rpx;
-        font-weight: var(--weight-semibold);
+        font-weight: 600;
       }
 
       .points-tag-full {
         font-size: 24rpx;
-        color: $accent-dark;
-        font-weight: var(--weight-bold);
+        color: var(--accent);
+        font-weight: 700;
+        text-shadow: 0 0 8rpx rgba(255,107,53,0.30);
       }
     }
   }

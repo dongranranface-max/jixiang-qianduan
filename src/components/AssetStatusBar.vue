@@ -10,11 +10,11 @@
           </view>
           <view class="chip">
             <text class="chip__label">生态积分</text>
-            <text class="chip__value chip__value--eco">{{ assetStore.ecoPointsDisplay }}</text>
+            <text class="chip__value chip__value--ice">{{ assetStore.ecoPointsDisplay }}</text>
           </view>
           <view class="chip">
             <text class="chip__label">消费积分</text>
-            <text class="chip__value chip__value--consume">{{ assetStore.consumerPointsDisplay }}</text>
+            <text class="chip__value chip__value--fire">{{ assetStore.consumerPointsDisplay }}</text>
           </view>
           <view class="chip">
             <text class="chip__label">今日分红</text>
@@ -23,7 +23,7 @@
         </view>
       </scroll-view>
       <view class="asset-bar__profit" @click="goWealth">
-        <text class="asset-bar__profit-label">增值区</text>
+        <text class="asset-bar__profit-label">增值</text>
         <text class="asset-bar__profit-arrow">›</text>
       </view>
     </view>
@@ -43,7 +43,7 @@ onMounted(() => {
 })
 
 function goWealth() {
-  uni.switchTab({ url: '/pages/wealth/index' })
+  uni.navigateTo({ url: '/pages/wealth/index' })
 }
 </script>
 
@@ -54,9 +54,13 @@ function goWealth() {
   position: sticky;
   top: 0;
   z-index: 200;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 244, 241, 0.95));
-  border-bottom: 1rpx solid $border-light;
-  backdrop-filter: blur(20px);
+  background: linear-gradient(
+    180deg,
+    rgba(6, 11, 40, 0.98) 0%,
+    rgba(13, 27, 62, 0.92) 100%
+  );
+  border-bottom: 1rpx solid rgba(0, 212, 255, 0.12);
+  backdrop-filter: blur(24px);
 }
 
 .asset-bar__inner {
@@ -79,51 +83,53 @@ function goWealth() {
 .chip {
   display: inline-flex;
   flex-direction: column;
-  padding: 10rpx 18rpx;
-  @include premium-surface($bg-secondary);
-  border-radius: $radius-md;
-  min-width: 132rpx;
+  padding: 10rpx 20rpx;
+  background: rgba(0, 212, 255, 0.06);
+  border: 1rpx solid rgba(0, 212, 255, 0.15);
+  border-radius: 16rpx;
+  min-width: 140rpx;
 }
 .chip--total {
-  background: $warm-yellow;
-  border-color: $border-primary;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(255, 107, 53, 0.08));
+  border-color: rgba(0, 212, 255, 0.28);
 }
 .chip__label {
-  font-size: var(--font-xs);
+  font-size: 18rpx;
   color: $text-muted;
 }
 .chip__value {
-  font-size: var(--font-sm);
-  font-weight: var(--weight-heavy);
+  font-size: 26rpx;
+  font-weight: 800;
   color: $text-primary;
   margin-top: 4rpx;
 }
-.chip__value--eco { color: $navy-light; }
-.chip__value--consume { color: $accent-dark; }
-.chip__value--gold { color: $accent-dark; }
+.chip__value--ice { color: $primary-light; }
+.chip__value--fire { color: $accent-light; }
+.chip__value--gold { color: $gold-light; }
 
 .asset-bar__profit {
   flex-shrink: 0;
-  padding: 12rpx 18rpx;
-  background: $navy;
-  border-radius: $radius-full;
+  padding: 12rpx 16rpx;
+  background: rgba(255, 107, 53, 0.15);
+  border: 1rpx solid rgba(255, 107, 53, 0.35);
+  border-radius: 999rpx;
   display: flex;
   align-items: center;
   gap: 4rpx;
 }
 .asset-bar__profit-label {
-  font-size: var(--font-xs);
-  color: $text-inverse;
-  font-weight: var(--weight-semibold);
+  font-size: 22rpx;
+  color: $accent-light;
+  font-weight: 700;
 }
 .asset-bar__profit-arrow {
-  color: $gold-light;
+  color: $accent-light;
   font-size: 28rpx;
 }
 
 .asset-bar__formula {
-  font-size: var(--font-xs);
-  color: $text-muted;
+  font-size: 18rpx;
+  color: rgba(126, 184, 218, 0.5);
   text-align: center;
   padding-bottom: 10rpx;
 }

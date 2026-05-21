@@ -1,12 +1,6 @@
 <template>
   <view class="brand-logo" :class="[`brand-logo--${size}`]">
-    <image
-      class="brand-logo__img"
-      :src="LOGO_SRC"
-      mode="aspectFit"
-      :lazy-load="false"
-      :show-menu-by-longpress="false"
-    />
+    <image class="brand-logo__img" src="/static/logo.png" mode="aspectFit" />
     <view v-if="showText" class="brand-logo__text">
       <text class="brand-logo__name">{{ BRAND_NAME }}</text>
       <text v-if="tagline" class="brand-logo__tag">{{ tagline }}</text>
@@ -15,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { BRAND_NAME, LOGO_SRC } from '@/config'
+import { BRAND_NAME } from '@/config'
 
 withDefaults(
   defineProps<{
@@ -23,7 +17,7 @@ withDefaults(
     showText?: boolean
     tagline?: string
   }>(),
-  { size: 'md', showText: true, tagline: '智能生活 · 轻松享' }
+  { size: 'md', showText: true, tagline: '消费即投资' }
 )
 </script>
 
@@ -34,32 +28,28 @@ withDefaults(
   display: flex;
   align-items: center;
   gap: 12rpx;
-  font-family: $font-sans;
 }
 .brand-logo__img {
-  flex-shrink: 0;
   border-radius: 50%;
-  box-shadow: $shadow-card;
-  border: 2rpx solid rgba(196, 165, 116, 0.35);
-  /* 高分辨率图源缩小显示，避免发糊 */
-  image-rendering: -webkit-optimize-contrast;
+  box-shadow: 0 0 24rpx rgba(0, 212, 255, 0.35), 0 0 16rpx rgba(255, 107, 53, 0.2);
 }
 .brand-logo--sm .brand-logo__img { width: 48rpx; height: 48rpx; }
 .brand-logo--md .brand-logo__img { width: 64rpx; height: 64rpx; }
-.brand-logo--lg .brand-logo__img { width: 120rpx; height: 120rpx; }
+.brand-logo--lg .brand-logo__img { width: 96rpx; height: 96rpx; }
 
-.brand-logo__text { display: flex; flex-direction: column; line-height: var(--leading-tight); }
+.brand-logo__text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand-logo__name {
-  font-size: var(--font-lg);
-  font-weight: var(--weight-heavy);
-  color: $text-primary;
-  letter-spacing: 2rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  background: linear-gradient(90deg, $primary-light 0%, $accent-light 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-.brand-logo--lg .brand-logo__name { font-size: var(--font-2xl); }
+.brand-logo--lg .brand-logo__name { font-size: 40rpx; }
 .brand-logo__tag {
-  font-size: var(--font-xs);
+  font-size: 20rpx;
   color: $text-muted;
   margin-top: 4rpx;
-  font-weight: var(--weight-medium);
 }
 </style>

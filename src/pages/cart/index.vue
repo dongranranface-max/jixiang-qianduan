@@ -4,13 +4,6 @@
     <AssetStatusBar v-if="loggedIn" />
     <view v-else class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
     
-    <!-- 未登录时简化资产提示条 -->
-    <view v-if="!loggedIn" class="guest-asset-strip" @click="goLogin">
-      <text class="strip-icon">积</text>
-      <text class="strip-text">登录后查看资产，享积分抵现</text>
-      <text class="strip-arrow">›</text>
-    </view>
-
     <!-- 页面标题 -->
     <view class="page-header">
       <text class="page-title">购物车</text>
@@ -104,7 +97,7 @@
     </view>
     
     <!-- 底部操作栏 -->
-    <view class="bottom-bar" v-if="cartItems.length > 0 && selectedCount > 0">
+    <view class="bottom-bar" v-if="cartItems.length > 0">
       <!-- 混合结算公式 -->
       <view class="settlement-formula" v-if="selectedCount > 0">
         <text class="formula-label">混合结算</text>
@@ -118,7 +111,7 @@
         <view class="total-info">
           <view class="total-row">
             <text class="total-label">合计:</text>
-            <text class="total-price">¥{{ Number(totalPrice).toFixed(2) }}</text>
+            <text class="total-price">¥{{ totalPrice }}</text>
           </view>
           <view class="points-row" v-if="totalPoints > 0">
             <text class="points-label">+{{ totalPoints }}积分</text>
@@ -175,13 +168,13 @@ const cartItems = ref<CartItem[]>([
 
 const consumeItems = computed(() => cartItems.value.filter(i => i.mall === 'consume'))
 const exchangeItems = computed(() => cartItems.value.filter(i => i.mall === 'exchange'))
-// redeemItems: 预留兑换商城商品，目前未在模板中渲染
 const redeemItems = computed(() => cartItems.value.filter(i => i.mall === 'redeem'))
 
 const totalPrice = computed(() => {
   return cartItems.value
     .filter(i => i.selected)
     .reduce((sum, i) => sum + i.price * i.quantity, 0)
+    .toFixed(2)
 })
 
 const totalCashDisplay = computed(() => {
@@ -193,13 +186,13 @@ const totalCashDisplay = computed(() => {
 
 const totalPointsDisplay = computed(() => {
   return cartItems.value
-    .filter(i => i.selected && i.points > 0)
+    .filter(i => i.selected && i.mall === 'consume')
     .reduce((sum, i) => sum + i.points * i.quantity, 0)
 })
 
 const totalPoints = computed(() => {
   return cartItems.value
-    .filter(i => i.selected && i.points > 0)
+    .filter(i => i.selected && i.mall === 'consume')
     .reduce((sum, i) => sum + i.points * i.quantity, 0)
 })
 
@@ -273,10 +266,6 @@ function goShop() {
   uni.switchTab({ url: '/pages/buy/index' })
 }
 
-function goLogin() {
-  uni.navigateTo({ url: '/pages/auth/login' })
-}
-
 function goProduct(id: number) {
   uni.navigateTo({ url: `/pages/product/detail?id=${id}` })
 }
@@ -296,44 +285,6 @@ function goCheckout() {
 
 .page-container {
   @include tab-page-shell;
-}
-
-// 未登录资产感知条
-guest-asset-strip {
-  display: flex;
-  align-items: center;
-  margin: 0 $spacing-base $spacing-base;
-  padding: 16rpx 24rpx;
-  background: $warm-yellow;
-  border: 1rpx solid $border-primary;
-  border-radius: $radius-lg;
-
-  .strip-icon {
-    width: 40rpx;
-    height: 40rpx;
-    line-height: 40rpx;
-    text-align: center;
-    background: $navy;
-    color: $gold-light;
-    border-radius: 50%;
-    font-size: 20rpx;
-    font-weight: var(--weight-heavy);
-    flex-shrink: 0;
-    margin-right: 12rpx;
-  }
-
-  .strip-text {
-    flex: 1;
-    font-size: var(--font-sm);
-    color: $accent-dark;
-    font-weight: var(--weight-medium);
-  }
-
-  .strip-arrow {
-    font-size: 28rpx;
-    color: $accent-dark;
-    flex-shrink: 0;
-  }
 }
 
 .page-header {
@@ -533,7 +484,7 @@ guest-asset-strip {
   left: 0;
   right: 0;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   padding: 16rpx 32rpx;
   padding-bottom: calc(16rpx + constant(safe-area-inset-bottom));
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
@@ -541,7 +492,7 @@ guest-asset-strip {
   backdrop-filter: blur(20px);
   border-top: 1rpx solid $border-light;
   box-shadow: 0 -8rpx 32rpx rgba(26, 36, 56, 0.06);
-
+  
   .select-all {
     display: flex;
     align-items: center;
@@ -567,29 +518,6 @@ guest-asset-strip {
       background: $navy;
       border-color: $navy;
       color: $text-inverse;
-    }
-  }
-
-  .settlement-formula {
-    display: flex;
-    align-items: center;
-    gap: 8rpx;
-    padding: 10rpx 20rpx;
-    margin-bottom: 12rpx;
-    background: linear-gradient(135deg, $warm-yellow 0%, rgba(255,215,0,0.15) 100%);
-    border: 1rpx solid rgba(201,162,39,0.3);
-    border-radius: $radius-lg;
-    font-size: var(--font-sm);
-
-    .formula-label {
-      font-weight: var(--weight-bold);
-      color: $navy;
-      font-size: var(--font-caption);
-    }
-
-    .formula-value {
-      color: $accent-dark;
-      font-weight: var(--weight-semibold);
     }
   }
 
