@@ -80,10 +80,27 @@
     <!-- 评价 -->
     <view class="review-section" v-if="currentTab === 'review'">
       <view class="review-list">
-        <view class="review-item" v-for="r in []" :key="r.id">
+        <view v-if="reviewsLoading" class="loading-more"><text>加载中...</text></view>
+        <view v-else-if="reviews.length === 0" class="empty-review"><text>暂无评价</text></view>
+        <view v-else class="review-item" v-for="r in reviews" :key="r.id">
+          <view class="review-header">
+            <image class="review-avatar" :src="r.avatar || 'https://picsum.photos/80/80?random=avatar'" mode="aspectFill" />
+            <view class="review-meta">
+              <text class="review-name">{{ r.nickname || '匿名用户' }}</text>
+              <view class="review-stars">
+                <text v-for="s in 5" :key="s" :class="s <= (r.rating || 5) ? 'star filled' : 'star'">★</text>
+              </view>
+            </view>
+            <text class="review-time">{{ r.createdAt }}</text>
+          </view>
           <text class="review-content">{{ r.content }}</text>
+          <view v-if="r.images && r.images.length > 0" class="review-images">
+            <image v-for="(img, idx) in r.images" :key="idx" :src="img" class="review-img" mode="aspectFill" @click="previewImage(r.images, idx)" />
+          </view>
         </view>
-        <view class="empty-review"><text>暂无评价</text></view>
+        <view v-if="!reviewsLoading && reviews.length > 0 && hasMoreReviews" class="load-more-btn" @click="loadMoreReviews">
+          <text>加载更多</text>
+        </view>
       </view>
     </view>
 
@@ -139,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { productApi } from '@/utils/api'
 import { requireAuth } from '@/utils/auth'
 
@@ -150,6 +167,14 @@ const quantity = ref(1)
 const cartCount = ref(0)
 const productId = ref('')
 const mode = ref<'consume' | 'exchange' | 'redeem'>('consume')
+
+// 评价相关
+const reviews = ref<any[]>([])
+const reviewsLoading = ref(false)
+const reviewsPage = ref(1)
+const hasMoreReviews = ref(true)
+const reviewsTotal = ref(0)
+
 
 const product = ref<any>({
   name: '',
@@ -196,21 +221,80 @@ onMounted(() => {
   if (productId.value) {
     loadProduct()
   }
+
+  // 监听 tab 切换，加载评论
+  watch(currentTab, (val) => {
+    if (val === 'review' && reviews.length === 0) {
+      loadReviews()
+    }
+  })
 })
 
 async function loadProduct() {
   try {
     const res = await productApi.getDetail(productId.value)
     product.value = res
+    // 加载评论
+    if (currentTab.value === 'review') {
+      loadReviews()
+    }
   } catch (e: any) {
     uni.showToast({ title: '加载商品失败', icon: 'none' })
   }
 }
 
+async function loadReviews() {
+  if (!productId.value || reviewsLoading.value) return
+  reviewsLoading.value = true
+  try {
+    const res = await productApi.getReviews(productId.value, { page: reviewsPage.value, limit: 10 })
+    const list = res.list || []
+    if (reviewsPage.value === 1) {
+      reviews.value = list
+    } else {
+      reviews.value.push(...list)
+    }
+    reviewsTotal.value = res.total || 0
+    hasMoreReviews.value = list.length >= 10
+  } catch (e) {
+    console.error('[product] loadReviews', e)
+  } finally {
+    reviewsLoading.value = false
+  }
+}
+
+function loadMoreReviews() {
+  reviewsPage.value++
+  loadReviews()
+}
+
+function previewImage(images: string[], current: number) {
+  uni.previewImage({ urls: images, current })
+}
+
 function goBack() { uni.navigateBack() }
 function goHome() { uni.switchTab({ url: '/pages/index/index' }) }
 function goCart() { uni.switchTab({ url: '/pages/cart/index' }) }
-function share() { uni.showShareMenu() }
+
+function share() {
+  const pages = getCurrentPages()
+  const current = pages[pages.length - 1]
+  const shareUrl = `/pages/product/detail?id=${productId.value}&mode=${mode.value}`
+  uni.share({
+    provider: 'weixin',
+    type: 0,
+    title: product.value.name,
+    scene: 'WXSceneSession',
+    success: () => uni.showToast({ title: '分享成功', icon: 'success' }),
+    fail: () => {
+      // fallback: 复制链接
+      uni.setClipboardData({
+        data: `${location.origin}${shareUrl}`,
+        success: () => uni.showToast({ title: '链接已复制', icon: 'success' })
+      })
+    }
+  })
+}
 
 function handleAddCart() {
   showSkuModal.value = true
@@ -339,7 +423,24 @@ function handleBuy() {
 }
 
 .review-section { padding: var(--spacing-base) var(--spacing-lg);
+  .loading-more { text-align: center; padding: 40rpx 0; color: var(--text-muted); font-size: 28rpx; }
   .empty-review { text-align: center; padding: 80rpx 0; color: var(--text-muted); font-size: 28rpx; }
+  .review-item {
+    padding: var(--spacing-base) 0;
+    border-bottom: 1rpx solid var(--border-light);
+    &:last-of-type { border-bottom: none; }
+  }
+  .review-header { display: flex; align-items: flex-start; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+  .review-avatar { width: 64rpx; height: 64rpx; border-radius: 50%; flex-shrink: 0; }
+  .review-meta { flex: 1; }
+  .review-name { font-size: 26rpx; color: var(--text-primary); font-weight: 600; display: block; }
+  .review-stars { display: flex; gap: 2rpx; margin-top: 4rpx; .star { font-size: 22rpx; color: var(--text-muted); &.filled { color: $gold; } } }
+  .review-time { font-size: 22rpx; color: var(--text-muted); flex-shrink: 0; }
+  .review-content { font-size: 28rpx; color: var(--text-secondary); line-height: 1.6; display: block; margin-bottom: var(--spacing-sm); }
+  .review-images { display: flex; flex-wrap: wrap; gap: 8rpx; margin-top: var(--spacing-sm);
+    .review-img { width: 160rpx; height: 160rpx; border-radius: $radius-sm; }
+  }
+  .load-more-btn { text-align: center; padding: var(--spacing-base); font-size: 26rpx; color: var(--text-accent); margin-top: var(--spacing-sm); }
 }
 
 .bottom-bar {

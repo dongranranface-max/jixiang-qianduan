@@ -291,6 +291,16 @@ export const productApi = {
   // 商品详情
   getDetail: (id: string) =>
     request<any>({ url: `/products/${id}` }),
+
+  // 商品评论列表
+  getReviews: (productId: string, params: { page?: number; limit?: number } = {}) => {
+    const q = new URLSearchParams()
+    if (params.page) q.append('page', String(params.page))
+    if (params.limit) q.append('limit', String(params.limit))
+    return request<{ list: any[]; total: number; page: number; limit: number }>(
+      { url: `/products/${productId}/reviews?${q.toString()}` }
+    )
+  },
 }
 
 // --------------------------------------------
@@ -359,6 +369,10 @@ export const orderApi = {
   // 退款详情
   getRefundDetail: (orderNo: string) =>
     request<any>({ url: `/orders/${orderNo}/refund` }),
+
+  // 模拟支付回调（前端用，实际由服务端唤起支付）
+  paymentCallback: (orderNo: string, channel: string) =>
+    request<void>({ url: `/orders/${orderNo}/pay`, method: 'POST', data: { channel } }),
 }
 
 // --------------------------------------------
@@ -606,6 +620,81 @@ export const signInApi = {
 }
 
 // --------------------------------------------
+//  购物车模块 /cart（本地 + API 混合）
+// --------------------------------------------
+function getCart(): any[] {
+  try {
+    return JSON.parse(uni.getStorageSync('cart') || '[]')
+  } catch { return [] }
+}
+function saveCart(items: any[]) {
+  uni.setStorageSync('cart', JSON.stringify(items))
+}
+
+export const cartApi = {
+  // 获取购物车列表（本地存储）
+  getList: () => {
+    const items = getCart()
+    // 过滤掉已删除的
+    return Promise.resolve({ list: items.filter(Boolean), total: items.length })
+  },
+
+  // 加入购物车（本地存储，productId + 数量）
+  add: (data: { productId: string; quantity: number; mall: 'consume' | 'exchange' | 'redeem' }) => {
+    const items = getCart()
+    const exist = items.find((i: any) => i.productId === data.productId && i.mall === data.mall)
+    if (exist) {
+      exist.quantity += data.quantity
+    } else {
+      items.push({ id: Date.now(), productId: data.productId, quantity: data.quantity, mall: data.mall, selected: false })
+    }
+    saveCart(items)
+    return Promise.resolve({ success: true })
+  },
+
+  // 更新数量
+  updateQuantity: (id: number, quantity: number) => {
+    const items = getCart()
+    const item = items.find((i: any) => i.id === id)
+    if (item) {
+      if (quantity <= 0) {
+        const idx = items.findIndex((i: any) => i.id === id)
+        items.splice(idx, 1)
+      } else {
+        item.quantity = quantity
+      }
+    }
+    saveCart(items)
+    return Promise.resolve({ success: true })
+  },
+
+  // 删除
+  remove: (id: number) => {
+    const items = getCart()
+    const idx = items.findIndex((i: any) => i.id === id)
+    if (idx > -1) items.splice(idx, 1)
+    saveCart(items)
+    return Promise.resolve({ success: true })
+  },
+
+  // 清空已选
+  clearSelected: () => {
+    const items = getCart()
+    saveCart(items.filter((i: any) => !i.selected))
+    return Promise.resolve({ success: true })
+  },
+
+  // 获取数量
+  getCount: () => {
+    return Promise.resolve({ count: getCart().length })
+  },
+}
+
+// --------------------------------------------
+//  商品评论模块 /products/:id/reviews
+// --------------------------------------------
+
+// --------------------------------------------
 //  导出汇总
 // --------------------------------------------
 export const api = {
@@ -621,4 +710,5 @@ export const api = {
   marketing: marketingApi,
   ticket: ticketApi,
   signIn: signInApi,
+  cart: cartApi,
 }

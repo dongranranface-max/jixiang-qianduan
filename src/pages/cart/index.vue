@@ -13,11 +13,16 @@
     </view>
     
     <!-- 购物车为空 -->
-    <view class="empty-cart" v-if="cartItems.length === 0">
+    <view class="empty-cart" v-if="!cartLoading && cartItems.length === 0">
       <view class="empty-icon"><text>购</text></view>
       <text class="empty-text">购物车是空的</text>
       <text class="empty-hint">快去挑选心仪的商品吧</text>
       <view class="empty-btn" @click="goShop">去逛逛</view>
+    </view>
+    
+    <!-- 加载中 -->
+    <view v-if="cartLoading" class="loading-cart">
+      <text>加载中...</text>
     </view>
     
     <!-- 购物车列表 -->
@@ -135,6 +140,7 @@ import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
+import { cartApi, productApi } from '@/utils/api'
 import AssetStatusBar from '@/components/AssetStatusBar.vue'
 
 const statusBarHeight = ref(20)
@@ -145,10 +151,12 @@ onShow(() => {
   loggedIn.value = checkAuth()
   statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
   if (loggedIn.value) assetStore.fetchBalance()
+  loadCartItems()
 })
 
 interface CartItem {
   id: number
+  productId: string
   name: string
   price: number
   points: number
@@ -159,12 +167,43 @@ interface CartItem {
   mallType?: 'flash'
 }
 
-const cartItems = ref<CartItem[]>([
-  { id: 1, name: 'iPhone 15 Pro Max 256GB 深空黑', price: 9999, points: 500, quantity: 1, image: 'https://picsum.photos/200/200?random=110', selected: false, mall: 'consume' },
-  { id: 2, name: 'AirPods Pro 2 代 MagSafe充电盒', price: 1899, points: 95, quantity: 2, image: 'https://picsum.photos/200/200?random=111', selected: false, mall: 'consume' },
-  { id: 3, name: '戴森吹风机 HD15 紫红色', price: 2999, points: 150, quantity: 1, image: 'https://picsum.photos/200/200?random=112', selected: false, mall: 'exchange' },
-  { id: 4, name: '小米手环 8 Pro 石墨黑', price: 399, points: 20, quantity: 1, image: 'https://picsum.photos/200/200?random=113', selected: false, mall: 'consume', mallType: 'flash' }
-])
+const cartItems = ref<CartItem[]>([])
+const cartLoading = ref(false)
+
+async function loadCartItems() {
+  cartLoading.value = true
+  try {
+    const { list } = await cartApi.getList()
+    // 加载每个商品详情
+    const withDetails = await Promise.all(
+      (list as any[]).map(async (item: any) => {
+        try {
+          const prod = await productApi.getDetail(item.productId)
+          const coverImg = (prod.coverImages || [])[0] || prod.coverImage || ''
+          return {
+            id: item.id,
+            productId: item.productId,
+            name: prod.name || '',
+            price: Number(prod.price || 0),
+            points: Number(prod.ecoPoints || 0),
+            quantity: item.quantity,
+            image: coverImg,
+            selected: item.selected,
+            mall: item.mall,
+            mallType: prod.flashSale ? 'flash' as const : undefined,
+          }
+        } catch {
+          return null
+        }
+      })
+    )
+    cartItems.value = withDetails.filter(Boolean) as CartItem[]
+  } catch (e) {
+    console.error('[cart] loadCartItems', e)
+  } finally {
+    cartLoading.value = false
+  }
+}
 
 const consumeItems = computed(() => cartItems.value.filter(i => i.mall === 'consume'))
 const exchangeItems = computed(() => cartItems.value.filter(i => i.mall === 'exchange'))
@@ -200,7 +239,11 @@ const selectedCount = computed(() => cartItems.value.filter(i => i.selected).len
 
 function toggleSelect(id: number) {
   const item = cartItems.value.find(i => i.id === id)
-  if (item) item.selected = !item.selected
+  if (item) {
+    item.selected = !item.selected
+    // 同步到本地存储
+    cartApi.updateQuantity(id, item.selected ? item.quantity : -item.quantity).catch(() => {})
+  }
 }
 
 function isAllSelected(type: 'consume' | 'exchange' | 'all') {
@@ -229,6 +272,7 @@ function changeQuantity(item: CartItem, delta: number) {
     return
   }
   item.quantity = newQty
+  cartApi.updateQuantity(item.id, newQty).catch(() => {})
 }
 
 function deleteItem(id: number) {
@@ -239,6 +283,7 @@ function deleteItem(id: number) {
       if (res.confirm) {
         const index = cartItems.value.findIndex(i => i.id === id)
         if (index > -1) cartItems.value.splice(index, 1)
+        cartApi.remove(id).catch(() => {})
       }
     }
   })
@@ -257,6 +302,7 @@ function deleteSelected() {
     success: (res) => {
       if (res.confirm) {
         cartItems.value = cartItems.value.filter(i => !i.selected)
+        cartApi.clearSelected().catch(() => {})
       }
     }
   })
