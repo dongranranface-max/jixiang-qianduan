@@ -366,12 +366,12 @@ function goProjectDetail(project: any) {
 
 // 资产骨架屏
 .asset-card.sk-loading {
-  background: linear-gradient(135deg, rgba(26,36,56,0.4) 0%, rgba(26,36,56,0.3) 100%);
-  border: 1rpx solid rgba(196,165,116,0.2);
+  background: $warm-yellow;
+  border: 1rpx solid $border-primary;
 
   .sk-line {
     height: 24rpx;
-    background: rgba(255,255,255,0.12);
+    background: rgba(26,36,56,0.08);
     border-radius: 8rpx;
     animation: shimmer 1.4s ease-in-out infinite;
   }
@@ -385,7 +385,7 @@ function goProjectDetail(project: any) {
     .sk-value {
       width: 120rpx;
       height: 56rpx;
-      background: rgba(255,255,255,0.12);
+      background: rgba(26,36,56,0.08);
       border-radius: 8rpx;
       margin: 0 auto 12rpx;
       animation: shimmer 1.4s ease-in-out infinite;
@@ -399,12 +399,12 @@ function goProjectDetail(project: any) {
 }
 
 .asset-card {
-  background: linear-gradient(135deg, $navy 0%, $navy-light 55%, #3D4F6A 100%);
-  border: none;
+  @include premium-surface($warm-yellow);
+  border: 1rpx solid $border-primary;
   border-radius: $radius-2xl;
-  box-shadow: $shadow-glow;
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
+  box-shadow: $shadow-gold;
   
   .asset-header {
     display: flex;
@@ -413,13 +413,13 @@ function goProjectDetail(project: any) {
     
     .asset-label {
       font-size: 30rpx;
-      color: rgba(255, 255, 255, 0.92);
+      color: $navy;
       font-weight: 600;
     }
     
     .asset-detail {
       font-size: 26rpx;
-      color: rgba(255, 255, 255, 0.65);
+      color: $accent-dark;
     }
   }
   
@@ -432,7 +432,7 @@ function goProjectDetail(project: any) {
     .asset-divider {
       width: 1rpx;
       height: 80rpx;
-      background: var(--border-color);
+      background: $border-primary;
     }
     
     .asset-item {
@@ -442,26 +442,23 @@ function goProjectDetail(project: any) {
         font-size: 56rpx;
         font-weight: 700;
         display: block;
+        color: $navy;
         
         &.text-gold {
-          color: var(--gold);
-        }
-        
-        &.text-purple {
-          color: var(--primary);
+          color: $accent-dark;
         }
       }
       
       .asset-name {
         font-size: 26rpx;
-        color: rgba(255, 255, 255, 0.75);
+        color: $navy-light;
         margin-top: 8rpx;
         display: block;
       }
       
       .asset-sub {
         font-size: 22rpx;
-        color: rgba(255, 255, 255, 0.5);
+        color: $text-muted;
         margin-top: 4rpx;
         display: block;
       }
@@ -476,13 +473,14 @@ function goProjectDetail(project: any) {
     gap: 8rpx;
     margin-top: var(--spacing-base);
     padding: 16rpx 24rpx;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.7);
+    border: 1rpx solid $border-primary;
     border-radius: $radius-full;
 
-    .profit-chip-icon { font-size: 28rpx; font-weight: 700; color: $gold-light; }
-    .profit-chip-label { font-size: 24rpx; color: rgba(255, 255, 255, 0.7); }
-    .profit-chip-value { font-size: 32rpx; font-weight: 700; color: $gold-light; }
-    .profit-chip-unit { font-size: 22rpx; color: rgba(255, 255, 255, 0.6); }
+    .profit-chip-icon { font-size: 28rpx; font-weight: 700; color: $accent-dark; }
+    .profit-chip-label { font-size: 24rpx; color: $navy-light; }
+    .profit-chip-value { font-size: 32rpx; font-weight: 700; color: $accent-dark; }
+    .profit-chip-unit { font-size: 22rpx; color: $text-muted; }
   }
   
   .asset-actions {
@@ -514,30 +512,22 @@ function goProjectDetail(project: any) {
   border-radius: $radius-2xl;
   padding: 40rpx 32rpx 36rpx;
   margin-bottom: var(--spacing-lg);
-  background: linear-gradient(145deg, $navy 0%, #243047 48%, $navy-light 100%);
-  border: 1rpx solid rgba(196, 165, 116, 0.35);
-  box-shadow:
-    0 24rpx 64rpx rgba(26, 36, 56, 0.2),
-    0 0 72rpx rgba(196, 165, 116, 0.14);
+  @include premium-surface($warm-yellow);
+  border: 1rpx solid $border-primary;
+  box-shadow: $shadow-gold;
 
   &__glow {
     position: absolute;
-    top: -35%;
-    right: -15%;
-    width: 70%;
-    height: 75%;
-    background: radial-gradient(circle, rgba(196, 165, 116, 0.42) 0%, transparent 68%);
+    top: -25%;
+    right: -10%;
+    width: 50%;
+    height: 55%;
+    background: radial-gradient(circle, rgba(196, 165, 116, 0.3) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
 
     &--2 {
-      top: auto;
-      bottom: -25%;
-      left: -10%;
-      right: auto;
-      width: 55%;
-      height: 50%;
-      background: radial-gradient(circle, rgba(232, 213, 181, 0.2) 0%, transparent 70%);
+      display: none;
     }
   }
 }
@@ -573,7 +563,7 @@ function goProjectDetail(project: any) {
   font-size: var(--font-card-title);
   font-weight: var(--weight-bold);
   letter-spacing: 0.2em;
-  color: $gold-light;
+  color: $accent-dark;
   text-transform: uppercase;
 }
 
@@ -581,10 +571,7 @@ function goProjectDetail(project: any) {
   font-size: 64rpx;
   font-weight: var(--weight-heavy);
   line-height: 1;
-  color: $text-inverse;
-  text-shadow:
-    0 0 48rpx rgba(196, 165, 116, 0.75),
-    0 4rpx 16rpx rgba(0, 0, 0, 0.25);
+  color: $navy;
 }
 
 .level-name-upper {
@@ -592,13 +579,13 @@ function goProjectDetail(project: any) {
   font-weight: var(--weight-semibold);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
+  color: $navy-light;
 }
 
 .level-subtitle {
   font-size: var(--font-body);
   font-weight: var(--weight-regular);
-  color: rgba(255, 255, 255, 0.55);
+  color: $text-muted;
 }
 
 .level-dividend {
@@ -608,21 +595,20 @@ function goProjectDetail(project: any) {
   .dividend-label {
     @include type-caption;
     display: block;
-    color: rgba(255, 255, 255, 0.5);
+    color: $text-muted;
   }
 
   .dividend-value {
     display: block;
     font-size: var(--font-page-title);
     font-weight: var(--weight-bold);
-    color: $gold-light;
+    color: $accent-dark;
     line-height: 1.2;
-    text-shadow: 0 0 32rpx rgba(196, 165, 116, 0.5);
   }
 
   .dividend-unit {
     font-size: var(--font-caption);
-    color: rgba(255, 255, 255, 0.65);
+    color: $text-muted;
   }
 }
 
@@ -641,7 +627,7 @@ function goProjectDetail(project: any) {
     .progress-current {
       font-size: var(--font-page-title);
       font-weight: var(--weight-bold);
-      color: $gold-light;
+      color: $accent-dark;
     }
 
     .progress-separator,
@@ -649,13 +635,13 @@ function goProjectDetail(project: any) {
     .progress-unit {
       font-size: var(--font-body);
       font-weight: var(--weight-regular);
-      color: rgba(255, 255, 255, 0.55);
+      color: $text-muted;
     }
   }
 
   .progress-bar {
     height: 14rpx;
-    background: rgba(255, 255, 255, 0.12);
+    background: $bg-tertiary;
     border-radius: $radius-full;
     overflow: visible;
     position: relative;
@@ -665,17 +651,15 @@ function goProjectDetail(project: any) {
     height: 100%;
     min-width: 4%;
     border-radius: $radius-full;
-    background: linear-gradient(90deg, $accent-dark 0%, $gold 45%, $gold-light 100%);
-    box-shadow:
-      0 0 20rpx rgba(196, 165, 116, 0.85),
-      0 0 40rpx rgba(196, 165, 116, 0.45);
+    background: $gold-gradient;
+    box-shadow: 0 0 16rpx rgba(196, 165, 116, 0.5);
     transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .progress-tip {
     @include type-caption;
     margin-top: 14rpx;
-    color: rgba(255, 255, 255, 0.6);
+    color: $text-muted;
   }
 }
 
@@ -823,13 +807,10 @@ function goProjectDetail(project: any) {
         font-weight: 800;
         display: block;
         letter-spacing: -1rpx;
+        color: $navy;
 
         &.profit {
-          background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-dark) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          filter: drop-shadow(0 0 8rpx rgba(255,140,0,0.5));
+          @include ai-jelly-text;
         }
       }
       
@@ -870,15 +851,14 @@ function goProjectDetail(project: any) {
     }
     
     .invest-btn {
-      background: var(--accent-fire);
-      color: #fff;
+      background: $navy;
+      color: $text-inverse;
       font-size: 26rpx;
       font-weight: 700;
       padding: 12rpx 32rpx;
       border-radius: 50rpx;
       margin-left: var(--spacing-base);
-      box-shadow: var(--shadow-fire);
-      text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.2);
+      box-shadow: $shadow-glow;
     }
   }
 }

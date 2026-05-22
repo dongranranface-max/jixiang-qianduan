@@ -12,8 +12,21 @@
       </text>
     </view>
     
+    <!-- 购物车骨架屏 -->
+    <view class="cart-skeleton" v-if="loading">
+      <view class="sk-item" v-for="i in 3" :key="i">
+        <view class="sk-checkbox shimmer"></view>
+        <view class="sk-img shimmer"></view>
+        <view class="sk-info">
+          <view class="sk-line sk-line--long shimmer"></view>
+          <view class="sk-line sk-line--mid shimmer"></view>
+          <view class="sk-line sk-line--short shimmer"></view>
+        </view>
+      </view>
+    </view>
+
     <!-- 购物车为空 -->
-    <view class="empty-cart" v-if="cartItems.length === 0">
+    <view class="empty-cart" v-else-if="cartItems.length === 0">
       <view class="empty-icon"><text>购</text></view>
       <text class="empty-text">购物车是空的</text>
       <text class="empty-hint">快去挑选心仪的商品吧</text>
@@ -356,13 +369,73 @@ function goCheckout() {
   }
 }
 
+// 购物车骨架屏
+.cart-skeleton {
+  padding: $spacing-base 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-base;
+
+  .sk-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    @include premium-surface($bg-secondary);
+    border-radius: $radius-md;
+    padding: $spacing-base;
+
+    .sk-checkbox {
+      width: 40rpx;
+      height: 40rpx;
+      border-radius: 50%;
+      background: $bg-tertiary;
+      flex-shrink: 0;
+    }
+
+    .sk-img {
+      width: 160rpx;
+      height: 160rpx;
+      border-radius: $radius-sm;
+      background: $bg-tertiary;
+      flex-shrink: 0;
+    }
+
+    .sk-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12rpx;
+    }
+
+    .sk-line {
+      height: 22rpx;
+      border-radius: 8rpx;
+      background: $bg-tertiary;
+      width: 100%;
+
+      &--long { width: 90%; }
+      &--mid { width: 65%; }
+      &--short { width: 40%; }
+    }
+  }
+}
+
+.shimmer {
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
 .empty-cart {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: $spacing-2xl 0;
-  
+
   .empty-icon {
     width: 120rpx;
     height: 120rpx;
