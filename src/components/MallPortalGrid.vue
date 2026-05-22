@@ -55,9 +55,9 @@ const emit = defineEmits<{ (e: 'select', type: PortalType): void }>()
   font-size: 32rpx;
   font-weight: var(--weight-heavy);
   color: $navy;
-  background: $warm-yellow;
+  background: transparent;
   border-radius: 50%;
-  border: 1rpx solid $border-primary;
+  border: 2rpx solid $border-primary;
   display: block;
 }
 .portal__tag {
@@ -69,8 +69,9 @@ const emit = defineEmits<{ (e: 'select', type: PortalType): void }>()
   font-weight: var(--weight-bold);
   padding: 4rpx 12rpx;
   border-radius: $radius-sm;
-  background: $warm-yellow;
-  color: rgba(154, 123, 79, 1);
+  background: transparent;
+  color: $accent-dark;
+  border: 1rpx solid $border-primary;
   line-height: 1.2;
   z-index: 1;
 }

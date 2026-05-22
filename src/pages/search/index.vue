@@ -95,7 +95,7 @@
 
     <!-- 无结果 -->
     <view class="empty-section" v-else-if="keyword && searchResult.length === 0 && searching">
-      <text class="empty-icon">搜</text>
+      <view class="empty-icon"><text>搜</text></view>
       <text class="empty-text">没有找到相关商品</text>
       <text class="empty-hint">试试其他关键词</text>
     </view>
@@ -459,20 +459,47 @@ watch(keyword, (newVal) => {
   align-items: center;
   justify-content: center;
   padding: var(--spacing-2xl) 0;
-  
+
   .empty-icon {
-    width: 120rpx; height: 120rpx; line-height: 120rpx; text-align: center;
-    font-size: 44rpx; font-weight: var(--weight-heavy); color: $navy;
-    background: $warm-yellow; border-radius: 50%;
-    margin-bottom: var(--spacing-base);
+    position: relative;
+    width: 140rpx;
+    height: 140rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-lg);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2rpx solid $border-primary;
+      background: $warm-yellow;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -12rpx;
+      border-radius: 50%;
+      border: 1rpx dashed rgba($accent-dark, 0.3);
+    }
+
+    text {
+      font-size: 48rpx;
+      font-weight: var(--weight-heavy);
+      color: $navy;
+      z-index: 1;
+    }
   }
-  
+
   .empty-text {
     font-size: 32rpx;
     color: var(--text-primary);
     margin-bottom: var(--spacing-sm);
   }
-  
+
   .empty-hint {
     font-size: 26rpx;
     color: var(--text-secondary);
