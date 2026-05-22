@@ -10,7 +10,7 @@
 
       <view class="brand-content">
         <view class="brand-logo-wrap stagger-1">
-          <image class="brand-logo-img" src="/static/logo.png" mode="aspectFit" />
+          <image class="brand-logo-img" src="/static/jxgs.png" mode="aspectFit" />
         </view>
         <text class="brand-name stagger-2">集享公社</text>
         <text class="brand-slogan stagger-3">注册账号 · 共享生态价值</text>
@@ -105,12 +105,12 @@
               </view>
             </view>
 
-            <!-- 邀请码（可选）-->
-            <view class="input-wrap input-field-wrap" :class="{ 'is-filled': form.inviteCode.length > 0 }">
+            <!-- 邀请码（必填）-->
+            <view class="input-wrap input-field-wrap invite-field" :class="{ 'is-filled': form.inviteCode.length > 0 }">
               <input
                 class="input-native"
                 v-model="form.inviteCode"
-                placeholder="邀请码（选填）"
+                placeholder="请输入邀请码"
                 placeholder-class="input-plh"
                 @focus="focusState.invite = true"
                 @blur="focusState.invite = false"
@@ -125,7 +125,7 @@
           <view class="panel-submit stagger-5">
             <view
               class="submit-btn"
-              :class="{ 'is-loading': submitting }"
+              :class="{ 'is-disabled': !agreed || submitting, 'is-loading': submitting }"
               @click="doRegister"
             >
               <view v-if="!submitting" class="submit-inner">
@@ -244,6 +244,9 @@ async function doRegister() {
   if (!agreed.value) {
     return uni.showToast({ title: '请先阅读并同意用户协议', icon: 'none' })
   }
+  if (!form.value.inviteCode) {
+    return uni.showToast({ title: '请输入邀请码', icon: 'none' })
+  }
 
   submitting.value = true
   uni.showLoading({ title: '注册中...' })
@@ -293,7 +296,7 @@ async function doRegister() {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  // 移除 filter:blur() — blur+animation 是移动端叠影主因
+  // 静态光晕，无动画，保证丝滑
   &--top {
     width: 480rpx;
     height: 480rpx;
@@ -306,8 +309,6 @@ async function doRegister() {
       transparent 70%
     );
     opacity: 0.85;
-    will-change: transform, opacity;
-    animation: glow-float 8s ease-in-out infinite;
   }
 
   &--bottom {
@@ -322,14 +323,7 @@ async function doRegister() {
       transparent 70%
     );
     opacity: 0.7;
-    will-change: transform, opacity;
-    animation: glow-float 10s ease-in-out infinite reverse;
   }
-}
-
-@keyframes glow-float {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
-  50% { transform: translate(12rpx, -12rpx) scale(1.05); opacity: 1; }
 }
 
 .brand-content {
@@ -347,8 +341,8 @@ async function doRegister() {
   width: 144rpx;
   height: 144rpx;
   border-radius: 40rpx;
-  background: rgba(184, 152, 118, 0.1);
-  border: 1rpx solid rgba(184, 152, 118, 0.2);
+  background: rgba(184, 152, 118, 0.12);
+  border: 1rpx solid rgba(184, 152, 118, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -497,7 +491,10 @@ async function doRegister() {
     box-sizing: border-box;
 
     &::placeholder { color: $text-muted; font-weight: 400; }
-    &:focus { outline: none; background: rgba(255, 255, 255, 0.8); }
+    &:focus {
+      outline: none;
+      background: transparent;
+    }
   }
 
   .input-gold-line {
@@ -508,7 +505,7 @@ async function doRegister() {
     height: 3rpx;
     background: linear-gradient(90deg, $accent 0%, $gold-light 50%, $accent 100%);
     border-radius: 3rpx 3rpx 0 0;
-    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.4s ease;
   }
 
   .input-glow {
@@ -531,6 +528,19 @@ async function doRegister() {
 
   &.is-filled {
     .input-gold-line { width: 100%; }
+  }
+}
+
+// 邀请码弱化视觉
+.invite-field {
+  .input-native {
+    font-size: 26rpx;
+    color: $text-muted;
+    &::placeholder { color: rgba(112, 123, 140, 0.55); }
+  }
+  .input-gold-line {
+    height: 2rpx;
+    opacity: 0.6;
   }
 }
 
@@ -568,8 +578,9 @@ async function doRegister() {
   justify-content: center;
 
   .toggle-icon {
-    font-size: 32rpx;
+    font-size: 28rpx;
     color: $text-muted;
+    line-height: 1;
   }
 }
 
@@ -588,6 +599,15 @@ async function doRegister() {
     transform: scale(0.98);
     box-shadow: 0 8rpx 24rpx rgba(47, 53, 66, 0.18);
   }
+
+  &.is-disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  &.is-loading {
+    opacity: 0.75;
+  }
 }
 
 .submit-inner,
@@ -598,22 +618,7 @@ async function doRegister() {
   align-items: center;
   justify-content: center;
   background: $mineral-gray;
-}
-
-.submit-inner::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.12) 50%, transparent 100%);
-  animation: btn-shimmer 3s ease-in-out infinite;
-}
-
-@keyframes btn-shimmer {
-  0% { left: -100%; }
-  50%, 100% { left: 100%; }
+  border-radius: inherit;
 }
 
 .submit-text {
@@ -622,8 +627,6 @@ async function doRegister() {
   color: #FFFFFF;
   letter-spacing: 4rpx;
 }
-
-.submit-btn.is-loading { opacity: 0.75; }
 
 .loading-spinner {
   width: 32rpx;

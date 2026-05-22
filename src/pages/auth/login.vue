@@ -6,7 +6,7 @@
       深藏青背景 + 金色点缀 + 仪式感动效
     ============================================ -->
     <view class="brand-space">
-      <!-- 背景光晕层 -->
+      <!-- 背景光晕层（静态渐变，无动画，保证丝滑）-->
       <view class="brand-glow brand-glow--top" />
       <view class="brand-glow brand-glow--bottom" />
 
@@ -14,7 +14,7 @@
       <view class="brand-content">
         <!-- Logo -->
         <view class="brand-logo-wrap stagger-1">
-          <image class="brand-logo-img" src="/static/logo.png" mode="aspectFit" />
+          <image class="brand-logo-img" src="/static/jxgs.png" mode="aspectFit" />
         </view>
 
         <!-- 品牌名称 -->
@@ -115,7 +115,6 @@
             >
               <view v-if="!submitting" class="submit-inner">
                 <text class="submit-text">登 录</text>
-                <text class="submit-arrow">→</text>
               </view>
               <view v-else class="submit-loading">
                 <view class="loading-spinner" />
@@ -258,6 +257,7 @@ async function doLogin() {
   // 移除 filter: blur() — blur + animation 是移动端叠影主因
   // 用径向渐变模拟自然光晕，不触发 GPU 光栅化
 
+  // 移除 filter:blur 和 animation，保持静态光晕确保丝滑
   &--top {
     width: 480rpx;
     height: 480rpx;
@@ -270,8 +270,6 @@ async function doLogin() {
       transparent 70%
     );
     opacity: 0.85;
-    will-change: transform, opacity;
-    animation: glow-float 8s ease-in-out infinite;
   }
 
   &--bottom {
@@ -286,14 +284,7 @@ async function doLogin() {
       transparent 70%
     );
     opacity: 0.7;
-    will-change: transform, opacity;
-    animation: glow-float 10s ease-in-out infinite reverse;
   }
-}
-
-@keyframes glow-float {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
-  50% { transform: translate(12rpx, -12rpx) scale(1.05); opacity: 1; }
 }
 
 // 品牌内容居中
@@ -313,13 +304,12 @@ async function doLogin() {
   width: 144rpx;
   height: 144rpx;
   border-radius: 40rpx;
-  background: rgba(184, 152, 118, 0.1);
-  border: 1rpx solid rgba(184, 152, 118, 0.2);
+  background: rgba(184, 152, 118, 0.12);
+  border: 1rpx solid rgba(184, 152, 118, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 40rpx;
-  box-shadow: 0 8rpx 32rpx rgba(184, 152, 118, 0.15);
   overflow: hidden;
 }
 
@@ -327,6 +317,7 @@ async function doLogin() {
   width: 96rpx;
   height: 96rpx;
   display: block;
+  border-radius: 0;
 }
 
 // 品牌名称
@@ -481,14 +472,14 @@ async function doLogin() {
 
     &::placeholder { color: $text-muted; font-weight: 400; }
 
-    // 聚焦时：顶部留空间给金线
+    // 聚焦时：透明背景，保证丝滑
     &:focus {
       outline: none;
-      background: rgba(255, 255, 255, 0.8);
+      background: transparent;
     }
   }
 
-  // 金色底线：从左向右徐徐展开，600ms
+    // 金色底线：从左向右徐徐展开，400ms
   .input-gold-line {
     position: absolute;
     bottom: 0;
@@ -502,7 +493,7 @@ async function doLogin() {
       $accent 100%
     );
     border-radius: 3rpx 3rpx 0 0;
-    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.4s ease;
   }
 
   // 聚焦时的柔和光晕
@@ -523,7 +514,7 @@ async function doLogin() {
     pointer-events: none;
   }
 
-  // 聚焦态
+    // 聚焦态（通过 JS class 绑定）
   &.is-focused {
     .input-gold-line { width: 100%; }
     .input-glow { opacity: 1; }
@@ -549,8 +540,9 @@ async function doLogin() {
   flex-shrink: 0;
 
   .toggle-icon {
-    font-size: 32rpx;
+    font-size: 28rpx;
     color: $text-muted;
+    line-height: 1;
   }
 }
 
@@ -584,50 +576,22 @@ async function doLogin() {
   }
 }
 
-.submit-inner,
-.submit-loading {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12rpx;
-  background: $mineral-gray;
-}
+  .submit-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $mineral-gray;
+    border-radius: inherit;
+  }
 
-// 光泽扫过动画
-.submit-inner::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.12) 50%,
-    transparent 100%
-  );
-  animation: btn-shimmer 3s ease-in-out infinite;
-}
-
-@keyframes btn-shimmer {
-  0% { left: -100%; }
-  50%, 100% { left: 100%; }
-}
-
-.submit-text {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: 4rpx;
-}
-
-.submit-arrow {
-  font-size: 28rpx;
-  color: rgba(255, 255, 255, 0.7);
-}
+  .submit-text {
+    font-size: 30rpx;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 4rpx;
+  }
 
 .submit-btn.is-loading {
   opacity: 0.75;
