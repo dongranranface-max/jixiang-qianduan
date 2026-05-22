@@ -10,7 +10,7 @@
 
       <view class="brand-content">
         <view class="brand-logo-wrap stagger-1">
-          <image class="brand-logo-img" src="/static/logo/logo.png" mode="aspectFit" />
+          <image class="brand-logo-img" src="/static/logo.png" mode="aspectFit" />
         </view>
         <text class="brand-name stagger-2">集享公社</text>
         <text class="brand-slogan stagger-3">注册账号 · 共享生态价值</text>
@@ -340,12 +340,13 @@ async function doRegister() {
   align-items: center;
   justify-content: center;
   margin-bottom: 40rpx;
+  overflow: hidden;
 }
 
 .brand-logo-img {
   width: 96rpx;
   height: 96rpx;
-  border-radius: 28rpx;
+  display: block;
 }
 
 .brand-name {

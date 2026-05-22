@@ -14,7 +14,7 @@
       <view class="brand-content">
         <!-- Logo -->
         <view class="brand-logo-wrap stagger-1">
-          <image class="brand-logo-img" src="/static/logo/logo.png" mode="aspectFit" />
+          <image class="brand-logo-img" src="/static/logo.png" mode="aspectFit" />
         </view>
 
         <!-- 品牌名称 -->
@@ -314,12 +314,13 @@ async function doLogin() {
   justify-content: center;
   margin-bottom: 40rpx;
   box-shadow: 0 8rpx 32rpx rgba(184, 152, 118, 0.15);
+  overflow: hidden;
 }
 
 .brand-logo-img {
   width: 96rpx;
   height: 96rpx;
-  border-radius: 28rpx;
+  display: block;
 }
 
 // 品牌名称
