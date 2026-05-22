@@ -235,7 +235,7 @@ async function doSubscribe() {
     .yield-value {
       font-size: 72rpx;
       font-weight: 700;
-      color: var(--profit);
+      color: $accent-dark;
       display: block;
     }
 
@@ -331,7 +331,7 @@ async function doSubscribe() {
   .earning {
     font-size: 56rpx;
     font-weight: 700;
-    color: var(--profit);
+    color: $accent-dark;
   }
 
   .earning-label {
@@ -359,7 +359,7 @@ async function doSubscribe() {
 }
 
 .submit-btn {
-  background: $accent-fire;
+  background: $navy;
   color: $text-inverse;
   font-size: 32rpx;
   font-weight: 700;

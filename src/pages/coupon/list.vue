@@ -243,16 +243,18 @@ function formatDate(dateStr: string | undefined): string {
   position: relative;
   
   &.used, &.expired {
-    opacity: 0.6;
-    
     .coupon-left {
-      .coupon-value { color: var(--text-muted); }
+      background: $bg-tertiary;
+      .coupon-value { color: $text-muted; }
+      .coupon-desc { color: $text-muted; }
     }
+    .coupon-right { opacity: 0.5; }
+    .coupon-status { opacity: 1; }
   }
   
   .coupon-left {
     width: 220rpx;
-    background: $accent-fire;
+    background: $navy;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -304,7 +306,7 @@ function formatDate(dateStr: string | undefined): string {
     .coupon-use-btn {
       width: fit-content;
       padding: 8rpx 24rpx;
-      background: $accent-fire;
+      background: $navy;
       border-radius: 50rpx;
       font-size: 22rpx;
       color: $text-inverse;
@@ -326,13 +328,13 @@ function formatDate(dateStr: string | undefined): string {
     }
     
     &.used {
-      background: var(--text-muted);
+      background: $text-muted;
       color: #fff;
     }
-    
+
     &.expired {
-      background: var(--danger);
-      color: #fff;
+      background: $bg-tertiary;
+      color: $text-muted;
     }
   }
 }

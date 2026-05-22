@@ -301,13 +301,13 @@ function goBack() {
     margin-right: var(--spacing-base);
     
     &.income {
-      background: rgba(var(--profit), 0.2);
-      color: var(--profit);
+      background: rgba($gold, 0.15);
+      color: $accent-dark;
     }
     
     &.expense {
-      background: rgba(var(--danger), 0.2);
-      color: var(--danger);
+      background: rgba($accent-dark, 0.12);
+      color: $accent-dark;
     }
   }
   
@@ -329,9 +329,9 @@ function goBack() {
   .record-points {
     font-size: 32rpx;
     font-weight: 700;
-    
-    &.income { color: var(--profit); }
-    &.expense { color: var(--danger); }
+
+    &.income { color: $accent-dark; }
+    &.expense { color: $text-muted; }
   }
 }
 

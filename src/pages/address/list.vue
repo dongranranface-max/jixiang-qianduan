@@ -143,7 +143,7 @@ async function deleteAddr(addr: any) {
   .add-empty {
     display: inline-block;
     margin-top: var(--spacing-xl);
-    background: $accent-fire;
+    background: $navy;
     color: $text-inverse;
     padding: 16rpx 48rpx;
     border-radius: 50rpx;
@@ -179,8 +179,9 @@ async function deleteAddr(addr: any) {
       .name { font-size: 30rpx; font-weight: 600; color: var(--text-primary); }
       .phone { font-size: 26rpx; color: var(--text-secondary); }
       .default-tag {
-        background: $accent-fire; color: $text-inverse;
+        background: $warm-yellow; color: $navy;
         font-size: 20rpx; padding: 2rpx 12rpx; border-radius: 8rpx;
+        font-weight: 600;
       }
     }
 

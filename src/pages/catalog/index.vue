@@ -442,7 +442,7 @@ function goProduct(p: any) {
 
   .product-image {
     width: 100%;
-    height: 300rpx;
+    aspect-ratio: 1 / 1;
     background: linear-gradient(135deg, $warm-blue 0%, $bg-tertiary 100%);
   }
 

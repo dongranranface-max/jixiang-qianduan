@@ -64,11 +64,11 @@ const salesText = computed(() => {
   overflow: hidden;
 }
 
-/* 4:3 图区，约占卡片高度 65% */
+/* 1:1 方图，商品展示更统一 */
 .p-card__media {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   flex-shrink: 0;
   overflow: hidden;
   background: $bg-tertiary;
