@@ -245,49 +245,55 @@ async function doLogin() {
   align-items: center;
   justify-content: center;
   background: $mineral-gray;
-  // 右侧内阴影，制造左右层次感
-  box-shadow: inset -24rpx 0 80rpx rgba(0, 0, 0, 0.3);
+  box-shadow: inset -24rpx 0 80rpx rgba(0, 0, 0, 0.25);
   position: relative;
   overflow: hidden;
 }
 
-// 背景光晕
+// 背景光晕 — 去掉 blur，改用 opacity 变化实现柔和效果
 .brand-glow {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(80rpx);
+  // 移除 filter: blur() — blur + animation 是移动端叠影主因
+  // 用径向渐变模拟自然光晕，不触发 GPU 光栅化
 
   &--top {
-    width: 400rpx;
-    height: 400rpx;
-    top: -100rpx;
-    right: -80rpx;
+    width: 480rpx;
+    height: 480rpx;
+    top: -120rpx;
+    right: -120rpx;
     background: radial-gradient(
       circle,
-      rgba(184, 152, 118, 0.15) 0%,
+      rgba(184, 152, 118, 0.25) 0%,
+      rgba(184, 152, 118, 0.08) 40%,
       transparent 70%
     );
+    opacity: 0.85;
+    will-change: transform, opacity;
     animation: glow-float 8s ease-in-out infinite;
   }
 
   &--bottom {
-    width: 350rpx;
-    height: 350rpx;
-    bottom: -80rpx;
-    left: -100rpx;
+    width: 400rpx;
+    height: 400rpx;
+    bottom: -100rpx;
+    left: -120rpx;
     background: radial-gradient(
       circle,
-      rgba(47, 53, 66, 0.4) 0%,
+      rgba(65, 75, 94, 0.5) 0%,
+      rgba(47, 53, 66, 0.15) 50%,
       transparent 70%
     );
+    opacity: 0.7;
+    will-change: transform, opacity;
     animation: glow-float 10s ease-in-out infinite reverse;
   }
 }
 
 @keyframes glow-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(16rpx, -16rpx) scale(1.08); }
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  50% { transform: translate(12rpx, -12rpx) scale(1.05); opacity: 1; }
 }
 
 // 品牌内容居中

@@ -385,7 +385,7 @@ async function doReset() {
   align-items: center;
   justify-content: center;
   background: $mineral-gray;
-  box-shadow: inset -24rpx 0 80rpx rgba(0, 0, 0, 0.3);
+  box-shadow: inset -24rpx 0 80rpx rgba(0, 0, 0, 0.25);
   position: relative;
   overflow: hidden;
 }
@@ -394,30 +394,43 @@ async function doReset() {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(80rpx);
-
+  // 移除 filter:blur() — blur+animation 是移动端叠影主因
   &--top {
-    width: 400rpx;
-    height: 400rpx;
-    top: -100rpx;
-    right: -80rpx;
-    background: radial-gradient(circle, rgba(184, 152, 118, 0.15) 0%, transparent 70%);
+    width: 480rpx;
+    height: 480rpx;
+    top: -120rpx;
+    right: -120rpx;
+    background: radial-gradient(
+      circle,
+      rgba(184, 152, 118, 0.25) 0%,
+      rgba(184, 152, 118, 0.08) 40%,
+      transparent 70%
+    );
+    opacity: 0.85;
+    will-change: transform, opacity;
     animation: glow-float 8s ease-in-out infinite;
   }
 
   &--bottom {
-    width: 350rpx;
-    height: 350rpx;
-    bottom: -80rpx;
-    left: -100rpx;
-    background: radial-gradient(circle, rgba(47, 53, 66, 0.4) 0%, transparent 70%);
+    width: 400rpx;
+    height: 400rpx;
+    bottom: -100rpx;
+    left: -120rpx;
+    background: radial-gradient(
+      circle,
+      rgba(65, 75, 94, 0.5) 0%,
+      rgba(47, 53, 66, 0.15) 50%,
+      transparent 70%
+    );
+    opacity: 0.7;
+    will-change: transform, opacity;
     animation: glow-float 10s ease-in-out infinite reverse;
   }
 }
 
 @keyframes glow-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(16rpx, -16rpx) scale(1.08); }
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  50% { transform: translate(12rpx, -12rpx) scale(1.05); opacity: 1; }
 }
 
 .brand-content {
