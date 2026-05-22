@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 
 const assetsDir = path.join(__dirname, '..', 'dist', 'build', 'h5', 'assets')
+const staticJsDir = path.join(__dirname, '..', 'dist', 'build', 'h5', 'static', 'js')
 
 function findJsFiles(dir) {
   const files = []
@@ -18,11 +19,14 @@ function findJsFiles(dir) {
 }
 
 function fixGlob() {
-  const jsFiles = findJsFiles(assetsDir)
+  // 修复 assets/ 目录
+  const assetsFiles = findJsFiles(assetsDir)
+  const staticJsFiles = findJsFiles(staticJsDir)
+  const allFiles = [...assetsFiles, ...staticJsFiles]
   let fixed = 0
   const re = /import\.meta\.globEager\([^)]+\)/g
 
-  for (const file of jsFiles) {
+  for (const file of allFiles) {
     let content = fs.readFileSync(file, 'utf-8')
     if (!content.includes('globEager')) continue
     const next = content.replace(re, '({})')
@@ -35,7 +39,7 @@ function fixGlob() {
 
   // 兼容旧版固定变量名替换
   const legacy = 'import.meta.globEager("./locale/*.json")'
-  for (const file of jsFiles) {
+  for (const file of allFiles) {
     let content = fs.readFileSync(file, 'utf-8')
     if (content.includes(legacy)) {
       content = content.replaceAll(legacy, '({})')
