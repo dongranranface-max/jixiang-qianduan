@@ -56,10 +56,10 @@ function goWealth() {
   z-index: 200;
   background: linear-gradient(
     180deg,
-    rgba(6, 11, 40, 0.98) 0%,
-    rgba(13, 27, 62, 0.92) 100%
+    rgba(47, 53, 66, 0.96) 0%,
+    rgba(47, 53, 66, 0.90) 100%
   );
-  border-bottom: 1rpx solid rgba(0, 212, 255, 0.12);
+  border-bottom: 1rpx solid rgba(112, 123, 140, 0.12);
   backdrop-filter: blur(24px);
 }
 
@@ -84,14 +84,14 @@ function goWealth() {
   display: inline-flex;
   flex-direction: column;
   padding: 10rpx 20rpx;
-  background: rgba(0, 212, 255, 0.06);
-  border: 1rpx solid rgba(0, 212, 255, 0.15);
+  background: rgba(112, 123, 140, 0.08);
+  border: 1rpx solid rgba(112, 123, 140, 0.15);
   border-radius: 16rpx;
   min-width: 140rpx;
 }
 .chip--total {
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.12), rgba(255, 107, 53, 0.08));
-  border-color: rgba(0, 212, 255, 0.28);
+  background: linear-gradient(135deg, rgba(112, 123, 140, 0.12), rgba(184, 152, 118, 0.08));
+  border-color: rgba(112, 123, 140, 0.28);
 }
 .chip__label {
   font-size: 18rpx;
@@ -105,13 +105,13 @@ function goWealth() {
 }
 .chip__value--ice { color: $primary-light; }
 .chip__value--fire { color: $accent-light; }
-.chip__value--gold { color: $gold-light; }
+.chip__value--gold { color: $bronze-light; }
 
 .asset-bar__profit {
   flex-shrink: 0;
   padding: 12rpx 16rpx;
-  background: rgba(255, 107, 53, 0.15);
-  border: 1rpx solid rgba(255, 107, 53, 0.35);
+  background: rgba(184, 152, 118, 0.18);
+  border: 1rpx solid rgba(184, 152, 118, 0.35);
   border-radius: 999rpx;
   display: flex;
   align-items: center;
@@ -119,17 +119,17 @@ function goWealth() {
 }
 .asset-bar__profit-label {
   font-size: 22rpx;
-  color: $accent-light;
+  color: $bronze-light;
   font-weight: 700;
 }
 .asset-bar__profit-arrow {
-  color: $accent-light;
+  color: $bronze-light;
   font-size: 28rpx;
 }
 
 .asset-bar__formula {
   font-size: 18rpx;
-  color: rgba(126, 184, 218, 0.5);
+  color: rgba(112, 123, 140, 0.5);
   text-align: center;
   padding-bottom: 10rpx;
 }

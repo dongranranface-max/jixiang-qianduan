@@ -172,7 +172,7 @@ const shortId = computed(() => {
   right: -10%;
   width: 55%;
   height: 60%;
-  background: radial-gradient(circle, rgba(196, 165, 116, 0.28) 0%, transparent 68%);
+  background: radial-gradient(circle, rgba(184, 152, 118, 0.28) 0%, transparent 68%);
   pointer-events: none;
   z-index: 0;
 }
@@ -194,14 +194,14 @@ const shortId = computed(() => {
     width: 100rpx;
     height: 100rpx;
     border-radius: 50%;
-    border: 3rpx solid rgba(196, 165, 116, 0.6);
+    border: 3rpx solid rgba(184, 152, 118, 0.6);
   }
 
   .avatar-ring {
     position: absolute;
     inset: -5rpx;
     border-radius: 50%;
-    border: 2rpx solid rgba(196, 165, 116, 0.3);
+    border: 2rpx solid rgba(184, 152, 118, 0.3);
   }
 }
 
@@ -421,9 +421,9 @@ const shortId = computed(() => {
   transition: all 0.3s ease;
 
   &.active {
-    background: $gold-gradient;
-    border-color: $gold;
-    box-shadow: 0 0 12rpx rgba(196, 165, 116, 0.5);
+    background: $bronze-gradient;
+    border-color: $bronze-gold;
+    box-shadow: 0 0 12rpx rgba(184, 152, 118, 0.5);
   }
 
   &.v1 .orb-label,

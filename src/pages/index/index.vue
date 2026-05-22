@@ -23,7 +23,7 @@
         <swiper
           class="banner"
           indicator-dots
-          indicator-active-color="#9A7B4F"
+          indicator-active-color="#B89876"
           indicator-color="rgba(0,0,0,0.1)"
           autoplay
           circular
@@ -451,14 +451,14 @@ function onPortal(type: PortalType) {
   position: relative;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #f7f3eb 0%, #e8dcc8 45%, #c9a227 100%);
+  background: linear-gradient(135deg, #EDE9E1 0%, #D4C4AE 45%, #B89876 100%);
 
   &--exchange {
-    background: linear-gradient(135deg, #eef1f5 0%, #d4dce8 50%, #9a7b4f 100%);
+    background: linear-gradient(135deg, #ECEEF2 0%, #D4C4AE 50%, #8E7459 100%);
   }
 
   &--wealth {
-    background: linear-gradient(135deg, #1a2438 0%, #2d3a52 55%, #9a7b4f 100%);
+    background: linear-gradient(135deg, #2F3542 0%, #414B5E 55%, #8E7459 100%);
   }
 
   &--wealth .banner__title,

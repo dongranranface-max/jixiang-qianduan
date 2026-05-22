@@ -31,7 +31,7 @@ withDefaults(
 }
 .brand-logo__img {
   border-radius: 50%;
-  box-shadow: 0 0 20rpx rgba(196, 165, 116, 0.4);
+  box-shadow: 0 0 20rpx rgba(184, 152, 118, 0.4);
 }
 .brand-logo--sm .brand-logo__img { width: 48rpx; height: 48rpx; }
 .brand-logo--md .brand-logo__img { width: 64rpx; height: 64rpx; }
@@ -41,7 +41,7 @@ withDefaults(
 .brand-logo__name {
   font-size: 30rpx;
   font-weight: 800;
-  background: linear-gradient(90deg, $accent-dark 0%, $gold 100%);
+  background: linear-gradient(90deg, $accent-dark 0%, $bronze-gold 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

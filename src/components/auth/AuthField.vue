@@ -128,7 +128,7 @@ function onInput(e: { detail: { value: string } }) {
 .af__row--focus {
   border-color: $border-primary;
   background: $bg-secondary;
-  box-shadow: 0 0 0 6rpx rgba(196, 165, 116, 0.12);
+  box-shadow: 0 0 0 6rpx rgba(184, 152, 118, 0.12);
 }
 .af__row--error {
   border-color: rgba(240, 113, 113, 0.65);
@@ -159,7 +159,7 @@ function onInput(e: { detail: { value: string } }) {
   }
 
   &.af__row--ok {
-    border-bottom-color: rgba(196, 165, 116, 0.65);
+    border-bottom-color: rgba(184, 152, 118, 0.65);
   }
 
   .af__icon {

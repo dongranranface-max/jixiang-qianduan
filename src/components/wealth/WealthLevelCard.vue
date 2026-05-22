@@ -110,7 +110,7 @@ function formatPoints(v: string | number): string {
     right: -10%;
     width: 50%;
     height: 55%;
-    background: radial-gradient(circle, rgba(196, 165, 116, 0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(184, 152, 118, 0.3) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
 
@@ -240,8 +240,8 @@ function formatPoints(v: string | number): string {
     min-width: 4%;
     max-width: 100%;
     border-radius: $radius-full;
-    background: $gold-gradient;
-    box-shadow: 0 0 16rpx rgba(196, 165, 116, 0.5);
+    background: $bronze-gradient;
+    box-shadow: 0 0 16rpx rgba(184, 152, 118, 0.5);
     transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
