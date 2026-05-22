@@ -1,122 +1,100 @@
 <template>
-  <view class="auth-split">
+  <view class="auth-page">
 
     <!-- ============================================
-      左侧品牌空间（40%）
+      移动端顶部品牌横条（含返回按钮）
     ============================================ -->
-    <view class="brand-space">
-      <view class="brand-glow brand-glow--top" />
-      <view class="brand-glow brand-glow--bottom" />
-
-      <view class="brand-content">
-        <view class="brand-logo-wrap">
-          <image class="brand-logo-img" src="/static/logo.png" mode="aspectFit" />
+    <view class="auth-brand-bar">
+      <view class="brand-left">
+        <view class="back-btn" @click="goBack">
+          <text class="back-btn__icon">←</text>
         </view>
-        <text class="brand-name">集享公社</text>
-        <text class="brand-slogan">集轻奢·享财富</text>
-
-        <view class="brand-divider">
-          <view class="divider-line divider-line--left" />
-          <view class="divider-diamond" />
-          <view class="divider-line divider-line--right" />
+        <view class="brand-logo-sm">
+          <image class="brand-logo-sm__img" src="/static/logo.png" mode="aspectFit" />
         </view>
-
-        <!-- 底部文案（两行语义断行）-->
-        <view class="brand-footer">
-          <text class="brand-footer-text">想起密码了？</text>
+        <view class="brand-info">
+          <text class="brand-info__name">集享公社</text>
+          <text class="brand-info__slogan">集轻奢·享财富</text>
         </view>
-        <view class="brand-footer-row">
-          <text class="brand-footer-link" @click="goLogin">返回登录</text>
-        </view>
-
-        <text class="brand-privacy">
-          找回过程中有任何问题，请联系平台客服
-        </text>
+      </view>
+      <view class="brand-right">
+        <text class="brand-nav-link" @click="goLogin">登录</text>
       </view>
     </view>
 
     <!-- ============================================
-      右侧操作空间（60%）
-      两步流程：① 验证手机 → ② 设置新密码
+      表单区域
     ============================================ -->
-    <view class="panel-space">
-      <view class="panel-safe-top" :style="{ height: statusBarHeight + 'px' }" />
-
-      <!-- 顶部返回栏 -->
-      <view class="panel-topbar">
-        <view class="back-btn" @click="goBack">
-          <text class="back-icon">←</text>
-        </view>
-      </view>
-
-      <scroll-view class="panel-scroll" scroll-y>
-        <view class="panel-inner">
+    <view class="auth-form-area">
+      <scroll-view class="auth-scroll" scroll-y>
+        <view class="auth-form-inner">
 
           <!-- 步骤指示器 -->
           <view class="step-indicator">
             <view class="step-item" :class="{ 'is-active': step === 1, 'is-done': step > 1 }">
-              <view class="step-circle">
-                <text v-if="step > 1" class="step-check">✓</text>
+              <view class="step-item__circle">
+                <text v-if="step > 1" class="step-item__check">✓</text>
                 <text v-else>1</text>
               </view>
-              <text class="step-label">验证手机</text>
+              <text class="step-item__label">验证手机</text>
             </view>
             <view class="step-connector" :class="{ 'is-done': step > 1 }" />
             <view class="step-item" :class="{ 'is-active': step === 2 }">
-              <view class="step-circle">
-                <text>2</text>
-              </view>
-              <text class="step-label">设置密码</text>
+              <view class="step-item__circle">2</view>
+              <text class="step-item__label">设置密码</text>
             </view>
           </view>
 
           <!-- ========== Step 1: 验证手机 ========== -->
           <template v-if="step === 1">
-            <view class="panel-header">
-              <text class="panel-title">短信验证</text>
-              <view class="subtitle-block">
-                <text class="panel-subtitle">验证注册手机号后</text>
-                <text class="panel-subtitle">设置新密码</text>
+            <view class="form-header">
+              <text class="form-header__title">短信验证</text>
+              <view class="form-header__sub-row">
+                <text class="form-header__sub">验证注册手机号后</text>
+                <text class="form-header__sub">设置新密码</text>
               </view>
             </view>
 
-            <view class="panel-form">
-
-              <!-- 手机号 -->
-              <view class="input-wrap input-field-wrap" :class="{ 'is-focused': focusState.phone, 'is-filled': form.phone.length === 11 }">
-                <input
-                  class="input-native"
-                  v-model="form.phone"
-                  type="number"
-                  maxlength="11"
-                  placeholder="注册时的手机号"
-                  placeholder-class="input-plh"
-                  @focus="focusState.phone = true"
-                  @blur="focusState.phone = false"
-                />
-                <view class="input-gold-line" />
-                <view class="input-glow" />
-              </view>
+            <!-- 手机号 -->
+            <view
+              class="field-wrap"
+              :class="{ 'is-focused': focusState.phone, 'is-filled': form.phone.length === 11 }"
+            >
+              <input
+                class="field-input"
+                v-model="form.phone"
+                type="number"
+                maxlength="11"
+                placeholder="注册时的手机号"
+                placeholder-class="field-placeholder"
+                @focus="focusState.phone = true"
+                @blur="focusState.phone = false"
+              />
+              <view class="field-line" />
+              <view class="field-glow" />
+            </view>
 
             <!-- 验证码 -->
-            <view class="code-row">
-              <view
-                class="input-wrap input-field-wrap code-input-wrap"
-                :class="{ 'is-focused': focusState.code, 'is-filled': form.code.length === 6 }"
-              >
-                <input
-                  class="input-native"
-                  v-model="form.code"
-                  type="number"
-                  maxlength="6"
-                  placeholder="请输入6位验证码"
-                  placeholder-class="input-plh"
-                  @focus="focusState.code = true"
-                  @blur="focusState.code = false"
-                />
-                <view class="input-gold-line" />
-                <view class="input-glow" />
-              </view>
+            <view
+              class="field-wrap"
+              :class="{ 'is-focused': focusState.code, 'is-filled': form.code.length === 6 }"
+            >
+              <input
+                class="field-input"
+                v-model="form.code"
+                type="number"
+                maxlength="6"
+                placeholder="请输入6位验证码"
+                placeholder-class="field-placeholder"
+                @focus="focusState.code = true"
+                @blur="focusState.code = false"
+              />
+              <view class="field-line" />
+              <view class="field-glow" />
+            </view>
+
+            <!-- 验证码按钮（独立成行） -->
+            <view class="code-btn-row">
               <view
                 class="code-btn"
                 :class="{ 'is-counting': countdown > 0 || sending }"
@@ -126,112 +104,109 @@
               </view>
             </view>
 
-            </view>
-
-            <view class="panel-submit">
-              <view
-                class="submit-btn"
-                :class="{ 'is-disabled': !canGoStep2 }"
-                @click="goStep2"
-              >
-                <view class="submit-inner">
-                  <text class="submit-text">下一步</text>
-                </view>
+            <!-- 提交按钮 -->
+            <view
+              class="submit-btn"
+              :class="{ 'is-disabled': !canGoStep2 }"
+              @click="goStep2"
+            >
+              <view class="submit-btn__inner">
+                <text class="submit-btn__text">下一步</text>
               </view>
             </view>
           </template>
 
           <!-- ========== Step 2: 设置密码 ========== -->
           <template v-else>
-            <view class="panel-header">
-              <text class="panel-title">设置新密码</text>
-              <text class="panel-subtitle">
+            <view class="form-header">
+              <text class="form-header__title">设置新密码</text>
+              <text class="form-header__sub">
                 已为 <text class="highlight-phone">{{ maskedPhone }}</text> 验证通过
               </text>
             </view>
 
-            <view class="panel-form">
-
-              <!-- 新密码 -->
-              <view class="input-wrap input-field-wrap" :class="{ 'is-focused': focusState.pwd, 'is-filled': form.password.length >= 6 }">
-                <input
-                  class="input-native"
-                  v-model="form.password"
-                  :type="showPwd ? 'text' : 'password'"
-                  placeholder="新密码（6位以上）"
-                  placeholder-class="input-plh"
-                  @focus="focusState.pwd = true"
-                  @blur="focusState.pwd = false"
-                />
-                <view class="input-gold-line" />
-                <view class="input-glow" />
-                <view class="input-toggle" @click="showPwd = !showPwd">
-                  <text class="toggle-icon">{{ showPwd ? '⊙' : '◉' }}</text>
-                </view>
-              </view>
-
-              <!-- 密码强度指示 -->
-              <view v-if="form.password" class="pwd-strength">
-                <view class="pwd-track">
-                  <view
-                    class="pwd-fill"
-                    :class="`pwd-fill--${pwdLevel}`"
-                    :style="{ width: pwdPercent + '%' }"
-                  />
-                </view>
-                <text class="pwd-hint">{{ pwdHint }}</text>
-              </view>
-
-              <!-- 确认新密码 -->
-              <view class="input-wrap input-field-wrap" :class="{ 'is-focused': focusState.confirm, 'is-filled': form.confirm.length >= 6 }">
-                <input
-                  class="input-native"
-                  v-model="form.confirm"
-                  :type="showConfirm ? 'text' : 'password'"
-                  placeholder="再次输入新密码"
-                  placeholder-class="input-plh"
-                  @focus="focusState.confirm = true"
-                  @blur="focusState.confirm = false"
-                />
-                <view class="input-gold-line" />
-                <view class="input-glow" />
-                <view class="input-toggle" @click="showConfirm = !showConfirm">
-                  <text class="toggle-icon">{{ showConfirm ? '⊙' : '◉' }}</text>
-                </view>
-              </view>
-
-              <!-- 确认密码错误提示 -->
-              <text v-if="confirmDirty && form.confirm !== form.password" class="confirm-error">
-                两次密码不一致
-              </text>
-
-            </view>
-
-            <view class="panel-submit">
-              <view
-                class="submit-btn"
-                :class="{ 'is-disabled': !canSubmit || submitting, 'is-loading': submitting }"
-                @click="doReset"
-              >
-                <view v-if="!submitting" class="submit-inner">
-                  <text class="submit-text">确认重置</text>
-                </view>
-                <view v-else class="submit-loading">
-                  <view class="loading-spinner" />
-                  <text class="loading-text">提交中...</text>
-                </view>
+            <!-- 新密码 -->
+            <view
+              class="field-wrap"
+              :class="{ 'is-focused': focusState.pwd, 'is-filled': form.password.length >= 6 }"
+            >
+              <input
+                class="field-input"
+                v-model="form.password"
+                :type="showPwd ? 'text' : 'password'"
+                placeholder="新密码（6位以上）"
+                placeholder-class="field-placeholder"
+                @focus="focusState.pwd = true"
+                @blur="focusState.pwd = false"
+              />
+              <view class="field-line" />
+              <view class="field-glow" />
+              <view class="field-toggle" @click="showPwd = !showPwd">
+                <text class="field-toggle__icon">{{ showPwd ? '⊙' : '◉' }}</text>
               </view>
             </view>
 
-            <view class="panel-back-link">
-              <text class="back-link-text" @click="step = 1">← 返回上一步</text>
+            <!-- 密码强度 -->
+            <view v-if="form.password" class="pwd-strength">
+              <view class="pwd-track">
+                <view
+                  class="pwd-fill"
+                  :class="`pwd-fill--${pwdLevel}`"
+                  :style="{ width: pwdPercent + '%' }"
+                />
+              </view>
+              <text class="pwd-hint">{{ pwdHint }}</text>
+            </view>
+
+            <!-- 确认新密码 -->
+            <view
+              class="field-wrap"
+              :class="{ 'is-focused': focusState.confirm, 'is-filled': form.confirm.length >= 6 }"
+            >
+              <input
+                class="field-input"
+                v-model="form.confirm"
+                :type="showConfirm ? 'text' : 'password'"
+                placeholder="再次输入新密码"
+                placeholder-class="field-placeholder"
+                @focus="focusState.confirm = true"
+                @blur="focusState.confirm = false"
+              />
+              <view class="field-line" />
+              <view class="field-glow" />
+              <view class="field-toggle" @click="showConfirm = !showConfirm">
+                <text class="field-toggle__icon">{{ showConfirm ? '⊙' : '◉' }}</text>
+              </view>
+            </view>
+
+            <!-- 确认密码错误 -->
+            <text v-if="confirmDirty && form.confirm !== form.password" class="confirm-error">
+              两次密码不一致
+            </text>
+
+            <!-- 提交按钮 -->
+            <view
+              class="submit-btn"
+              :class="{ 'is-disabled': !canSubmit || submitting, 'is-loading': submitting }"
+              @click="doReset"
+            >
+              <view v-if="!submitting" class="submit-btn__inner">
+                <text class="submit-btn__text">确认重置</text>
+              </view>
+              <view v-else class="submit-btn__loading">
+                <view class="loading-spinner" />
+                <text class="loading-text">提交中...</text>
+              </view>
+            </view>
+
+            <!-- 返回上一步 -->
+            <view class="back-step-row">
+              <text class="back-step-link" @click="step = 1">← 返回上一步</text>
             </view>
           </template>
 
         </view>
       </scroll-view>
-
-      <view class="panel-safe-bottom" />
     </view>
 
   </view>
@@ -353,13 +328,10 @@ function onPwdInput() {
 
 async function doReset() {
   if (submitting.value || !canSubmit.value) return
-
   confirmDirty.value = true
-
   if (form.value.confirm !== form.value.password) {
     return uni.showToast({ title: '两次密码不一致', icon: 'none' })
   }
-
   submitting.value = true
   uni.showLoading({ title: '重置中...', mask: true })
   try {
@@ -383,224 +355,157 @@ async function doReset() {
 @import '@/styles/theme.scss';
 
 // ============================================
-//  沉浸式分屏（与登录/注册页一致）
+//  全屏移动端布局
 // ============================================
-.auth-split {
-  display: flex;
+.auth-page {
   width: 100vw;
   min-height: 100vh;
   background: $bg-primary;
+  display: flex;
+  flex-direction: column;
 }
 
-.brand-space {
-  flex: 0 0 40%;
+// ============================================
+//  顶部品牌横条
+// ============================================
+.auth-brand-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: calc(16rpx + env(safe-area-inset-top)) 24rpx 16rpx;
   background: $mineral-gray;
-  box-shadow: inset -24rpx 0 80rpx rgba(0, 0, 0, 0.25);
-  position: relative;
-  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.brand-glow {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  // 静态光晕，无动画，保证丝滑
-  &--top {
-    width: 480rpx;
-    height: 480rpx;
-    top: -120rpx;
-    right: -120rpx;
-    background: radial-gradient(
-      circle,
-      rgba(184, 152, 118, 0.25) 0%,
-      rgba(184, 152, 118, 0.08) 40%,
-      transparent 70%
-    );
-    opacity: 0.85;
-  }
-
-  &--bottom {
-    width: 400rpx;
-    height: 400rpx;
-    bottom: -100rpx;
-    left: -120rpx;
-    background: radial-gradient(
-      circle,
-      rgba(65, 75, 94, 0.5) 0%,
-      rgba(47, 53, 66, 0.15) 50%,
-      transparent 70%
-    );
-    opacity: 0.7;
-  }
-}
-
-.brand-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 80rpx 48rpx;
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.brand-logo-wrap {
-  width: 144rpx;
-  height: 144rpx;
-  border-radius: 40rpx;
-  background: rgba(184, 152, 118, 0.12);
-  border: 1rpx solid rgba(184, 152, 118, 0.25);
+.brand-left {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 40rpx;
-  overflow: hidden;
-}
-
-.brand-logo-img {
-  width: 96rpx;
-  height: 96rpx;
-  display: block;
-  border-radius: 0;
-}
-
-.brand-name {
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: 2rpx;
-  margin-bottom: 16rpx;
-}
-
-.brand-slogan {
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 1rpx;
-  margin-bottom: 56rpx;
-}
-
-.brand-divider {
-  display: flex;
-  align-items: center;
-  width: 180rpx;
-  margin-bottom: 56rpx;
-}
-
-.divider-line {
-  flex: 1;
-  height: 1rpx;
-
-  &--left {
-    background: linear-gradient(90deg, transparent 0%, rgba(184, 152, 118, 0.45) 100%);
-  }
-
-  &--right {
-    background: linear-gradient(90deg, rgba(184, 152, 118, 0.45) 0%, transparent 100%);
-  }
-}
-
-.divider-diamond {
-  width: 8rpx;
-  height: 8rpx;
-  background: $accent-dark;
-  transform: rotate(45deg);
-  margin: 0 16rpx;
-  opacity: 0.7;
-}
-
-// 品牌栏底部：两行语义断行，左对齐（和登录/注册页统一）
-.brand-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4rpx;
-  margin-bottom: 12rpx;
-}
-
-.brand-footer-text {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.4);
-  line-height: 1.5;
-}
-
-.brand-footer-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.brand-footer-link {
-  font-size: 24rpx;
-  color: $accent-dark;
-  font-weight: 600;
-  line-height: 1.5;
-}
-
-.brand-privacy {
-  font-size: 20rpx;
-  color: rgba(255, 255, 255, 0.45);
-  text-align: center;
-  line-height: 1.7;
-  padding: 0 16rpx;
-}
-
-// ============================================
-//  右侧操作空间
-// ============================================
-.panel-space {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: $bg-primary;
-  min-height: 100vh;
-}
-
-.panel-safe-top { flex-shrink: 0; }
-
-// 返回栏
-.panel-topbar {
-  display: flex;
-  align-items: center;
-  padding: 0 24rpx;
-  height: 88rpx;
+  gap: 16rpx;
 }
 
 .back-btn {
-  width: 72rpx;
-  height: 72rpx;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(47, 53, 66, 0.08);
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 
-  .back-icon {
-    font-size: 36rpx;
-    color: $mineral-gray;
+  &__icon {
+    font-size: 32rpx;
+    color: #FFFFFF;
     font-weight: 400;
     line-height: 1;
   }
 }
 
-.panel-scroll {
-  flex: 1;
-  height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 88rpx);
-  // 移动端隐藏滚动条但保持滚动功能
-  &::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
+.brand-logo-sm {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 18rpx;
+  background: rgba(184, 152, 118, 0.15);
+  border: 1rpx solid rgba(184, 152, 118, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+
+  &__img {
+    width: 48rpx;
+    height: 48rpx;
+    display: block;
+    border-radius: 0;
   }
 }
 
-.panel-inner {
-  padding: 80rpx 64rpx 120rpx;
+.brand-info {
   display: flex;
   flex-direction: column;
+  gap: 2rpx;
+
+  &__name {
+    font-size: 30rpx;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 1rpx;
+    line-height: 1.2;
+  }
+
+  &__slogan {
+    font-size: 20rpx;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.5rpx;
+    line-height: 1.2;
+  }
+}
+
+.brand-right {
+  flex-shrink: 0;
+}
+
+.brand-nav-link {
+  font-size: 28rpx;
+  color: $accent-dark;
+  font-weight: 600;
+  padding: 8rpx 0;
+}
+
+// ============================================
+//  表单区域
+// ============================================
+.auth-form-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-scroll {
+  flex: 1;
+  height: calc(100vh - env(safe-area-inset-top) - 120rpx);
+  &::-webkit-scrollbar { display: none; width: 0; height: 0; }
+}
+
+.auth-form-inner {
+  padding: 56rpx 48rpx 80rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+// 页面标题
+.form-header {
+  margin-bottom: 48rpx;
+
+  &__title {
+    display: block;
+    font-size: 44rpx;
+    font-weight: 700;
+    color: $text-primary;
+    letter-spacing: 0;
+    margin-bottom: 12rpx;
+  }
+
+  &__sub-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2rpx;
+  }
+
+  &__sub {
+    display: block;
+    font-size: 25rpx;
+    color: $text-muted;
+    line-height: 1.5;
+  }
+}
+
+.highlight-phone {
+  color: $accent-dark;
+  font-weight: 600;
 }
 
 // ============================================
@@ -609,16 +514,16 @@ async function doReset() {
 .step-indicator {
   display: flex;
   align-items: center;
-  margin-bottom: 56rpx;
+  margin-bottom: 48rpx;
 }
 
 .step-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10rpx;
+  gap: 8rpx;
 
-  .step-circle {
+  &__circle {
     width: 56rpx;
     height: 56rpx;
     border-radius: 50%;
@@ -631,38 +536,46 @@ async function doReset() {
     color: $text-muted;
     background: $bg-secondary;
     transition: all 0.4s ease;
-
-    .step-check {
-      font-size: 24rpx;
-      color: #FFFFFF;
-    }
   }
 
-  .step-label {
+  &__check {
+    font-size: 24rpx;
+    color: #FFFFFF;
+  }
+
+  &__label {
     font-size: 22rpx;
     color: $text-muted;
     font-weight: 500;
+    white-space: nowrap;
   }
 
-  &.is-active .step-circle {
+  &.is-active__circle {
     border-color: $accent-dark;
     background: $accent-dark;
     color: #FFFFFF;
     box-shadow: 0 4rpx 16rpx rgba(142, 116, 89, 0.35);
   }
 
-  &.is-active .step-label {
+  &.is-active &__circle {
+    border-color: $accent-dark;
+    background: $accent-dark;
+    color: #FFFFFF;
+    box-shadow: 0 4rpx 16rpx rgba(142, 116, 89, 0.35);
+  }
+
+  &.is-active &__label {
     color: $accent-dark;
     font-weight: 600;
   }
 
-  &.is-done .step-circle {
+  &.is-done &__circle {
     border-color: $success;
     background: $success;
     color: #FFFFFF;
   }
 
-  &.is-done .step-label {
+  &.is-done &__label {
     color: $success;
   }
 }
@@ -671,7 +584,7 @@ async function doReset() {
   flex: 1;
   height: 2rpx;
   background: rgba(20, 20, 20, 0.1);
-  margin: 0 16rpx;
+  margin: 0 12rpx;
   margin-bottom: 36rpx;
   transition: background 0.4s ease;
 
@@ -681,69 +594,30 @@ async function doReset() {
 }
 
 // ============================================
-//  页面标题
+//  输入框
 // ============================================
-.panel-header {
-  margin-bottom: 56rpx;
-}
-
-.panel-title {
-  display: block;
-  font-size: 38rpx;
-  font-weight: 700;
-  color: $text-primary;
-  letter-spacing: 0;
-  margin-bottom: 12rpx;
-}
-
-// 副标题双行语义化断行
-.subtitle-block {
-  display: flex;
-  flex-direction: column;
-  gap: 4rpx;
-}
-
-.panel-subtitle {
-  display: block;
-  font-size: 25rpx;
-  color: $text-muted;
-  line-height: 1.5;
-}
-
-.highlight-phone {
-  color: $accent-dark;
-  font-weight: 600;
-}
-
-// ============================================
-//  输入框：金线延伸
-// ============================================
-.input-field-wrap {
+.field-wrap {
   position: relative;
-  margin-bottom: 40rpx;
+  margin-bottom: 48rpx;
 
-  .input-native {
+  .field-input {
     width: 100%;
     height: 96rpx;
-    padding: 0 40rpx;
+    padding: 0 8rpx;
     background: transparent;
     border: none;
     border-radius: 0;
-    font-size: 28rpx;
+    font-size: 30rpx;
     font-weight: 500;
     color: $text-primary;
     letter-spacing: 0;
-    transition: background 0.3s ease;
     box-sizing: border-box;
 
     &::placeholder { color: $text-muted; font-weight: 400; }
-    &:focus {
-      outline: none;
-      background: transparent;
-    }
+    &:focus { outline: none; background: transparent; }
   }
 
-  .input-gold-line {
+  .field-line {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -754,46 +628,68 @@ async function doReset() {
     transition: width 0.4s ease;
   }
 
-  .input-glow {
+  .field-glow {
     position: absolute;
-    bottom: -6rpx;
+    bottom: -8rpx;
     left: 50%;
     transform: translateX(-50%);
     width: 70%;
     height: 32rpx;
-    background: radial-gradient(ellipse at center, rgba(184, 152, 118, 0.18) 0%, transparent 70%);
+    background: radial-gradient(ellipse at center, rgba(184, 152, 118, 0.2) 0%, transparent 70%);
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
   }
 
   &.is-focused {
-    .input-gold-line { width: 100%; }
-    .input-glow { opacity: 1; }
+    .field-line { width: 100%; }
+    .field-glow { opacity: 1; }
   }
 
   &.is-filled {
-    .input-gold-line { width: 100%; }
+    .field-line { width: 100%; }
   }
 }
 
-// 验证码按钮：独立成行，水平居中，不遮挡输入框
-.code-btn-row {
+// 密码显示切换
+.field-toggle {
+  position: absolute;
+  right: 8rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
+  align-items: center;
   justify-content: center;
-  margin-top: 24rpx;
+  flex-shrink: 0;
+
+  &__icon {
+    font-size: 32rpx;
+    color: $text-muted;
+    line-height: 1;
+  }
 }
 
-// 验证码按钮
+// ============================================
+//  验证码按钮（独立成行）
+// ============================================
+.code-btn-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 48rpx;
+  margin-top: -16rpx;
+}
+
 .code-btn {
   height: 72rpx;
-  padding: 0 48rpx;
+  padding: 0 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(142, 116, 89, 0.08);
-  border: 1rpx solid rgba(142, 116, 89, 0.3);
-  border-radius: 9999rpx;
+  border: 1rpx solid rgba(142, 116, 89, 0.28);
+  border-radius: 36rpx;
   font-size: 26rpx;
   color: $accent-dark;
   font-weight: 600;
@@ -811,33 +707,15 @@ async function doReset() {
   }
 }
 
-// 密码显示切换
-.input-toggle {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 64rpx;
-  height: 64rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .toggle-icon {
-    font-size: 28rpx;
-    color: $text-muted;
-    line-height: 1;
-  }
-}
-
 // ============================================
-//  密码强度指示
+//  密码强度
 // ============================================
 .pwd-strength {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  margin-bottom: 40rpx;
+  margin-bottom: 48rpx;
+  margin-top: -16rpx;
 }
 
 .pwd-track {
@@ -871,24 +749,24 @@ async function doReset() {
   display: block;
   font-size: 22rpx;
   color: $danger;
-  margin-top: -28rpx;
-  margin-bottom: 40rpx;
+  margin-top: -16rpx;
+  margin-bottom: 32rpx;
 }
 
 // ============================================
 //  提交按钮
 // ============================================
 .submit-btn {
-  height: 96rpx;
-  border-radius: 9999rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 16rpx 40rpx rgba(47, 53, 66, 0.22);
+  box-shadow: 0 8rpx 32rpx rgba(47, 53, 66, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:active {
     transform: scale(0.98);
-    box-shadow: 0 8rpx 24rpx rgba(47, 53, 66, 0.18);
+    box-shadow: 0 4rpx 16rpx rgba(47, 53, 66, 0.15);
   }
 
   &.is-disabled {
@@ -899,29 +777,38 @@ async function doReset() {
   &.is-loading {
     opacity: 0.75;
   }
-}
 
-.submit-inner,
-.submit-loading {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: $mineral-gray;
-  border-radius: inherit;
-}
+  &__inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $mineral-gray;
+    border-radius: inherit;
+  }
 
-.submit-text {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: 4rpx;
+  &__text {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 6rpx;
+  }
+
+  &__loading {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $mineral-gray;
+    border-radius: inherit;
+  }
 }
 
 .loading-spinner {
-  width: 32rpx;
-  height: 32rpx;
+  width: 36rpx;
+  height: 36rpx;
   border: 3rpx solid rgba(255, 255, 255, 0.3);
   border-top-color: #FFFFFF;
   border-radius: 50%;
@@ -943,19 +830,14 @@ async function doReset() {
 // ============================================
 //  返回上一步
 // ============================================
-.panel-back-link {
-  margin-top: 32rpx;
+.back-step-row {
+  margin-top: 28rpx;
   text-align: center;
 }
 
-.back-link-text {
+.back-step-link {
   font-size: 24rpx;
   color: $text-muted;
   font-weight: 500;
-}
-
-.panel-safe-bottom {
-  height: constant(safe-area-inset-bottom);
-  height: env(safe-area-inset-bottom);
 }
 </style>
