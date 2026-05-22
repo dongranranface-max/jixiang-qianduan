@@ -324,18 +324,18 @@ async function doLogin() {
 
 // 品牌名称
 .brand-name {
-  font-size: 48rpx;
-  font-weight: 800;
+  font-size: 40rpx;
+  font-weight: 700;
   color: #FFFFFF;
-  letter-spacing: 8rpx;
+  letter-spacing: 2rpx;
   margin-bottom: 16rpx;
 }
 
 // 品牌宣言
 .brand-slogan {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 4rpx;
+  letter-spacing: 1rpx;
   margin-bottom: 56rpx;
 }
 
@@ -398,8 +398,8 @@ async function doLogin() {
 
 // 隐私条款
 .brand-privacy {
-  font-size: 18rpx;
-  color: rgba(255, 255, 255, 0.28);
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.45);
   text-align: center;
   line-height: 1.7;
   padding: 0 16rpx;
@@ -436,10 +436,10 @@ async function doLogin() {
 
 .panel-title {
   display: block;
-  font-size: 48rpx;
+  font-size: 38rpx;
   font-weight: 700;
   color: $text-primary;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
   margin-bottom: 12rpx;
 }
 
@@ -465,10 +465,10 @@ async function doLogin() {
     background: transparent;
     border: none;
     border-radius: 0;
-    font-size: 30rpx;
+    font-size: 28rpx;
     font-weight: 500;
     color: $text-primary;
-    letter-spacing: 1rpx;
+    letter-spacing: 0;
     transition: background 0.3s ease;
     box-sizing: border-box;
 
@@ -614,7 +614,7 @@ async function doLogin() {
   font-size: 30rpx;
   font-weight: 700;
   color: #FFFFFF;
-  letter-spacing: 8rpx;
+  letter-spacing: 4rpx;
 }
 
 .submit-arrow {
