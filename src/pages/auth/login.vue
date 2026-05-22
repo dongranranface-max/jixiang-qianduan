@@ -21,7 +21,7 @@
         <text class="brand-name">集享公社</text>
 
         <!-- 品牌宣言 -->
-        <text class="brand-slogan">智蓝火炼 · 生态积分商城</text>
+        <text class="brand-slogan">集轻奢·享财富</text>
 
         <!-- 装饰分隔线 -->
         <view class="brand-divider">
@@ -32,7 +32,7 @@
 
         <!-- 底部文案 -->
         <view class="brand-footer">
-          <text class="brand-footer-text">已有账号？</text>
+          <text class="brand-footer-text">没有账号？</text>
           <text class="brand-footer-link" @click="goRegister">立即注册</text>
         </view>
 
@@ -129,17 +129,12 @@
             </view>
           </view>
 
-          <!-- 第三方登录 -->
-          <view class="panel-third">
+          <!-- 第三方登录（占位，后续扩展） -->
+          <view class="panel-third" style="display:none;">
             <view class="third-divider">
               <view class="third-line" />
               <text class="third-text">其他方式登录</text>
               <view class="third-line" />
-            </view>
-            <view class="third-icons">
-              <view class="third-icon-item" @click="wxLogin">
-                <image class="third-icon-img" src="/static/icons/wx.svg" mode="aspectFit" />
-              </view>
             </view>
           </view>
 
@@ -375,7 +370,7 @@ async function doLogin() {
 .divider-diamond {
   width: 8rpx;
   height: 8rpx;
-  background: $gold;
+  background: $accent-dark;
   transform: rotate(45deg);
   margin: 0 16rpx;
   opacity: 0.7;
@@ -396,7 +391,7 @@ async function doLogin() {
 
 .brand-footer-link {
   font-size: 24rpx;
-  color: $gold;
+  color: $accent-dark;
   font-weight: 600;
 }
 
@@ -568,7 +563,7 @@ async function doLogin() {
 .forget-link {
   font-size: 24rpx;
   color: $accent-dark;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 

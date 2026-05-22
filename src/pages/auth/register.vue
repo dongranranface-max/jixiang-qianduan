@@ -13,7 +13,7 @@
           <image class="brand-logo-img" src="/static/logo.png" mode="aspectFit" />
         </view>
         <text class="brand-name">集享公社</text>
-        <text class="brand-slogan">注册账号 · 共享生态价值</text>
+        <text class="brand-slogan">集轻奢·享财富</text>
 
         <view class="brand-divider">
           <view class="divider-line divider-line--left" />
@@ -366,6 +366,7 @@ async function doRegister() {
   width: 96rpx;
   height: 96rpx;
   display: block;
+  border-radius: 0;
 }
 
 .brand-name {
@@ -406,7 +407,7 @@ async function doRegister() {
 .divider-diamond {
   width: 8rpx;
   height: 8rpx;
-  background: $gold;
+  background: $accent-dark;
   transform: rotate(45deg);
   margin: 0 16rpx;
   opacity: 0.7;
@@ -426,7 +427,7 @@ async function doRegister() {
 
 .brand-footer-link {
   font-size: 24rpx;
-  color: $gold;
+  color: $accent-dark;
   font-weight: 600;
 }
 
@@ -693,8 +694,8 @@ async function doRegister() {
   transition: all 0.3s ease;
 
   &.is-checked {
-    background: $gold;
-    border-color: $gold;
+    background: $accent-dark;
+    border-color: $accent-dark;
   }
 }
 

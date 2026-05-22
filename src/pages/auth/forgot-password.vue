@@ -13,7 +13,7 @@
           <image class="brand-logo-img" src="/static/logo.png" mode="aspectFit" />
         </view>
         <text class="brand-name">集享公社</text>
-        <text class="brand-slogan">找回密码 · 重新启程</text>
+        <text class="brand-slogan">集轻奢·享财富</text>
 
         <view class="brand-divider">
           <view class="divider-line divider-line--left" />
@@ -123,7 +123,9 @@
                 :class="{ 'is-disabled': !canGoStep2 }"
                 @click="goStep2"
               >
-                <text class="submit-text">下一步</text>
+                <view class="submit-inner">
+                  <text class="submit-text">下一步</text>
+                </view>
               </view>
             </view>
           </template>
@@ -452,12 +454,7 @@ async function doReset() {
   width: 96rpx;
   height: 96rpx;
   display: block;
-}
-
-.brand-logo-img {
-  width: 96rpx;
-  height: 96rpx;
-  display: block;
+  border-radius: 0;
 }
 
 .brand-name {
@@ -498,7 +495,7 @@ async function doReset() {
 .divider-diamond {
   width: 8rpx;
   height: 8rpx;
-  background: $gold;
+  background: $accent-dark;
   transform: rotate(45deg);
   margin: 0 16rpx;
   opacity: 0.7;
@@ -518,7 +515,7 @@ async function doReset() {
 
 .brand-footer-link {
   font-size: 24rpx;
-  color: $gold;
+  color: $accent-dark;
   font-weight: 600;
 }
 
@@ -552,18 +549,19 @@ async function doReset() {
 }
 
 .back-btn {
-  width: 56rpx;
-  height: 56rpx;
+  width: 72rpx;
+  height: 72rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(47, 53, 66, 0.06);
+  background: rgba(47, 53, 66, 0.08);
 
   .back-icon {
-    font-size: 28rpx;
+    font-size: 36rpx;
     color: $mineral-gray;
-    font-weight: 500;
+    font-weight: 400;
+    line-height: 1;
   }
 }
 
@@ -615,7 +613,7 @@ async function doReset() {
 
     .step-check {
       font-size: 24rpx;
-      color: $success;
+      color: #FFFFFF;
     }
   }
 
@@ -626,13 +624,14 @@ async function doReset() {
   }
 
   &.is-active .step-circle {
-    border-color: $gold;
-    background: $gold;
+    border-color: $accent-dark;
+    background: $accent-dark;
     color: #FFFFFF;
+    box-shadow: 0 4rpx 16rpx rgba(142, 116, 89, 0.35);
   }
 
   &.is-active .step-label {
-    color: $text-primary;
+    color: $accent-dark;
     font-weight: 600;
   }
 
