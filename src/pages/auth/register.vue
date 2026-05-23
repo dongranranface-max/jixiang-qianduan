@@ -1,9 +1,7 @@
 <template>
   <view class="auth-page">
 
-    <!-- ============================================
-      顶部导航栏（Header Logo + Ghost Button）
-    ============================================ -->
+    <!-- 顶部导航栏 -->
     <view class="auth-nav">
       <view class="auth-nav__brand">
         <view class="auth-nav__logo">
@@ -14,21 +12,16 @@
           <text class="auth-nav__slogan">集轻奢 · 享财富</text>
         </view>
       </view>
-      <view class="auth-nav__actions">
-        <view class="ghost-btn" @click="goLogin">
-          <text class="ghost-btn__text">登录</text>
-        </view>
+      <view class="ghost-btn" @click="goLogin">
+        <text class="ghost-btn__text">登录</text>
       </view>
     </view>
 
-    <!-- ============================================
-      表单区域（光学居中）
-    ============================================ -->
+    <!-- 表单区域 -->
     <view class="auth-body">
       <scroll-view scroll-y class="auth-scroll" :show-scrollbar="false">
         <view class="auth-card">
 
-          <!-- 标题 -->
           <view class="auth-card__head">
             <view class="auth-card__title-wrap">
               <text class="auth-card__title">创建账号</text>
@@ -38,41 +31,35 @@
 
           <!-- 手机号 -->
           <view class="field-group">
-            <view class="field-group__label-row">
-              <text class="field-group__label">手机号</text>
-            </view>
-            <view class="field-line" :class="{ 'is-focused': focusState.phone }">
+            <view class="field-line" :class="{ 'is-focused': focusState.phone, 'has-value': form.phone }">
+              <span class="field-line__fl">手机号</span>
               <input
                 class="field-line__input"
                 v-model="form.phone"
                 inputmode="numeric"
                 type="number"
                 maxlength="11"
-                placeholder="请输入手机号"
+                placeholder=" "
                 @focus="onFocus('phone')"
                 @blur="onBlur('phone')"
               />
-              <view class="field-line__glow" />
             </view>
           </view>
 
           <!-- 验证码 -->
           <view class="field-group">
-            <view class="field-group__label-row">
-              <text class="field-group__label">短信验证码</text>
-            </view>
-            <view class="field-line field-line--with-code" :class="{ 'is-focused': focusState.code }">
+            <view class="field-line field-line--with-code" :class="{ 'is-focused': focusState.code, 'has-value': form.code }">
+              <span class="field-line__fl">短信验证码</span>
               <input
                 class="field-line__input"
                 v-model="form.code"
                 inputmode="numeric"
                 type="number"
                 maxlength="6"
-                placeholder="请输入验证码"
+                placeholder=" "
                 @focus="onFocus('code')"
                 @blur="onBlur('code')"
               />
-              <view class="field-line__glow" />
               <view
                 class="field-line__code-btn"
                 :class="{ 'is-counting': countdown > 0 || sending }"
@@ -87,19 +74,16 @@
 
           <!-- 密码 -->
           <view class="field-group">
-            <view class="field-group__label-row">
-              <text class="field-group__label">登录密码</text>
-            </view>
-            <view class="field-line field-line--with-eye" :class="{ 'is-focused': focusState.pwd }">
+            <view class="field-line field-line--with-eye" :class="{ 'is-focused': focusState.pwd, 'has-value': form.password }">
+              <span class="field-line__fl">登录密码</span>
               <input
                 class="field-line__input"
                 v-model="form.password"
                 :type="showPwd ? 'text' : 'password'"
-                placeholder="6位以上，数字与字母组合"
+                placeholder=" "
                 @focus="onFocus('pwd')"
                 @blur="onBlur('pwd')"
               />
-              <view class="field-line__glow" />
               <view class="field-line__eye-wrap" @click="showPwd = !showPwd">
                 <svg v-if="showPwd" class="field-line__eye" viewBox="0 0 24 24" fill="none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
@@ -115,20 +99,15 @@
 
           <!-- 邀请码 -->
           <view class="field-group field-group--muted">
-            <view class="field-group__label-row">
-              <text class="field-group__label field-group__label--muted">
-                邀请码 <text class="field-group__optional">（选填）</text>
-              </text>
-            </view>
-            <view class="field-line field-line--dashed" :class="{ 'is-focused': focusState.invite }">
+            <view class="field-line field-line--dashed" :class="{ 'is-focused': focusState.invite, 'has-value': form.inviteCode }">
+              <span class="field-line__fl field-line__fl--muted">邀请码 <text class="field-line__opt">(选填)</text></span>
               <input
                 class="field-line__input"
                 v-model="form.inviteCode"
-                placeholder="如有邀请码请输入"
+                placeholder=" "
                 @focus="onFocus('invite')"
                 @blur="onBlur('invite')"
               />
-              <view class="field-line__glow" />
             </view>
           </view>
 
@@ -148,10 +127,7 @@
           <!-- 提交按钮 -->
           <view
             class="btn-submit"
-            :class="{
-              'is-disabled': !agreed || submitting || !canSubmit,
-              'is-loading': submitting
-            }"
+            :class="{ 'is-disabled': !agreed || submitting || !canSubmit, 'is-loading': submitting }"
             @click="doRegister"
           >
             <view v-if="!submitting" class="btn-submit__inner">
@@ -280,31 +256,6 @@ async function doRegister() {
   box-sizing: border-box;
   overflow-x: hidden;
   position: relative;
-
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 50% at 8% 5%, rgba(184, 152, 118, 0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 55% 45% at 92% 95%, rgba(184, 152, 118, 0.05) 0%, transparent 55%),
-      radial-gradient(ellipse 40% 35% at 85% 8%, rgba(212, 196, 174, 0.04) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 40% at 15% 92%, rgba(212, 196, 174, 0.04) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  &::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='55' fill='none' stroke='%23B89876' stroke-width='0.5' opacity='0.06'/%3E%3C/svg%3E");
-    background-size: 240rpx 240rpx;
-    background-position: center 15%;
-    background-repeat: no-repeat;
-    pointer-events: none;
-    z-index: 0;
-  }
 }
 
 // ============================================
@@ -323,25 +274,17 @@ async function doRegister() {
   &__brand { display: flex; align-items: center; gap: 16rpx; }
 
   &__logo {
-    @include logo-card;
     width: 64rpx;
     height: 64rpx;
     border-radius: 18rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    background: $bg-secondary;
+    box-shadow: 0 4rpx 20rpx rgba(184, 152, 118, 0.18), 0 1rpx 4rpx rgba(0, 0, 0, 0.04);
     flex-shrink: 0;
-    background: transparent;
-    box-shadow: none;
-    filter: drop-shadow(0 0 10rpx rgba(184, 152, 118, 0.20));
 
-    &-img {
-      width: 42rpx;
-      height: 42rpx;
-      object-fit: contain;
-      display: block;
-    }
+    &-img { width: 40rpx; height: 40rpx; object-fit: contain; display: block; }
   }
 
   &__text { display: flex; flex-direction: column; gap: 5rpx; }
@@ -359,10 +302,8 @@ async function doRegister() {
     letter-spacing: 0.5rpx;
     line-height: 1;
   }
-  &__actions { flex-shrink: 0; }
 }
 
-// Ghost Button
 .ghost-btn {
   display: inline-flex;
   align-items: center;
@@ -401,7 +342,7 @@ async function doRegister() {
 }
 
 // ============================================
-//  表单区域（光学居中）
+//  表单区域
 // ============================================
 .auth-body {
   flex: 1;
@@ -409,9 +350,7 @@ async function doRegister() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 5dvh;
-  padding-left: 40rpx;
-  padding-right: 40rpx;
+  padding: 4dvh 40rpx 0;
   width: 100%;
   box-sizing: border-box;
   position: relative;
@@ -428,22 +367,23 @@ async function doRegister() {
 .auth-card {
   width: 100%;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1rpx solid rgba(184, 152, 118, 0.10);
+  border: 1rpx solid rgba(184, 152, 118, 0.12);
   border-radius: 40rpx;
   box-shadow:
-    0 24rpx 80rpx rgba(47, 53, 66, 0.06),
-    0 4rpx 16rpx rgba(0, 0, 0, 0.03);
-  padding: 52rpx 48rpx 52rpx;
+    0 8rpx 32rpx rgba(47, 53, 66, 0.08),
+    0 32rpx 96rpx rgba(47, 53, 66, 0.10),
+    0 64rpx 160rpx rgba(47, 53, 66, 0.06);
+  padding: 48rpx 44rpx 48rpx;
 
-  &__head { margin-bottom: 44rpx; }
+  &__head { margin-bottom: 40rpx; }
 
   &__title-wrap {
     display: flex;
     align-items: flex-end;
-    margin-bottom: 12rpx;
+    margin-bottom: 10rpx;
   }
 
   &__title {
@@ -451,7 +391,7 @@ async function doRegister() {
     font-size: 52rpx;
     font-weight: 500;
     color: $mineral-gray;
-    letter-spacing: 3rpx;
+    letter-spacing: 1.5rpx;
     line-height: 1.1;
   }
 
@@ -460,7 +400,7 @@ async function doRegister() {
     font-size: 26rpx;
     color: #888888;
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.5;
   }
 }
 
@@ -468,15 +408,15 @@ async function doRegister() {
 //  字段组
 // ============================================
 .field-group {
-  margin-bottom: 40rpx;
+  margin-bottom: 36rpx;
 
-  &--muted { opacity: 0.72; }
+  &--muted { opacity: 0.7; }
 
   &__label-row {
-    height: 36rpx;
+    height: 32rpx;
     display: flex;
     align-items: center;
-    margin-bottom: 8rpx;
+    margin-bottom: 6rpx;
   }
 
   &__label {
@@ -484,56 +424,66 @@ async function doRegister() {
     color: $text-secondary;
     font-weight: 500;
     letter-spacing: 0.5rpx;
-
-    &--muted { color: rgba(92, 92, 92, 0.75); }
-  }
-
-  &__optional {
-    font-size: 20rpx;
-    color: #888888;
-    font-weight: 400;
   }
 }
 
 // ============================================
-//  输入框
+//  浮动标签输入框
 // ============================================
 .field-line {
   position: relative;
-  height: 88rpx;
+  height: 96rpx;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   border-bottom: 1.5rpx solid rgba(47, 53, 66, 0.12);
-  overflow: hidden;
+  overflow: visible;
+  transition: border-color 0.25s ease;
 
   &.is-focused { border-bottom-color: $bronze-gold; }
 
-  &__glow {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 0;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(212, 180, 131, 0.12) 40%,
-      rgba(212, 180, 131, 0.20) 60%,
-      transparent 100%
-    );
-    pointer-events: none;
-  }
-
-  &.is-focused &__glow {
-    animation: light-sweep 0.5s ease-out forwards;
-  }
-
-  &--with-code { padding-right: 160rpx; }
+  &--with-code { padding-right: 156rpx; }
   &--with-eye { padding-right: 72rpx; }
-
   &--dashed {
     border-bottom-style: dashed;
     border-bottom-color: rgba(142, 116, 89, 0.22);
+  }
+
+  // 浮动标签
+  &__fl {
+    position: absolute;
+    left: 0;
+    bottom: 12rpx;
+    font-size: 28rpx;
+    color: $text-muted;
+    font-weight: 400;
+    transform-origin: left bottom;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &.has-value &__fl,
+  &.is-focused &__fl {
+    font-size: 18rpx;
+    color: $bronze-gold;
+    font-weight: 600;
+    letter-spacing: 0.5rpx;
+    transform: translateY(-40rpx) scale(0.85);
+  }
+
+  &__fl--muted {
+    color: rgba(92, 92, 92, 0.75);
+  }
+
+  &.has-value &__fl--muted,
+  &.is-focused &__fl--muted {
+    color: rgba(142, 116, 89, 0.75);
+  }
+
+  &__opt {
+    font-size: 18rpx;
+    font-weight: 400;
+    color: #888888;
   }
 
   &__input {
@@ -547,26 +497,20 @@ async function doRegister() {
     color: $mineral-gray;
     padding: 0;
     box-sizing: border-box;
-
-    &::placeholder {
-      color: rgba(138, 138, 138, 0.5);
-      font-weight: 400;
-    }
+    padding-bottom: 8rpx;
   }
 
   &__code-btn {
     position: absolute;
     right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 56rpx;
+    bottom: 12rpx;
+    height: 52rpx;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 0 4rpx;
-    border-bottom: 1.5rpx solid $bronze-gold;
-    transition: opacity 0.2s ease, color 0.2s ease;
+    background: transparent;
+    transition: opacity 0.2s ease;
 
     text {
       font-size: 24rpx;
@@ -577,19 +521,14 @@ async function doRegister() {
       white-space: nowrap;
     }
 
-    &.is-counting {
-      border-bottom-color: transparent;
-      text { color: $text-muted; font-weight: 400; }
-    }
-
-    &:active { opacity: 0.6; }
+    &.is-counting text { color: $text-muted; font-weight: 400; }
+    &:active { opacity: 0.55; }
   }
 
   &__eye-wrap {
     position: absolute;
     right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+    bottom: 8rpx;
     width: 72rpx;
     height: 72rpx;
     display: flex;
@@ -606,14 +545,9 @@ async function doRegister() {
     object-fit: contain;
     flex-shrink: 0;
     transition: color 0.2s ease;
+
     &:active { color: $bronze-gold; }
   }
-}
-
-@keyframes light-sweep {
-  0%   { width: 0; left: 0; opacity: 0.8; }
-  60%  { width: 100%; left: 0; opacity: 0.4; }
-  100% { width: 0; left: 100%; opacity: 0; }
 }
 
 // ============================================
@@ -622,18 +556,16 @@ async function doRegister() {
 .terms-row {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  margin-bottom: 24rpx;
+  gap: 14rpx;
   margin-top: 8rpx;
   cursor: pointer;
-  padding: 8rpx 0;
 }
 
 .check-square {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 14rpx;
-  border: 1.5rpx solid rgba(184, 152, 118, 0.50);
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 12rpx;
+  border: 1.5rpx solid rgba(184, 152, 118, 0.45);
   background: rgba(255, 255, 255, 0.60);
   display: flex;
   align-items: center;
@@ -645,7 +577,7 @@ async function doRegister() {
   &.is-checked {
     background: rgba(184, 152, 118, 0.12);
     border-color: $bronze-gold;
-    box-shadow: 0 0 0 4rpx rgba(184, 152, 118, 0.12);
+    box-shadow: 0 0 0 3rpx rgba(184, 152, 118, 0.10);
   }
 
   &__icon {
@@ -657,28 +589,25 @@ async function doRegister() {
 }
 
 .terms-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: rgba(20, 20, 20, 0.50);
-  line-height: 1.65;
-  flex: 1;
-  letter-spacing: 0.2rpx;
+  line-height: 1.5;
 }
 
 .terms-link {
   color: $bronze-gold;
-  font-weight: 600;
-  transition: opacity 0.2s;
-  &:active { opacity: 0.6; }
+  font-weight: 500;
 }
 
 // ============================================
 //  提交按钮
 // ============================================
 .btn-submit {
-  height: 104rpx;
-  border-radius: 52rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
   overflow: hidden;
   position: relative;
+  margin-top: 8rpx;
 
   &:active { transform: scale(0.984); }
 
@@ -747,14 +676,14 @@ async function doRegister() {
   &__flow-text {
     position: relative;
     z-index: 1;
-    font-size: 30rpx;
+    font-size: 28rpx;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.92);
     letter-spacing: 4rpx;
   }
 
   &__text {
-    font-size: 30rpx;
+    font-size: 28rpx;
     font-weight: 700;
     color: #FFFFFF;
     letter-spacing: 6rpx;

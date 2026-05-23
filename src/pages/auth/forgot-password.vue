@@ -1,18 +1,12 @@
 <template>
   <view class="auth-page">
 
-    <!-- ============================================
-      顶部进度线（纤细线性引导）
-    ============================================ -->
+    <!-- 顶部进度线 -->
     <view class="progress-line">
-      <view class="progress-line__track">
-        <view class="progress-line__fill" :style="{ width: step === 1 ? '50%' : '100%' }" />
-      </view>
+      <view class="progress-line__fill" :style="{ width: step === 1 ? '50%' : '100%' }" />
     </view>
 
-    <!-- ============================================
-      顶部导航栏（Header Logo + Ghost Button 登录入口）
-    ============================================ -->
+    <!-- 顶部导航栏 -->
     <view class="auth-nav">
       <view class="auth-nav__brand">
         <view class="auth-nav__logo">
@@ -23,16 +17,12 @@
           <text class="auth-nav__slogan">集轻奢 · 享财富</text>
         </view>
       </view>
-      <view class="auth-nav__actions">
-        <view class="ghost-btn" @click="goLogin">
-          <text class="ghost-btn__text">登录</text>
-        </view>
+      <view class="ghost-btn" @click="goLogin">
+        <text class="ghost-btn__text">登录</text>
       </view>
     </view>
 
-    <!-- ============================================
-      表单区域（光学居中）
-    ============================================ -->
+    <!-- 表单区域 -->
     <view class="auth-body">
       <view class="auth-card">
 
@@ -60,41 +50,35 @@
 
           <!-- 手机号 -->
           <view class="field-group">
-            <view class="field-group__label-row">
-              <text class="field-group__label">注册手机号</text>
-            </view>
-            <view class="field-line" :class="{ 'is-focused': focusState.phone }">
+            <view class="field-line" :class="{ 'is-focused': focusState.phone, 'has-value': form.phone }">
+              <span class="field-line__fl">注册手机号</span>
               <input
                 class="field-line__input"
                 v-model="form.phone"
                 inputmode="numeric"
                 type="number"
                 maxlength="11"
-                placeholder="请输入手机号"
+                placeholder=" "
                 @focus="onFocus('phone')"
                 @blur="onBlur('phone')"
               />
-              <view class="field-line__glow" />
             </view>
           </view>
 
           <!-- 验证码 -->
           <view class="field-group">
-            <view class="field-group__label-row">
-              <text class="field-group__label">短信验证码</text>
-            </view>
-            <view class="field-line field-line--with-code" :class="{ 'is-focused': focusState.code }">
+            <view class="field-line field-line--with-code" :class="{ 'is-focused': focusState.code, 'has-value': form.code }">
+              <span class="field-line__fl">短信验证码</span>
               <input
                 class="field-line__input"
                 v-model="form.code"
                 inputmode="numeric"
                 type="number"
                 maxlength="6"
-                placeholder="请输入验证码"
+                placeholder=" "
                 @focus="onFocus('code')"
                 @blur="onBlur('code')"
               />
-              <view class="field-line__glow" />
               <view
                 class="field-line__code-btn"
                 :class="{ 'is-counting': countdown > 0 || sending }"
@@ -149,20 +133,17 @@
 
           <!-- 新密码 -->
           <view class="field-group">
-            <view class="field-group__label-row">
-              <text class="field-group__label">新密码</text>
-            </view>
-            <view class="field-line field-line--with-eye" :class="{ 'is-focused': focusState.pwd }">
+            <view class="field-line field-line--with-eye" :class="{ 'is-focused': focusState.pwd, 'has-value': form.password }">
+              <span class="field-line__fl">新密码</span>
               <input
                 class="field-line__input"
                 v-model="form.password"
                 :type="showPwd ? 'text' : 'password'"
-                placeholder="6位以上，数字与字母组合"
+                placeholder=" "
                 @focus="onFocus('pwd')"
                 @blur="onBlur('pwd')"
                 @input="onPwdInput"
               />
-              <view class="field-line__glow" />
               <view class="field-line__eye-wrap" @click="showPwd = !showPwd">
                 <svg v-if="showPwd" class="field-line__eye" viewBox="0 0 24 24" fill="none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
@@ -184,19 +165,16 @@
 
           <!-- 确认密码 -->
           <view class="field-group">
-            <view class="field-group__label-row">
-              <text class="field-group__label">确认新密码</text>
-            </view>
-            <view class="field-line field-line--with-eye" :class="{ 'is-focused': focusState.confirm }">
+            <view class="field-line field-line--with-eye" :class="{ 'is-focused': focusState.confirm, 'has-value': form.confirm }">
+              <span class="field-line__fl">确认新密码</span>
               <input
                 class="field-line__input"
                 v-model="form.confirm"
                 :type="showConfirm ? 'text' : 'password'"
-                placeholder="再次输入新密码"
+                placeholder=" "
                 @focus="onFocus('confirm')"
                 @blur="onBlur('confirm')"
               />
-              <view class="field-line__glow" />
               <view class="field-line__eye-wrap" @click="showConfirm = !showConfirm">
                 <svg v-if="showConfirm" class="field-line__eye" viewBox="0 0 24 24" fill="none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
@@ -365,35 +343,10 @@ async function doReset() {
   box-sizing: border-box;
   overflow-x: hidden;
   position: relative;
-
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 50% at 8% 5%, rgba(184, 152, 118, 0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 55% 45% at 92% 95%, rgba(184, 152, 118, 0.05) 0%, transparent 55%),
-      radial-gradient(ellipse 40% 35% at 85% 8%, rgba(212, 196, 174, 0.04) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 40% at 15% 92%, rgba(212, 196, 174, 0.04) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  &::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='55' fill='none' stroke='%23B89876' stroke-width='0.5' opacity='0.06'/%3E%3C/svg%3E");
-    background-size: 240rpx 240rpx;
-    background-position: center 15%;
-    background-repeat: no-repeat;
-    pointer-events: none;
-    z-index: 0;
-  }
 }
 
 // ============================================
-//  顶部纤细进度线
+//  顶部进度线
 // ============================================
 .progress-line {
   position: fixed;
@@ -403,18 +356,10 @@ async function doReset() {
   z-index: 20;
   height: 3rpx;
 
-  &__track {
-    width: 100%;
-    height: 3rpx;
-    background: rgba(47, 53, 66, 0.08);
-    position: relative;
-    overflow: hidden;
-  }
-
   &__fill {
     height: 100%;
     background: linear-gradient(90deg, $bronze-gold 0%, $bronze-light 100%);
-    border-radius: 0 3rpx 3rpx 0;
+    border-radius: 0 2rpx 2rpx 0;
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
@@ -435,20 +380,17 @@ async function doReset() {
   &__brand { display: flex; align-items: center; gap: 16rpx; }
 
   &__logo {
-    @include logo-card;
     width: 64rpx;
     height: 64rpx;
     border-radius: 18rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    background: $bg-secondary;
+    box-shadow: 0 4rpx 20rpx rgba(184, 152, 118, 0.18), 0 1rpx 4rpx rgba(0, 0, 0, 0.04);
     flex-shrink: 0;
-    background: transparent;
-    box-shadow: none;
-    filter: drop-shadow(0 0 10rpx rgba(184, 152, 118, 0.20));
 
-    &-img { width: 42rpx; height: 42rpx; object-fit: contain; display: block; }
+    &-img { width: 40rpx; height: 40rpx; object-fit: contain; display: block; }
   }
 
   &__text { display: flex; flex-direction: column; gap: 5rpx; }
@@ -466,7 +408,6 @@ async function doReset() {
     letter-spacing: 0.5rpx;
     line-height: 1;
   }
-  &__actions { flex-shrink: 0; }
 }
 
 .ghost-btn {
@@ -507,7 +448,7 @@ async function doReset() {
 }
 
 // ============================================
-//  表单区域（光学居中）
+//  表单区域
 // ============================================
 .auth-body {
   flex: 1;
@@ -515,9 +456,7 @@ async function doReset() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 5dvh;
-  padding-left: 40rpx;
-  padding-right: 40rpx;
+  padding: 4dvh 40rpx 0;
   width: 100%;
   box-sizing: border-box;
   position: relative;
@@ -528,22 +467,23 @@ async function doReset() {
   width: 100%;
   max-width: 600rpx;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1rpx solid rgba(184, 152, 118, 0.10);
+  border: 1rpx solid rgba(184, 152, 118, 0.12);
   border-radius: 40rpx;
   box-shadow:
-    0 24rpx 80rpx rgba(47, 53, 66, 0.06),
-    0 4rpx 16rpx rgba(0, 0, 0, 0.03);
-  padding: 52rpx 48rpx;
+    0 8rpx 32rpx rgba(47, 53, 66, 0.08),
+    0 32rpx 96rpx rgba(47, 53, 66, 0.10),
+    0 64rpx 160rpx rgba(47, 53, 66, 0.06);
+  padding: 48rpx 44rpx;
 
-  &__head { margin-bottom: 44rpx; }
+  &__head { margin-bottom: 40rpx; }
 
   &__title-wrap {
     display: flex;
     align-items: flex-end;
-    margin-bottom: 12rpx;
+    margin-bottom: 10rpx;
   }
 
   &__title {
@@ -551,7 +491,7 @@ async function doReset() {
     font-size: 52rpx;
     font-weight: 500;
     color: $mineral-gray;
-    letter-spacing: 3rpx;
+    letter-spacing: 1.5rpx;
     line-height: 1.1;
   }
 
@@ -560,7 +500,7 @@ async function doReset() {
     font-size: 26rpx;
     color: #888888;
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.5;
   }
 }
 
@@ -575,7 +515,7 @@ async function doReset() {
 .step-bar {
   display: flex;
   align-items: center;
-  margin-bottom: 44rpx;
+  margin-bottom: 40rpx;
   padding: 0 12rpx;
 }
 
@@ -583,12 +523,12 @@ async function doReset() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10rpx;
+  gap: 8rpx;
   flex-shrink: 0;
 
   &__dot {
-    width: 56rpx;
-    height: 56rpx;
+    width: 52rpx;
+    height: 52rpx;
     border-radius: 50%;
     background: rgba(47, 53, 66, 0.06);
     border: 1.5rpx solid rgba(47, 53, 66, 0.12);
@@ -599,7 +539,7 @@ async function doReset() {
   }
 
   &__num {
-    font-size: 24rpx;
+    font-size: 22rpx;
     font-weight: 700;
     color: $text-muted;
     line-height: 1;
@@ -607,7 +547,7 @@ async function doReset() {
   }
 
   &__icon {
-    font-size: 22rpx;
+    font-size: 20rpx;
     font-weight: 700;
     color: $success;
     line-height: 1;
@@ -625,7 +565,7 @@ async function doReset() {
     .step-item__dot {
       background: rgba(184, 152, 118, 0.10);
       border-color: $bronze-gold;
-      box-shadow: 0 0 0 6rpx rgba(184, 152, 118, 0.12);
+      box-shadow: 0 0 0 5rpx rgba(184, 152, 118, 0.12);
     }
     .step-item__num { color: $bronze-gold; }
     .step-item__label { color: $mineral-gray; font-weight: 500; }
@@ -656,13 +596,13 @@ async function doReset() {
 //  字段组
 // ============================================
 .field-group {
-  margin-bottom: 40rpx;
+  margin-bottom: 36rpx;
 
   &__label-row {
-    height: 36rpx;
+    height: 32rpx;
     display: flex;
     align-items: center;
-    margin-bottom: 8rpx;
+    margin-bottom: 6rpx;
   }
 
   &__label {
@@ -674,40 +614,43 @@ async function doReset() {
 }
 
 // ============================================
-//  输入框
+//  浮动标签输入框
 // ============================================
 .field-line {
   position: relative;
-  height: 88rpx;
+  height: 96rpx;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   border-bottom: 1.5rpx solid rgba(47, 53, 66, 0.12);
-  overflow: hidden;
+  overflow: visible;
+  transition: border-color 0.25s ease;
 
   &.is-focused { border-bottom-color: $bronze-gold; }
 
-  &__glow {
+  &--with-code { padding-right: 156rpx; }
+  &--with-eye { padding-right: 72rpx; }
+
+  &__fl {
     position: absolute;
     left: 0;
-    top: 0;
-    width: 0;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(212, 180, 131, 0.12) 40%,
-      rgba(212, 180, 131, 0.20) 60%,
-      transparent 100%
-    );
+    bottom: 12rpx;
+    font-size: 28rpx;
+    color: $text-muted;
+    font-weight: 400;
+    transform-origin: left bottom;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
+    z-index: 1;
   }
 
-  &.is-focused &__glow {
-    animation: light-sweep 0.5s ease-out forwards;
+  &.has-value &__fl,
+  &.is-focused &__fl {
+    font-size: 18rpx;
+    color: $bronze-gold;
+    font-weight: 600;
+    letter-spacing: 0.5rpx;
+    transform: translateY(-40rpx) scale(0.85);
   }
-
-  &--with-code { padding-right: 160rpx; }
-  &--with-eye { padding-right: 72rpx; }
 
   &__input {
     flex: 1;
@@ -720,29 +663,23 @@ async function doReset() {
     color: $mineral-gray;
     padding: 0;
     box-sizing: border-box;
-
-    &::placeholder {
-      color: rgba(138, 138, 138, 0.5);
-      font-weight: 400;
-    }
+    padding-bottom: 8rpx;
   }
 
   &__code-btn {
     position: absolute;
     right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 56rpx;
+    bottom: 12rpx;
+    height: 52rpx;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 0 4rpx;
     background: transparent;
     transition: opacity 0.2s ease;
 
     text {
-      font-size: 26rpx;
+      font-size: 24rpx;
       color: $bronze-gold;
       font-weight: 600;
       letter-spacing: 0.3rpx;
@@ -757,8 +694,7 @@ async function doReset() {
   &__eye-wrap {
     position: absolute;
     right: 0;
-    top: 50%;
-    transform: translateY(-50%);
+    bottom: 8rpx;
     width: 72rpx;
     height: 72rpx;
     display: flex;
@@ -775,14 +711,15 @@ async function doReset() {
     object-fit: contain;
     flex-shrink: 0;
     transition: color 0.2s ease;
+
     &:active { color: $bronze-gold; }
   }
 }
 
 @keyframes light-sweep {
-  0%   { width: 0; left: 0; opacity: 0.8; }
-  60%  { width: 100%; left: 0; opacity: 0.4; }
-  100% { width: 0; left: 100%; opacity: 0; }
+  0%   { opacity: 0.8; }
+  60%  { opacity: 0.4; }
+  100% { opacity: 0; }
 }
 
 // ============================================
@@ -813,7 +750,7 @@ async function doReset() {
 }
 
 .pwd-hint {
-  font-size: 21rpx;
+  font-size: 20rpx;
   color: $text-muted;
   flex-shrink: 0;
 }
@@ -826,15 +763,14 @@ async function doReset() {
   font-size: 22rpx;
   color: $danger;
   margin-top: 10rpx;
-  letter-spacing: 0.2rpx;
 }
 
 // ============================================
 //  提交按钮
 // ============================================
 .btn-submit {
-  height: 104rpx;
-  border-radius: 52rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
   overflow: hidden;
   position: relative;
 
@@ -905,14 +841,14 @@ async function doReset() {
   &__flow-text {
     position: relative;
     z-index: 1;
-    font-size: 30rpx;
+    font-size: 28rpx;
     font-weight: 700;
     color: rgba(255, 255, 255, 0.92);
     letter-spacing: 4rpx;
   }
 
   &__text {
-    font-size: 30rpx;
+    font-size: 28rpx;
     font-weight: 700;
     color: #FFFFFF;
     letter-spacing: 4rpx;
@@ -936,7 +872,7 @@ async function doReset() {
 //  返回上一步
 // ============================================
 .back-step {
-  margin-top: 28rpx;
+  margin-top: 24rpx;
   display: flex;
   justify-content: center;
 
