@@ -1,65 +1,38 @@
 <template>
   <view class="page-container">
     <AssetStatusBar v-if="loggedIn" />
-    <view v-else class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
+    <view v-else class="safe-area-top" :style="{ height: statusBarHeight + 'px' }" />
 
-    <!-- 搜索栏 -->
-    <view class="search-bar">
-      <view class="search-input-wrap">
-        <text class="search-icon">🔍</text>
-        <input
-          class="search-input"
-          v-model="keyword"
-          placeholder="搜索商品"
-          @confirm="onSearch"
-        />
-      </view>
+    <!-- 页面导航 -->
+    <view class="page-nav">
+      <view class="page-nav__back" @click="goBack"><text>←</text></view>
+      <text class="page-nav__title">商品分类</text>
+      <view class="page-nav__action" @click="goSearch"><text>⌕</text></view>
     </view>
 
-    <!-- 商城类型切换 -->
+    <!-- Tab 类型切换 -->
     <view class="mall-tabs">
       <view
+        v-for="tab in tabs"
+        :key="tab.key"
         class="mall-tab"
-        :class="{ active: currentType === 1 }"
-        @click="switchType(1)"
+        :class="{ active: currentType === tab.key }"
+        @click="switchType(tab.key)"
       >
-        <text class="mall-tab-icon">🛍️</text>
-        <text class="mall-tab-text">消费商城</text>
-      </view>
-      <view
-        class="mall-tab"
-        :class="{ active: currentType === 2 }"
-        @click="switchType(2)"
-      >
-        <text class="mall-tab-icon">🔄</text>
-        <text class="mall-tab-text">换购商城</text>
-      </view>
-      <view
-        class="mall-tab"
-        :class="{ active: currentType === 3 }"
-        @click="switchType(3)"
-      >
-        <text class="mall-tab-icon">🎁</text>
-        <text class="mall-tab-text">兑换商城</text>
+        <text class="mall-tab__abbr">{{ tab.abbr }}</text>
+        <text class="mall-tab__label">{{ tab.label }}</text>
       </view>
     </view>
 
-    <!-- 分类 + 商品横向布局 -->
+    <!-- 分类 + 商品 -->
     <view class="content-layout">
       <!-- 左侧分类导航 -->
       <scroll-view class="category-nav" scroll-y>
         <view
-          class="category-item"
-          :class="{ active: currentCategoryId === '' }"
-          @click="selectCategory('')"
-        >
-          <text>全部</text>
-        </view>
-        <view
-          class="category-item"
-          :class="{ active: currentCategoryId === c.id }"
           v-for="c in categories"
           :key="c.id"
+          class="category-item"
+          :class="{ active: currentCategoryId === c.id }"
           @click="selectCategory(c.id)"
         >
           <text>{{ c.name }}</text>
@@ -69,53 +42,33 @@
       <!-- 右侧商品列表 -->
       <scroll-view class="product-list" scroll-y @scrolltolower="loadMore">
         <!-- 骨架屏 -->
-        <view v-if="loading" class="product-grid">
-          <view class="sk-card" v-for="i in 6" :key="i">
-            <view class="sk-img shimmer"></view>
+        <view v-if="loading && !products.length" class="product-grid">
+          <view v-for="i in 6" :key="i" class="sk-card">
+            <view class="sk-img shimmer" />
             <view class="sk-info">
-              <view class="sk-line sk-long shimmer"></view>
-              <view class="sk-line sk-short shimmer"></view>
+              <view class="sk-line shimmer" />
+              <view class="sk-line sk-short shimmer" />
             </view>
           </view>
         </view>
 
         <!-- 空状态 -->
-        <view v-else-if="products.length === 0" class="empty-wrap">
-          <text class="empty-icon">📦</text>
-          <text class="empty-text">暂无商品</text>
+        <view v-else-if="!products.length" class="empty-state">
+          <view class="empty-state__icon">商</view>
+          <text class="empty-state__text">该分类暂无商品</text>
+          <text class="empty-state__sub">换个分类看看吧</text>
         </view>
 
         <!-- 商品网格 -->
         <view v-else class="product-grid">
-          <view
-            class="product-card"
+          <HomeProductCard
             v-for="p in products"
             :key="p.id"
+            :product="p"
+            :type="currentType"
+            :default-cover="defaultCover"
             @click="goProduct(p)"
-          >
-            <LaxImage
-              class="product-image"
-              :src="productCover(p)"
-              aspect-ratio="100%"
-              mode="aspectFill"
-            />
-            <view class="product-info">
-              <text class="product-name">{{ p.name }}</text>
-              <view v-if="currentType === 1" class="product-price">
-                <text class="price-symbol">¥</text>
-                <text class="price-value">{{ p.price }}</text>
-                <text v-if="p.originalPrice" class="original-price">¥{{ p.originalPrice }}</text>
-              </view>
-              <view v-else-if="currentType === 2" class="product-price">
-                <text class="price-symbol">¥</text>
-                <text class="price-value">{{ p.price }}</text>
-                <text class="points-tag">+{{ p.requiredPoints || 0 }}积分</text>
-              </view>
-              <view v-else class="product-price">
-                <text class="points-tag-full">{{ p.requiredPoints }}积分兑换</text>
-              </view>
-            </view>
-          </view>
+          />
         </view>
 
         <!-- 加载更多 -->
@@ -127,6 +80,8 @@
         </view>
       </scroll-view>
     </view>
+
+    <view class="safe-area-bottom" />
   </view>
 </template>
 
@@ -136,30 +91,34 @@ import { onShow } from '@dcloudio/uni-app'
 import { productApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { HOME_CATEGORY_FALLBACK, normalizeCategoryTree, flattenCategories } from '@/utils/category'
-import { resolveProductCover } from '@/utils/media'
-import LaxImage from '@/components/lazy/LaxImage.vue'
-
-function productCover(p: any) {
-  return resolveProductCover(p)
-}
+import { DEFAULT_PRODUCT_COVER } from '@/utils/media'
 import { assetStore } from '@/store/asset'
 import AssetStatusBar from '@/components/AssetStatusBar.vue'
+import HomeProductCard from '@/components/HomeProductCard.vue'
 
+const CATALOG_PRESET_KEY = '***'
 const statusBarHeight = ref(20)
 const loggedIn = ref(checkAuth())
-const keyword = ref('')
 const currentType = ref(1)
 const currentCategoryId = ref('')
 const categories = ref<any[]>([])
 const products = ref<any[]>([])
+const defaultCover = DEFAULT_PRODUCT_COVER
 const loading = ref(false)
 const page = ref(1)
 const limit = 20
 const hasMore = ref(true)
+let categoriesLoadSeq = 0
+
+const tabs = [
+  { key: 1, abbr: '购', label: '消费' },
+  { key: 2, abbr: '换', label: '换购' },
+  { key: 3, abbr: '兑', label: '兑换' },
+]
 
 onMounted(() => {
-  const sys = uni.getSystemInfoSync()
-  statusBarHeight.value = sys.statusBarHeight || 20
+  statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
+  loadPreset()
   loadCategories()
   loadProducts(true)
 })
@@ -169,23 +128,34 @@ onShow(() => {
   if (loggedIn.value) assetStore.fetchBalance()
 })
 
+function loadPreset() {
+  try {
+    const preset = uni.getStorageSync(CATALOG_PRESET_KEY)
+    if (preset) {
+      if (preset.type) currentType.value = preset.type
+      if (preset.categoryId) currentCategoryId.value = preset.categoryId
+      uni.removeStorageSync(CATALOG_PRESET_KEY)
+    }
+  } catch {}
+}
+
 async function loadCategories() {
+  const seq = ++categoriesLoadSeq
   try {
     const res = await productApi.getCategories()
+    if (seq !== categoriesLoadSeq) return
     const tree = normalizeCategoryTree(res)
     const flat = flattenCategories(tree)
-    categories.value = flat.length > 0 ? flat : HOME_CATEGORY_FALLBACK
+    categories.value = flat.length ? flat : HOME_CATEGORY_FALLBACK
   } catch {
+    if (seq !== categoriesLoadSeq) return
     categories.value = HOME_CATEGORY_FALLBACK
   }
 }
 
 async function loadProducts(reset = false) {
   if (loading.value) return
-  if (reset) {
-    page.value = 1
-    hasMore.value = true
-  }
+  if (reset) { page.value = 1; hasMore.value = true }
   if (!hasMore.value) return
 
   loading.value = true
@@ -193,7 +163,6 @@ async function loadProducts(reset = false) {
     const res = await productApi.getList({
       type: currentType.value,
       categoryId: currentCategoryId.value || undefined,
-      keyword: keyword.value || undefined,
       page: page.value,
       limit,
     })
@@ -205,8 +174,8 @@ async function loadProducts(reset = false) {
     }
     hasMore.value = list.length === limit
     page.value++
-  } catch (e: any) {
-    uni.showToast({ title: e.message || '加载失败', icon: 'none' })
+  } catch {
+    if (reset) products.value = []
   } finally {
     loading.value = false
   }
@@ -225,16 +194,12 @@ function selectCategory(id: string) {
   loadProducts(true)
 }
 
-function onSearch() {
-  loadProducts(true)
-}
-
 function loadMore() {
-  if (hasMore.value && !loading.value) {
-    loadProducts(false)
-  }
+  if (hasMore.value && !loading.value) loadProducts(false)
 }
 
+function goBack() { uni.navigateBack() }
+function goSearch() { uni.navigateTo({ url: '/pages/search/index' }) }
 function goProduct(p: any) {
   uni.navigateTo({ url: `/pages/product/detail?id=${p.id}&type=${currentType.value}` })
 }
@@ -245,270 +210,226 @@ function goProduct(p: any) {
 
 .page-container {
   min-height: 100vh;
-  background: var(--bg-primary);
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, #F9F9F9 0%, #F0EDE8 100%);
   display: flex;
   flex-direction: column;
 }
 
-.search-bar {
-  padding: var(--spacing-base) var(--spacing-lg);
-  background: var(--bg-primary);
+.safe-area-top { width: 100%; }
 
-  .search-input-wrap {
+.page-nav {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx $spacing-base;
+
+  &__back,
+  &__action {
+    width: 64rpx;
+    height: 64rpx;
     display: flex;
     align-items: center;
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1rpx solid var(--glass-border);
-    border-radius: 50rpx;
-    padding: 0 var(--spacing-base);
-    height: 72rpx;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: 50%;
+    font-size: 28rpx;
+    color: $mineral-gray;
+    flex-shrink: 0;
+  }
 
-    .search-icon {
-      font-size: 32rpx;
-      margin-right: var(--spacing-sm);
-      color: var(--primary)-light;
-    }
-
-    .search-input {
-      flex: 1;
-      font-size: 28rpx;
-      color: var(--text-primary);
-
-      &::placeholder {
-        color: var(--text-muted);
-      }
-    }
+  &__title {
+    flex: 1;
+    font-size: 32rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    text-align: center;
+    letter-spacing: 0.5rpx;
   }
 }
 
+// Tab 切换
 .mall-tabs {
   display: flex;
-  padding: 0 var(--spacing-lg) var(--spacing-base);
-  gap: var(--spacing-base);
-  background: var(--bg-primary);
+  padding: 0 $spacing-base $spacing-base;
+  gap: 12rpx;
+}
 
-  .mall-tab {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4rpx;
-    padding: var(--spacing-sm) 0;
-    border-radius: var(--radius-lg);
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1rpx solid var(--glass-border);
-    transition: all 0.3s;
+.mall-tab {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1rpx solid rgba(20, 20, 20, 0.06);
+  border-radius: $radius-lg;
+  transition: all 0.25s ease;
 
-    &.active {
-      border-color: var(--border-primary);
-      background: $warm-yellow;
-      box-shadow: var(--shadow-gold);
+  &.active {
+    background: $warm-yellow;
+    border-color: $border-primary;
+    box-shadow: $shadow-gold;
+
+    .mall-tab__label {
+      color: $accent-dark;
+      font-weight: 700;
     }
+  }
 
-    .mall-tab-icon {
-      font-size: 40rpx;
-    }
+  &__abbr {
+    width: 40rpx;
+    height: 40rpx;
+    line-height: 40rpx;
+    text-align: center;
+    font-size: 22rpx;
+    font-weight: 800;
+    background: $bg-tertiary;
+    border-radius: 50%;
+    color: $mineral-gray;
+  }
 
-    .mall-tab-text {
-      font-size: 24rpx;
-      color: var(--text-secondary);
-      font-weight: 500;
+  &.active .mall-tab__abbr {
+    background: $mineral-gray;
+    color: $bronze-light;
+  }
 
-      .active & {
-        color: var(--primary-light);
-        font-weight: 700;
-      }
-    }
+  &__label {
+    font-size: 20rpx;
+    font-weight: 500;
+    color: $text-muted;
   }
 }
 
+// 分类 + 商品布局
 .content-layout {
   flex: 1;
   display: flex;
   overflow: hidden;
 }
 
+// 左侧分类
 .category-nav {
   width: 160rpx;
   height: calc(100vh - 300rpx);
-  background: $bg-tertiary;
-  border-right: 1rpx solid var(--border-light);
+  background: rgba(255, 255, 255, 0.5);
+  border-right: 1rpx solid rgba(20, 20, 20, 0.05);
 
   .category-item {
+    height: 96rpx;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100rpx;
     font-size: 26rpx;
-    color: var(--text-secondary);
+    color: $text-secondary;
+    font-weight: 500;
     border-left: 4rpx solid transparent;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
+    padding: 0 12rpx;
 
     &.active {
-      background: var(--bg-primary);
-      color: var(--primary);
-      border-left-color: var(--primary);
-      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      color: $accent-dark;
+      font-weight: 700;
+      border-left-color: $accent-dark;
     }
   }
 }
 
+// 右侧商品
 .product-list {
   flex: 1;
   height: calc(100vh - 300rpx);
-  padding: var(--spacing-base);
-
-  .loading-wrap,
-  .empty-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 100rpx 0;
-
-    .loading-text {
-      font-size: 28rpx;
-      color: var(--text-muted);
-    }
-
-    .empty-icon {
-      font-size: 80rpx;
-      margin-bottom: var(--spacing-base);
-    }
-
-    .empty-text {
-      font-size: 28rpx;
-      color: var(--text-muted);
-    }
-  }
+  padding: $spacing-base;
 }
 
 .product-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-base);
+  gap: $spacing-base;
 }
 
-// 骨架屏
 .sk-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1rpx solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: $radius-lg;
   overflow: hidden;
 
   .sk-img {
     width: 100%;
-    height: 300rpx;
+    aspect-ratio: 1 / 1;
     background: $bg-tertiary;
   }
 
   .sk-info {
-    padding: var(--spacing-base);
+    padding: $spacing-base;
     display: flex;
     flex-direction: column;
-    gap: 12rpx;
+    gap: 10rpx;
   }
 
   .sk-line {
     height: 22rpx;
     border-radius: 8rpx;
     background: $bg-tertiary;
-    &.sk-long { width: 85%; }
-    &.sk-short { width: 45%; }
+    width: 80%;
+
+    &.sk-short { width: 40%; }
   }
 }
 
 .shimmer {
-  animation: shimmer 1.2s ease-in-out infinite;
+  animation: shim 1.4s ease-in-out infinite;
 }
 
-@keyframes shimmer {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-}
-
-.product-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1rpx solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-
-  &:active {
-    border-color: $border-primary;
-    box-shadow: var(--shadow-gold);
-  }
-
-  .product-image {
-    width: 100%;
-    // 高度由 LaxImage 的 padding-bottom: 100% 控制
-  }
-
-  .product-info {
-    padding: var(--spacing-base);
-
-    .product-name {
-      font-size: 26rpx;
-      color: var(--text-primary);
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-bottom: 12rpx;
-    }
-
-    .product-price {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      flex-wrap: wrap;
-
-      .price-symbol {
-        font-size: 22rpx;
-        color: var(--primary-light);
-      }
-
-      .price-value {
-        font-size: 30rpx;
-        font-weight: 700;
-        color: var(--primary-light);
-      }
-
-      .original-price {
-        font-size: 22rpx;
-        color: var(--text-muted);
-        text-decoration: line-through;
-        margin-left: 8rpx;
-      }
-
-      .points-tag {
-        font-size: 20rpx;
-        color: var(--accent);
-        background: rgba(255,107,53,0.15);
-        padding: 2rpx 10rpx;
-        border-radius: 999rpx;
-        margin-left: 8rpx;
-        font-weight: 600;
-      }
-
-      .points-tag-full {
-        font-size: 24rpx;
-        color: var(--accent);
-        font-weight: 700;
-        text-shadow: 0 0 8rpx rgba(255,107,53,0.30);
-      }
-    }
-  }
+@keyframes shim {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
 }
 
 .load-more,
 .no-more {
   text-align: center;
-  padding: var(--spacing-base) 0;
+  padding: $spacing-base 0;
   font-size: 26rpx;
-  color: var(--text-muted);
+  color: $text-muted;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+  text-align: center;
+
+  &__icon {
+    width: 120rpx;
+    height: 120rpx;
+    line-height: 120rpx;
+    text-align: center;
+    font-size: 48rpx;
+    font-weight: 800;
+    background: $warm-yellow;
+    border: 1rpx solid $border-primary;
+    border-radius: 50%;
+    color: $accent-dark;
+    margin-bottom: 24rpx;
+  }
+
+  &__text {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 12rpx;
+  }
+
+  &__sub {
+    font-size: 26rpx;
+    color: $text-muted;
+  }
 }
 </style>

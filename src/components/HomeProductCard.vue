@@ -1,6 +1,6 @@
 <template>
   <view
-    class="p-card clay-card-hover"
+    class="p-card"
     :class="{ 'p-card--pressed': isPressed }"
     @click="emit('click')"
     @touchstart="isPressed = true"
@@ -9,18 +9,18 @@
   >
     <!-- 媒体区 -->
     <view class="p-card__media">
-      <!-- 类型徽章 -->
+      <!-- 类型徽章：左上角 -->
       <view class="p-card__badge" :class="`p-card__badge--t${type}`">
         {{ badge }}
       </view>
-      <!-- 商品图片（懒加载） -->
+      <!-- 商品图片 -->
       <LaxImage
         class="p-card__img"
         :src="cover"
         aspect-ratio="100%"
         mode="aspectFill"
       />
-      <!-- 销售标签 -->
+      <!-- 销量标签：左下角 -->
       <view v-if="salesText" class="p-card__sales-tag">{{ salesText }}</view>
     </view>
 
@@ -32,11 +32,15 @@
       <view class="p-card__price">
         <template v-if="type === 1">
           <text class="p-card__cash">¥{{ product.price }}</text>
-          <text class="p-card__tag p-card__tag--ice">返积分</text>
+          <view class="p-card__tag p-card__tag--ice">
+            <text>返积分</text>
+          </view>
         </template>
         <template v-else-if="type === 2">
           <text class="p-card__cash">¥{{ product.price }}</text>
-          <text class="p-card__tag p-card__tag--green">+{{ product.requiredPoints || 0 }}积分</text>
+          <view class="p-card__tag p-card__tag--gold">
+            <text>+{{ product.requiredPoints || 0 }}积分</text>
+          </view>
         </template>
         <template v-else>
           <text class="p-card__redeem">{{ product.requiredPoints }} 消费积分</text>
@@ -56,16 +60,14 @@ const props = defineProps<{
   defaultCover?: string
 }>()
 
-const emit = defineEmits<{
-  (e: 'click'): void
-}>()
+const emit = defineEmits<{ (e: 'click'): void }>()
 
 const isPressed = ref(false)
 
 const badge = computed(() => {
-  if (props.type === 1) return '消费'
-  if (props.type === 2) return '换购'
-  return '兑换'
+  if (props.type === 1) return '购'
+  if (props.type === 2) return '换'
+  return '兑'
 })
 
 const cover = computed(
@@ -84,30 +86,28 @@ const salesText = computed(() => {
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
-@import '@/styles/animations.scss';
 
 .p-card {
   position: relative;
   display: flex;
   flex-direction: column;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.6);
   border-radius: $radius-lg;
   overflow: hidden;
-  // 点击按压反馈
-  transition:
-    transform var(--duration-base) var(--ease-spring),
-    box-shadow var(--duration-base) var(--ease-default);
+  box-shadow: $clay-shadow;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-  &:active {
-    transform: scale(0.98);
-  }
-
+  &:active,
   &--pressed {
     transform: scale(0.97);
-    box-shadow: 0 4rpx 16rpx rgba(26, 36, 56, 0.05);
+    box-shadow: 0 4rpx 16rpx rgba(47, 53, 66, 0.08);
+    border-color: rgba(212, 180, 131, 0.2);
   }
 }
 
-/* 1:1 方图 */
+/* 媒体区：1:1 正方形 */
 .p-card__media {
   position: relative;
   width: 100%;
@@ -128,83 +128,118 @@ const salesText = computed(() => {
   top: 10rpx;
   left: 10rpx;
   z-index: 2;
-  font-size: 18rpx;
-  padding: 4rpx 10rpx;
-  border-radius: $radius-sm;
-  font-weight: 600;
-  letter-spacing: var(--tracking-wide);
+  min-width: 40rpx;
+  height: 40rpx;
+  padding: 0 10rpx;
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.5rpx;
 
   &--t1 {
     background: $warm-yellow;
     color: $accent-dark;
-    border: 1rpx solid $border-primary;
+    border: 1rpx solid rgba(184, 152, 118, 0.35);
   }
+
   &--t2 {
-    background: $warm-blue;
-    color: $navy-light;
+    background: rgba(65, 75, 94, 0.88);
+    color: $bronze-light;
+    border: 1rpx solid rgba(184, 152, 118, 0.25);
   }
+
   &--t3 {
-    background: $navy;
-    color: $gold-light;
+    background: $mineral-gray;
+    color: $bronze-light;
+    border: 1rpx solid rgba(184, 152, 118, 0.3);
   }
 }
 
-/* 销售标签 */
+/* 销量标签 */
 .p-card__sales-tag {
   position: absolute;
   bottom: 10rpx;
   left: 10rpx;
+  z-index: 2;
   font-size: 18rpx;
-  color: $text-inverse;
-  background: rgba($navy, 0.6);
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(47, 53, 66, 0.55);
+  backdrop-filter: blur(4px);
   padding: 4rpx 10rpx;
   border-radius: $radius-sm;
-  backdrop-filter: blur(4px);
+  font-weight: 500;
+  letter-spacing: 0.3rpx;
 }
 
 /* 信息区 */
 .p-card__body {
   flex: 1;
   min-height: 0;
-  padding: 12rpx 16rpx 14rpx;
+  padding: 14rpx 16rpx 16rpx;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  gap: 8rpx;
 }
 
 .p-card__name {
-  @include type-card-title;
-  line-height: 1.35;
-  @include line-clamp(2);
+  font-size: 26rpx;
+  font-weight: 600;
   color: $text-primary;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .p-card__price {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 6rpx;
-  margin-top: 6rpx;
+  gap: 8rpx;
+  margin-top: auto;
+  padding-top: 6rpx;
 }
 
 .p-card__cash {
-  font-size: 20rpx;
-  font-weight: var(--weight-heavy);
-  color: $text-primary;
-  letter-spacing: var(--tracking-tight);
+  font-family: $asset-balance-font;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: $mineral-gray;
+  letter-spacing: -0.5rpx;
+  font-variant-numeric: tabular-nums;
 }
 
 .p-card__redeem {
-  font-size: 20rpx;
-  font-weight: var(--weight-semibold);
-  color: $navy;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: $accent-dark;
+  letter-spacing: 0.2rpx;
 }
 
 .p-card__tag {
-  font-size: 20rpx;
-  font-weight: var(--weight-semibold);
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 10rpx;
+  border-radius: 999rpx;
+  font-size: 18rpx;
+  font-weight: 600;
+  letter-spacing: 0.3rpx;
 
-  &--ice { color: $primary-dark; }
-  &--green { color: #2A8A6A; }
+  &--ice {
+    background: rgba(47, 53, 66, 0.06);
+    color: $mineral-gray;
+    border: 1rpx solid rgba(47, 53, 66, 0.1);
+  }
+
+  &--gold {
+    background: rgba(184, 152, 118, 0.10);
+    color: $accent-dark;
+    border: 1rpx solid rgba(184, 152, 118, 0.30);
+  }
 }
 </style>

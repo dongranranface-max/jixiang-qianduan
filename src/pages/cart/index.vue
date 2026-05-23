@@ -1,377 +1,285 @@
 <template>
   <view class="page-container">
-    <!-- 顶部沉浸式资产状态栏（已登录用户） -->
     <AssetStatusBar v-if="loggedIn" />
-    <view v-else class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
-    
+    <view v-else class="safe-area-top" :style="{ height: statusBarHeight + 'px' }" />
+
     <!-- 页面标题 -->
-    <view class="page-header">
-      <text class="page-title">购物车</text>
-      <text class="edit-btn" @click="isEditMode = !isEditMode">
-        {{ isEditMode ? '完成' : '编辑' }}
-      </text>
+    <view class="page-nav">
+      <view class="page-nav__back" @click="goBack"><text>←</text></view>
+      <text class="page-nav__title">购物车</text>
+      <view class="page-nav__action" @click="goHome"><text>首</text></view>
     </view>
-    
-    <!-- 购物车骨架屏 -->
-    <view class="cart-skeleton" v-if="loading">
-      <view class="sk-item" v-for="i in 3" :key="i">
-        <view class="sk-checkbox shimmer"></view>
-        <view class="sk-img shimmer"></view>
-        <view class="sk-info">
-          <view class="sk-line sk-line--long shimmer"></view>
-          <view class="sk-line sk-line--mid shimmer"></view>
-          <view class="sk-line sk-line--short shimmer"></view>
+
+    <!-- 购物车列表 -->
+    <scroll-view class="cart-scroll" scroll-y>
+      <view v-if="loading && !cartItems.length" class="cart-skeleton">
+        <view v-for="i in 3" :key="i" class="sk-item">
+          <view class="sk-check shimmer" />
+          <view class="sk-img shimmer" />
+          <view class="sk-info">
+            <view class="sk-line shimmer" />
+            <view class="sk-line sk-short shimmer" />
+          </view>
         </view>
+      </view>
+
+      <view v-else-if="!cartItems.length" class="empty-state">
+        <view class="empty-state__icon">购</view>
+        <text class="empty-state__text">购物车是空的</text>
+        <text class="empty-state__sub">去分类发现好物吧</text>
+        <view class="empty-state__btn" @click="goCatalog">
+          <text>去逛逛</text>
+        </view>
+      </view>
+
+      <view v-else class="cart-list">
+        <view
+          v-for="item in cartItems"
+          :key="item.id"
+          class="cart-item"
+          :class="{ 'cart-item--selected': item.selected }"
+        >
+          <!-- 选择框 -->
+          <view class="cart-item__check" @click="toggleSelect(item)">
+            <view class="check-circle" :class="{ 'is-selected': item.selected }">
+              <text v-if="item.selected" class="check-mark">✓</text>
+            </view>
+          </view>
+
+          <!-- 商品图片 -->
+          <image
+            class="cart-item__img"
+            :src="item.product?.coverImage || item.coverImage"
+            mode="aspectFill"
+          />
+
+          <!-- 商品信息 -->
+          <view class="cart-item__info">
+            <text class="cart-item__name">{{ item.product?.name || item.name }}</text>
+
+            <!-- 价格展示（混合结算公式）-->
+            <view class="cart-item__price-row">
+              <template v-if="item.type === 1">
+                <text class="cart-item__cash">¥{{ item.price }}</text>
+                <view class="cart-item__tag">返积分</view>
+              </template>
+              <template v-else-if="item.type === 2">
+                <text class="cart-item__cash">¥{{ item.price }}</text>
+                <view class="cart-item__tag cart-item__tag--gold">
+                  +{{ item.requiredPoints || 0 }}积分
+                </view>
+              </template>
+              <template v-else>
+                <text class="cart-item__points">{{ item.requiredPoints }}积分</text>
+              </template>
+            </view>
+
+            <!-- 数量操作 -->
+            <view class="cart-item__stepper">
+              <view class="stepper-btn" @click="changeQty(item, -1)">
+                <text>−</text>
+              </view>
+              <text class="stepper-num">{{ item.quantity }}</text>
+              <view class="stepper-btn" @click="changeQty(item, 1)">
+                <text>+</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 删除 -->
+          <view class="cart-item__del" @click="removeItem(item)">
+            <text>×</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 底部结算栏 -->
+    <view v-if="cartItems.length" class="bottom-bar">
+      <!-- 全选 -->
+      <view class="bottom-bar__select" @click="toggleSelectAll">
+        <view class="check-circle" :class="{ 'is-selected': allSelected }">
+          <text v-if="allSelected" class="check-mark">✓</text>
+        </view>
+        <text class="bottom-bar__select-label">全选</text>
+      </view>
+
+      <!-- 合计 -->
+      <view class="bottom-bar__total">
+        <text class="total-label">合计</text>
+        <view class="total-amount">
+          <text class="total-cash">¥{{ totalCash.toFixed(2) }}</text>
+          <text v-if="totalPoints > 0" class="total-points">+{{ totalPoints }}积分</text>
+        </view>
+      </view>
+
+      <!-- 结算按钮 -->
+      <view class="bottom-bar__btn" :class="{ 'is-disabled': !hasSelected }" @click="goSettle">
+        <text>结算 ({{ selectedCount }})</text>
       </view>
     </view>
 
-    <!-- 购物车为空 -->
-    <view class="empty-cart" v-else-if="cartItems.length === 0">
-      <view class="empty-icon"><text>购</text></view>
-      <text class="empty-text">购物车是空的</text>
-      <text class="empty-hint">快去挑选心仪的商品吧</text>
-      <view class="empty-btn" @click="goShop">去逛逛</view>
-    </view>
-    
-    <!-- 购物车列表 -->
-    <view class="cart-list" v-else>
-      <!-- 消费商城商品 -->
-      <view class="cart-group" v-if="consumeItems.length > 0">
-        <view class="group-header">
-          <view class="group-select" @click="toggleSelectAll('consume')">
-            <text :class="isAllSelected('consume') ? 'checkbox-checked' : 'checkbox'">✓</text>
-          </view>
-          <text class="group-title">消费商城</text>
-        </view>
-        <view 
-          class="cart-item" 
-          v-for="item in consumeItems" 
-          :key="item.id"
-        >
-          <view class="item-select" @click="toggleSelect(item.id)">
-            <text :class="item.selected ? 'checkbox-checked' : 'checkbox'">✓</text>
-          </view>
-          <image class="item-image" :src="item.image" mode="aspectFill" @click="goProduct(item.productId)" />
-          <view class="item-info">
-            <text class="item-name" @click="goProduct(item.productId)">{{ item.name }}</text>
-            <view class="item-tags">
-              <text v-if="item.mallType === 'flash'" class="tag tag-green">限时</text>
-            </view>
-            <view class="item-bottom">
-              <text class="item-price">¥{{ item.price }}</text>
-              <view class="item-stepper">
-                <view class="stepper-btn" @click="changeQuantity(item, -1)">-</view>
-                <text class="stepper-value">{{ item.quantity }}</text>
-                <view class="stepper-btn" @click="changeQuantity(item, 1)">+</view>
-              </view>
-            </view>
-          </view>
-          <view class="item-delete" @click="deleteItem(item.id)" v-if="isEditMode">×</view>
-        </view>
-      </view>
-      
-      <!-- 换购商城商品 -->
-      <view class="cart-group" v-if="exchangeItems.length > 0">
-        <view class="group-header">
-          <view class="group-select" @click="toggleSelectAll('exchange')">
-            <text :class="isAllSelected('exchange') ? 'checkbox-checked' : 'checkbox'">✓</text>
-          </view>
-          <text class="group-title">🔄 换购商城</text>
-        </view>
-        <view 
-          class="cart-item" 
-          v-for="item in exchangeItems" 
-          :key="item.id"
-        >
-          <view class="item-select" @click="toggleSelect(item.id)">
-            <text :class="item.selected ? 'checkbox-checked' : 'checkbox'">✓</text>
-          </view>
-          <image class="item-image" :src="item.image" mode="aspectFill" />
-          <view class="item-info">
-            <text class="item-name">{{ item.name }}</text>
-            <view class="item-tags">
-              <text class="tag tag-purple">换购</text>
-            </view>
-            <view class="item-bottom">
-              <view class="item-price-row">
-                <text class="item-price">¥{{ item.price }}</text>
-                <text class="item-points">+{{ item.points }}积分</text>
-              </view>
-              <view class="item-stepper">
-                <view class="stepper-btn" @click="changeQuantity(item, -1)">-</view>
-                <text class="stepper-value">{{ item.quantity }}</text>
-                <view class="stepper-btn" @click="changeQuantity(item, 1)">+</view>
-              </view>
-            </view>
-          </view>
-          <view class="item-delete" @click="deleteItem(item.id)" v-if="isEditMode">×</view>
-        </view>
-      </view>
-    </view>
-    
-    <!-- 底部操作栏 -->
-    <view class="bottom-bar" v-if="cartItems.length > 0">
-      <!-- 混合结算公式 -->
-      <view class="settlement-formula" v-if="selectedCount > 0">
-        <text class="formula-label">混合结算</text>
-        <text class="formula-value">{{ totalCashDisplay }}元现金 + {{ totalPointsDisplay }}积分</text>
-      </view>
-      <view class="bottom-inner">
-        <view class="select-all" @click="toggleSelectAll('all')">
-          <text :class="isAllSelected('all') ? 'checkbox-checked' : 'checkbox'">✓</text>
-          <text class="select-label">全选</text>
-        </view>
-        <view class="total-info">
-          <view class="total-row">
-            <text class="total-label">合计:</text>
-            <text class="total-price">¥{{ totalPrice }}</text>
-          </view>
-          <view class="points-row" v-if="totalPoints > 0">
-            <text class="points-label">+{{ totalPoints }}积分</text>
-          </view>
-        </view>
-        <view class="submit-btn" @click="goCheckout">
-          <text>结算({{ selectedCount }})</text>
-        </view>
-        <view class="delete-btn" @click="deleteSelected" v-if="isEditMode">
-          <text>删除</text>
-        </view>
-      </view>
-    </view>
-    
-    <view class="safe-area-bottom"></view>
+    <view class="safe-area-bottom" />
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { checkAuth, requireAuth } from '@/utils/auth'
 import { cartApi } from '@/utils/api'
-import { resolveProductCover } from '@/utils/media'
+import { checkAuth, requireAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import AssetStatusBar from '@/components/AssetStatusBar.vue'
 
 const statusBarHeight = ref(20)
 const loggedIn = ref(checkAuth())
-const isEditMode = ref(false)
+const cartItems = ref<any[]>([])
 const loading = ref(false)
 
-interface CartItem {
-  id: string
-  productId: string
-  name: string
-  price: number
-  points: number
-  quantity: number
-  image: string
-  selected: boolean
-  mall: 'consume' | 'exchange' | 'redeem'
-  productType?: number
-}
-
-const cartItems = ref<CartItem[]>([])
+onMounted(() => {
+  statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
+})
 
 onShow(() => {
   loggedIn.value = checkAuth()
-  statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
   if (loggedIn.value) {
     assetStore.fetchBalance()
     loadCart()
-  } else {
-    cartItems.value = []
   }
 })
 
 async function loadCart() {
-  if (!checkAuth()) return
   loading.value = true
   try {
     const res = await cartApi.list()
-    cartItems.value = (res.list || []).map((row: any) => ({
-      id: row.id,
-      productId: row.productId,
-      name: row.name,
-      price: Number(row.price),
-      points: Number(row.points || 0),
-      quantity: row.quantity,
-      image: resolveProductCover(row),
-      selected: !!row.selected,
-      mall: row.mall,
-      productType: row.productType,
-    }))
-  } catch (e: any) {
-    uni.showToast({ title: e.message || '加载失败', icon: 'none' })
+    cartItems.value = (res || []).map((item: any) => ({ ...item, selected: item.selected ?? false }))
+  } catch {
+    cartItems.value = []
   } finally {
     loading.value = false
   }
 }
 
-const consumeItems = computed(() => cartItems.value.filter(i => i.mall === 'consume'))
-const exchangeItems = computed(() => cartItems.value.filter(i => i.mall === 'exchange'))
-const redeemItems = computed(() => cartItems.value.filter(i => i.mall === 'redeem'))
-
-const totalPrice = computed(() => {
-  return cartItems.value
-    .filter(i => i.selected)
-    .reduce((sum, i) => sum + i.price * i.quantity, 0)
-    .toFixed(2)
-})
-
-const totalCashDisplay = computed(() => {
-  return cartItems.value
-    .filter(i => i.selected)
-    .reduce((sum, i) => sum + i.price * i.quantity, 0)
-    .toFixed(2)
-})
-
-const totalPointsDisplay = computed(() => {
-  return cartItems.value
-    .filter(i => i.selected && i.mall === 'consume')
-    .reduce((sum, i) => sum + i.points * i.quantity, 0)
-})
-
-const totalPoints = computed(() => {
-  return cartItems.value
-    .filter(i => i.selected && i.mall === 'consume')
-    .reduce((sum, i) => sum + i.points * i.quantity, 0)
-})
-
-const selectedCount = computed(() => cartItems.value.filter(i => i.selected).length)
-
-async function toggleSelect(id: string) {
-  const item = cartItems.value.find((i) => i.id === id)
-  if (!item) return
-  item.selected = !item.selected
+async function changeQty(item: any, delta: number) {
+  const newQty = item.quantity + delta
+  if (newQty < 1) return
   try {
-    await cartApi.updateSelected(id, item.selected)
-  } catch {
+    await cartApi.updateQuantity(item.id, newQty)
+    item.quantity = newQty
+  } catch (e: any) {
+    uni.showToast({ title: e.message || '修改失败', icon: 'none' })
+  }
+}
+
+async function toggleSelect(item: any) {
+  try {
+    await cartApi.updateSelected(item.id, !item.selected)
+    item.selected = !item.selected
+  } catch (e: any) {
     item.selected = !item.selected
   }
 }
 
-function isAllSelected(type: 'consume' | 'exchange' | 'all') {
-  if (type === 'all') {
-    return cartItems.value.length > 0 && cartItems.value.every(i => i.selected)
-  }
-  const items = type === 'consume' ? consumeItems.value : exchangeItems.value
-  return items.length > 0 && items.every(i => i.selected)
-}
-
-async function toggleSelectAll(type: 'consume' | 'exchange' | 'all') {
-  const items =
-    type === 'all' ? cartItems.value : type === 'consume' ? consumeItems.value : exchangeItems.value
-  const allSelected = items.length > 0 && items.every((i) => i.selected)
-  const next = !allSelected
+async function toggleSelectAll() {
+  const all = allSelected.value
   try {
-    await cartApi.selectAll(next, type === 'all' ? 'all' : type)
-    await loadCart()
+    await cartApi.selectAll(!all)
+    cartItems.value.forEach((item: any) => { item.selected = !all })
   } catch (e: any) {
     uni.showToast({ title: e.message || '操作失败', icon: 'none' })
   }
 }
 
-async function changeQuantity(item: CartItem, delta: number) {
-  const newQty = item.quantity + delta
-  if (newQty < 1) {
-    deleteItem(item.id)
-    return
-  }
+async function removeItem(item: any) {
   try {
-    await cartApi.updateQuantity(item.id, newQty)
-    item.quantity = newQty
+    await cartApi.remove(item.id)
+    cartItems.value = cartItems.value.filter((i: any) => i.id !== item.id)
   } catch (e: any) {
-    uni.showToast({ title: e.message || '更新失败', icon: 'none' })
+    uni.showToast({ title: e.message || '删除失败', icon: 'none' })
   }
 }
 
-function deleteItem(id: string) {
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除这件商品吗？',
-    success: async (res) => {
-      if (res.confirm) {
-        try {
-          await cartApi.remove(id)
-          await loadCart()
-        } catch (e: any) {
-          uni.showToast({ title: e.message || '删除失败', icon: 'none' })
-        }
-      }
-    },
-  })
-}
+const allSelected = computed(() =>
+  cartItems.value.length > 0 && cartItems.value.every((i: any) => i.selected)
+)
 
-function deleteSelected() {
-  const n = cartItems.value.filter((i) => i.selected).length
-  if (n === 0) {
-    uni.showToast({ title: '请先选择商品', icon: 'none' })
-    return
-  }
-  uni.showModal({
-    title: '提示',
-    content: `确定要删除选中的 ${n} 件商品吗？`,
-    success: async (res) => {
-      if (res.confirm) {
-        try {
-          await cartApi.removeSelected()
-          await loadCart()
-        } catch (e: any) {
-          uni.showToast({ title: e.message || '删除失败', icon: 'none' })
-        }
-      }
-    },
-  })
-}
+const selectedItems = computed(() => cartItems.value.filter((i: any) => i.selected))
 
-function goShop() {
-  uni.navigateTo({ url: '/pages/buy/index' })
-}
+const selectedCount = computed(() => selectedItems.value.length)
 
-function goProduct(productId: string) {
-  const item = cartItems.value.find((i) => i.productId === productId)
-  const mode = item?.mall === 'exchange' ? 'exchange' : item?.mall === 'redeem' ? 'redeem' : 'consume'
-  uni.navigateTo({ url: `/pages/product/detail?id=${productId}&mode=${mode}` })
-}
+const totalCash = computed(() =>
+  selectedItems.value.reduce((sum: number, i: any) => sum + (Number(i.price) * i.quantity), 0)
+)
 
-function goCheckout() {
+const totalPoints = computed(() =>
+  selectedItems.value.reduce((sum: number, i: any) => sum + ((i.requiredPoints || 0) * i.quantity), 0)
+)
+
+const hasSelected = computed(() => selectedCount.value > 0)
+
+function goBack() { uni.navigateBack() }
+function goHome() { uni.switchTab({ url: '/pages/index/index' }) }
+function goCatalog() { uni.switchTab({ url: '/pages/catalog/index' }) }
+
+function goSettle() {
+  if (!hasSelected.value) return
   if (!requireAuth()) return
-  const selected = cartItems.value.filter((i) => i.selected)
-  if (!selected.length) {
-    uni.showToast({ title: '请先选择商品', icon: 'none' })
-    return
-  }
-  const malls = new Set(selected.map((i) => i.mall))
-  if (malls.size > 1) {
-    uni.showToast({ title: '请按商城分开结算', icon: 'none' })
-    return
-  }
-  const first = selected[0]
-  const mode = first.mall === 'redeem' ? 'redeem' : first.mall === 'exchange' ? 'exchange' : 'consume'
-  uni.navigateTo({ url: `/pages/order/confirm?productId=${first.productId}&mode=${mode}` })
+  const ids = selectedItems.value.map((i: any) => i.id).join(',')
+  uni.navigateTo({ url: `/pages/order/confirm?cartIds=${ids}` })
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
-@import '@/styles/page-shell.scss';
 
 .page-container {
-  @include tab-page-shell;
+  min-height: 100vh;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, #F9F9F9 0%, #F0EDE8 100%);
+  display: flex;
+  flex-direction: column;
 }
 
-.page-header {
-  @include page-header-bar;
+.safe-area-top { width: 100%; }
 
-  .edit-btn {
-    font-size: var(--font-body);
-    color: $text-accent;
+.page-nav {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx $spacing-base;
+
+  &__back,
+  &__action {
+    width: 64rpx;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: 50%;
+    font-size: 28rpx;
+    color: $mineral-gray;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    flex: 1;
+    font-size: 32rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    text-align: center;
+    letter-spacing: 0.5rpx;
   }
 }
 
-// 购物车骨架屏
+.cart-scroll {
+  flex: 1;
+  height: calc(100vh - 200rpx);
+  padding: $spacing-base;
+}
+
 .cart-skeleton {
-  padding: $spacing-base 0;
   display: flex;
   flex-direction: column;
   gap: $spacing-base;
@@ -379,334 +287,367 @@ function goCheckout() {
   .sk-item {
     display: flex;
     align-items: center;
-    gap: $spacing-sm;
-    @include premium-surface($bg-secondary);
-    border-radius: $radius-md;
+    gap: 16rpx;
     padding: $spacing-base;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: $radius-lg;
+  }
 
-    .sk-checkbox {
-      width: 40rpx;
-      height: 40rpx;
-      border-radius: 50%;
-      background: $bg-tertiary;
-      flex-shrink: 0;
-    }
+  .sk-check {
+    width: 44rpx;
+    height: 44rpx;
+    border-radius: 50%;
+    background: $bg-tertiary;
+    flex-shrink: 0;
+  }
 
-    .sk-img {
-      width: 160rpx;
-      height: 160rpx;
-      border-radius: $radius-sm;
-      background: $bg-tertiary;
-      flex-shrink: 0;
-    }
+  .sk-img {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: $radius-md;
+    background: $bg-tertiary;
+    flex-shrink: 0;
+  }
 
-    .sk-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 12rpx;
-    }
+  .sk-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12rpx;
+  }
 
-    .sk-line {
-      height: 22rpx;
-      border-radius: 8rpx;
-      background: $bg-tertiary;
-      width: 100%;
+  .sk-line {
+    height: 24rpx;
+    border-radius: 8rpx;
+    background: $bg-tertiary;
+    width: 70%;
 
-      &--long { width: 90%; }
-      &--mid { width: 65%; }
-      &--short { width: 40%; }
-    }
+    &.sk-short { width: 40%; }
   }
 }
 
 .shimmer {
-  animation: shimmer 1.2s ease-in-out infinite;
+  animation: shim 1.4s ease-in-out infinite;
 }
 
-@keyframes shimmer {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-}
-
-.empty-cart {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: $spacing-2xl 0;
-
-  .empty-icon {
-    width: 120rpx;
-    height: 120rpx;
-    line-height: 120rpx;
-    text-align: center;
-    font-size: 48rpx;
-    font-weight: var(--weight-heavy);
-    color: $navy;
-    background: $warm-yellow;
-    border-radius: 50%;
-    border: 1rpx solid $border-primary;
-    margin-bottom: $spacing-lg;
-  }
-
-  .empty-text {
-    @include type-page-title;
-    margin-bottom: $spacing-sm;
-  }
-
-  .empty-hint {
-    @include type-body;
-    color: $text-secondary;
-    margin-bottom: $spacing-xl;
-  }
-
-  .empty-btn {
-    padding: 20rpx 64rpx;
-    background: $navy;
-    border-radius: $radius-full;
-    font-size: var(--font-card-title);
-    color: $text-inverse;
-  }
+@keyframes shim {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
 }
 
 .cart-list {
-  .cart-group {
-    margin-bottom: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-base;
+}
 
-    .group-header {
-      display: flex;
-      align-items: center;
-      gap: $spacing-sm;
-      padding: $spacing-base 0;
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: $spacing-base;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.6);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
+  transition: all 0.2s ease;
 
-      .group-title {
-        @include type-card-title;
-      }
+  &--selected {
+    border-color: rgba(184, 152, 118, 0.25);
+    box-shadow: 0 4rpx 20rpx rgba(184, 152, 118, 0.12);
+  }
+
+  &__check {
+    flex-shrink: 0;
+    padding: 8rpx;
+    cursor: pointer;
+  }
+
+  &__img {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: $radius-md;
+    background: $bg-tertiary;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+  }
+
+  &__name {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $text-primary;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.4;
+  }
+
+  &__price-row {
+    display: flex;
+    align-items: center;
+    gap: 8rpx;
+    flex-wrap: wrap;
+  }
+
+  &__cash {
+    font-family: $asset-balance-font;
+    font-size: 30rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__points {
+    font-size: 24rpx;
+    font-weight: 700;
+    color: $accent-dark;
+  }
+
+  &__tag {
+    font-size: 18rpx;
+    font-weight: 600;
+    padding: 4rpx 10rpx;
+    border-radius: 999rpx;
+    background: rgba(47, 53, 66, 0.06);
+    color: $mineral-gray;
+    border: 1rpx solid rgba(47, 53, 66, 0.1);
+
+    &--gold {
+      background: rgba(184, 152, 118, 0.10);
+      color: $accent-dark;
+      border-color: rgba(184, 152, 118, 0.30);
     }
+  }
 
-    .cart-item {
-      display: flex;
-      align-items: center;
-      @include premium-surface($bg-secondary);
-      border-radius: $radius-md;
-      padding: $spacing-base;
-      margin-bottom: $spacing-sm;
-      position: relative;
+  &__stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1rpx solid rgba(47, 53, 66, 0.1);
+    border-radius: $radius-md;
+    width: fit-content;
+    overflow: hidden;
+  }
 
-      .item-select, .group-select {
-        margin-right: $spacing-sm;
-
-        .checkbox, .checkbox-checked {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 40rpx;
-          height: 40rpx;
-          border: 2rpx solid $border-color;
-          border-radius: 50%;
-          font-size: var(--font-body);
-          color: transparent;
-        }
-
-        .checkbox-checked {
-          background: $navy;
-          border-color: $navy;
-          color: $text-inverse;
-        }
-      }
-
-      .item-image {
-        width: 180rpx;
-        height: 180rpx;
-        border-radius: $radius-sm;
-        flex-shrink: 0;
-      }
-
-      .item-info {
-        flex: 1;
-        margin-left: $spacing-base;
-        display: flex;
-        flex-direction: column;
-
-        .item-name {
-          @include type-card-title;
-          @include line-clamp(2);
-          margin-bottom: $spacing-xs;
-        }
-
-        .item-tags {
-          margin-bottom: $spacing-sm;
-          
-          .tag {
-            font-size: 18rpx;
-            padding: 2rpx 12rpx;
-            border-radius: 6rpx;
-          }
-        }
-        
-        .item-bottom {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          
-          .item-price-row {
-            display: flex;
-            align-items: baseline;
-            gap: $spacing-sm;
-          }
-
-          .item-price {
-            font-size: var(--font-page-title);
-            font-weight: var(--weight-heavy);
-            color: $text-primary;
-          }
-
-          .item-points {
-            @include type-caption;
-            color: $gold;
-          }
-
-          .item-stepper {
-            display: flex;
-            align-items: center;
-
-            .stepper-btn {
-              width: 48rpx;
-              height: 48rpx;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              background: $bg-tertiary;
-              border-radius: $radius-sm;
-              font-size: var(--font-card-title);
-              color: $text-primary;
-            }
-
-            .stepper-value {
-              font-size: var(--font-card-title);
-              color: $text-primary;
-              min-width: 60rpx;
-              text-align: center;
-            }
-          }
-        }
-      }
-
-      .item-delete {
-        position: absolute;
-        top: $spacing-sm;
-        right: $spacing-sm;
-        width: 40rpx;
-        height: 40rpx;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba($danger, 0.12);
-        border-radius: 50%;
-        font-size: var(--font-card-title);
-        color: $danger;
-      }
-    }
+  &__del {
+    width: 56rpx;
+    height: 56rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-muted;
+    font-size: 36rpx;
+    flex-shrink: 0;
   }
 }
 
+.stepper-btn {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg-tertiary;
+  font-size: 28rpx;
+  color: $mineral-gray;
+  font-weight: 500;
+
+  &:active {
+    background: rgba(47, 53, 66, 0.1);
+  }
+}
+
+.stepper-num {
+  min-width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: $mineral-gray;
+  font-variant-numeric: tabular-nums;
+  border-left: 1rpx solid rgba(47, 53, 66, 0.08);
+  border-right: 1rpx solid rgba(47, 53, 66, 0.08);
+  box-sizing: border-box;
+}
+
+.check-circle {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(47, 53, 66, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.5);
+
+  &.is-selected {
+    background: $accent-dark;
+    border-color: $accent-dark;
+  }
+
+  .check-mark {
+    font-size: 22rpx;
+    color: #fff;
+    font-weight: 700;
+  }
+}
+
+// 底部结算栏
 .bottom-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
-  padding: 16rpx 32rpx;
-  padding-bottom: calc(16rpx + constant(safe-area-inset-bottom));
+  padding: 16rpx $spacing-base;
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border-top: 1rpx solid $border-light;
-  box-shadow: 0 -8rpx 32rpx rgba(26, 36, 56, 0.06);
-  
-  .select-all {
+  border-top: 1rpx solid rgba(20, 20, 20, 0.06);
+  box-shadow: 0 -8rpx 32rpx rgba(47, 53, 66, 0.06);
+  gap: 16rpx;
+
+  &__select {
     display: flex;
     align-items: center;
-    gap: $spacing-xs;
-
-    .select-label {
-      @include type-body;
-    }
-
-    .checkbox, .checkbox-checked {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40rpx;
-      height: 40rpx;
-      border: 2rpx solid $border-color;
-      border-radius: 50%;
-      font-size: var(--font-body);
-      color: transparent;
-    }
-
-    .checkbox-checked {
-      background: $navy;
-      border-color: $navy;
-      color: $text-inverse;
-    }
+    gap: 10rpx;
+    flex-shrink: 0;
+    cursor: pointer;
   }
 
-  .total-info {
+  &__select-label {
+    font-size: 26rpx;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
+  &__total {
     flex: 1;
-    margin: 0 $spacing-base;
-    text-align: right;
-
-    .total-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: flex-end;
-      gap: $spacing-xs;
-
-      .total-label {
-        @include type-body;
-        color: $text-secondary;
-      }
-
-      .total-price {
-        font-size: 36rpx;
-        font-weight: var(--weight-heavy);
-        color: $text-primary;
-      }
-    }
-
-    .points-row {
-      .points-label {
-        @include type-caption;
-        color: $gold;
-      }
-    }
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4rpx;
   }
 
-  .submit-btn {
-    background: $navy;
-    color: $text-inverse;
-    padding: 20rpx 48rpx;
+  &__btn {
+    height: 80rpx;
+    padding: 0 40rpx;
+    background: $btn-gold-gradient;
     border-radius: $radius-full;
-    font-size: var(--font-card-title);
-    font-weight: var(--weight-bold);
-    box-shadow: $shadow-fire;
-  }
+    box-shadow: $btn-gold-shadow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30rpx;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1rpx;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
 
-  .delete-btn {
-    background: $danger;
-    color: $text-inverse;
-    padding: 20rpx 32rpx;
-    border-radius: $radius-full;
-    font-size: var(--font-card-title);
-    margin-left: $spacing-sm;
+    &:active {
+      transform: scale(0.97);
+    }
+
+    &.is-disabled {
+      background: $btn-disabled-bg;
+      color: $btn-disabled-text;
+      box-shadow: none;
+      pointer-events: none;
+    }
   }
 }
 
-.safe-area-bottom {
-  height: constant(safe-area-inset-bottom);
-  height: env(safe-area-inset-bottom);
+.total-label {
+  font-size: 22rpx;
+  color: $text-muted;
+}
+
+.total-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+}
+
+.total-cash {
+  font-family: $asset-balance-font;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: $mineral-gray;
+  font-variant-numeric: tabular-nums;
+}
+
+.total-points {
+  font-size: 22rpx;
+  color: $accent-dark;
+  font-weight: 600;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 40rpx;
+  text-align: center;
+
+  &__icon {
+    width: 140rpx;
+    height: 140rpx;
+    line-height: 140rpx;
+    text-align: center;
+    font-size: 56rpx;
+    font-weight: 800;
+    background: $warm-yellow;
+    border: 1rpx solid $border-primary;
+    border-radius: 50%;
+    color: $accent-dark;
+    margin-bottom: 32rpx;
+  }
+
+  &__text {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 12rpx;
+  }
+
+  &__sub {
+    font-size: 26rpx;
+    color: $text-muted;
+    margin-bottom: 40rpx;
+  }
+
+  &__btn {
+    height: 80rpx;
+    padding: 0 56rpx;
+    background: $btn-gold-gradient;
+    border-radius: $radius-full;
+    box-shadow: $btn-gold-shadow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text {
+      font-size: 30rpx;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1rpx;
+    }
+  }
 }
 </style>

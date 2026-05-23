@@ -3,15 +3,18 @@
     <AssetStatusBar v-if="loggedIn" />
     <view v-else class="safe-area-top" :style="{ height: statusBarHeight + 'px' }" />
 
-    <view class="page-header">
-      <text class="page-header__title">我的订单</text>
+    <!-- 页面导航 -->
+    <view class="page-nav">
+      <view class="page-nav__back" @click="goBack"><text>←</text></view>
+      <text class="page-nav__title">我的订单</text>
     </view>
 
-    <view class="status-tabs">
+    <!-- Tab 切换 -->
+    <view class="tab-bar">
       <view
         v-for="tab in tabs"
         :key="tab.key"
-        class="status-tabs__item"
+        class="tab-bar__item"
         :class="{ active: currentTab === tab.key }"
         @click="switchTab(tab.key)"
       >
@@ -19,71 +22,101 @@
       </view>
     </view>
 
+    <!-- 订单列表 -->
     <scroll-view class="order-scroll" scroll-y @scrolltolower="loadMore">
-      <view v-for="order in orders" :key="order.orderNo" class="order-card glass-card">
-        <view class="order-card__head">
-          <text class="order-card__type">{{ typeName(order.orderType) }}</text>
-          <text class="order-card__status" :class="'s' + order.status">{{ statusName(order.status) }}</text>
-        </view>
-        <text class="order-card__no">{{ order.orderNo }}</text>
-
-        <view v-for="item in order.items || []" :key="item.productName" class="order-item">
-          <image class="order-item__img" :src="item.coverImage" mode="aspectFill" />
-          <view class="order-item__info">
-            <text class="order-item__name">{{ item.productName }}</text>
-            <text class="order-item__spec">{{ item.specs }} ×{{ item.quantity }}</text>
+      <!-- 骨架屏 -->
+      <view v-if="loading && !orders.length" class="order-list">
+        <view v-for="i in 3" :key="i" class="sk-card">
+          <view class="sk-head shimmer" />
+          <view class="sk-items">
+            <view class="sk-product shimmer" />
           </view>
-          <text class="order-item__price">¥{{ item.price }}</text>
-        </view>
-
-        <view class="order-card__foot">
-          <text class="order-card__time">{{ formatTime(order.createdAt) }}</text>
-          <text class="order-card__amount">
-            {{ order.orderType === 3 ? `${order.pointsEarned || 0} 积分` : `¥${order.payAmount}` }}
-          </text>
-        </view>
-
-        <view v-if="order.pointsEarned && order.status >= 2" class="order-card__reward">
-          预计/已得生态积分 {{ order.pointsEarned }}
-        </view>
-
-        <view class="order-card__actions">
-          <view v-if="order.status === 1" class="btn-sm btn-fire" @click="cancelOrder(order)">取消</view>
-          <view v-if="order.status === 1" class="btn-sm btn-primary" @click="payOrder(order)">去支付</view>
-          <view v-if="order.status === 3" class="btn-sm btn-primary" @click="confirmOrder(order)">确认收货</view>
-          <view v-if="order.status === 4" class="btn-sm btn-outline" @click="applyRefund(order)">申请退款</view>
+          <view class="sk-foot shimmer" />
         </view>
       </view>
 
-      <!-- 骨架屏 -->
-      <view v-if="loading && !orders.length" class="order-skeleton">
-        <view class="sk-card glass-card" v-for="i in 3" :key="i">
-          <view class="sk-head">
-            <view class="sk-tag shimmer"></view>
-            <view class="sk-status shimmer"></view>
+      <!-- 空状态 -->
+      <view v-else-if="!orders.length" class="empty-state">
+        <view class="empty-state__icon">单</view>
+        <text class="empty-state__text">暂无订单</text>
+        <text class="empty-state__sub">去商城发现好物吧</text>
+        <view class="empty-state__btn" @click="goCatalog">
+          <text>去逛逛</text>
+        </view>
+      </view>
+
+      <!-- 订单卡片 -->
+      <view v-else class="order-list">
+        <view v-for="order in orders" :key="order.orderNo" class="order-card">
+          <!-- 订单头 -->
+          <view class="order-card__head">
+            <text class="order-card__type">{{ typeName(order.orderType) }}</text>
+            <text class="order-card__status" :class="`status--${order.status}`">
+              {{ statusName(order.status) }}
+            </text>
           </view>
-          <view class="sk-line shimmer"></view>
-          <view class="sk-items">
-            <view class="sk-product">
-              <view class="sk-img shimmer"></view>
-              <view class="sk-prod-info">
-                <view class="sk-line sk-long shimmer"></view>
-                <view class="sk-line sk-short shimmer"></view>
-              </view>
-              <view class="sk-price shimmer"></view>
+
+          <!-- 商品项 -->
+          <view
+            v-for="item in (order.items || []).slice(0, 2)"
+            :key="item.productId || item.id"
+            class="order-item"
+            @click="goDetail(order)"
+          >
+            <image
+              class="order-item__img"
+              :src="item.coverImage || item.image"
+              mode="aspectFill"
+            />
+            <view class="order-item__info">
+              <text class="order-item__name">{{ item.productName || item.name }}</text>
+              <text class="order-item__spec">{{ item.specs || item.skuInfo }} ×{{ item.quantity }}</text>
+            </view>
+            <text class="order-item__price">
+              {{ order.orderType === 3 ? `${item.points || 0}积分` : `¥${item.price}` }}
+            </text>
+          </view>
+
+          <view v-if="(order.items || []).length > 2" class="order-more">
+            <text>查看全部 {{ order.items.length }} 件商品 ›</text>
+          </view>
+
+          <!-- 订单底部 -->
+          <view class="order-card__foot">
+            <view class="order-card__time">{{ formatTime(order.createdAt) }}</view>
+            <view class="order-card__amount">
+              <text class="order-card__amount-label">{{ order.orderType === 3 ? '合计' : '实付' }}</text>
+              <text class="order-card__amount-value">
+                {{ order.orderType === 3 ? `${order.pointsEarned || 0}积分` : `¥${order.payAmount}` }}
+              </text>
             </view>
           </view>
-          <view class="sk-foot">
-            <view class="sk-line shimmer"></view>
-            <view class="sk-btn shimmer"></view>
+
+          <!-- 积分返还提示 -->
+          <view v-if="order.pointsEarned && order.status >= 3" class="order-card__bonus">
+            <text>🎁 获得 {{ order.pointsEarned }} 生态积分</text>
+          </view>
+
+          <!-- 操作按钮 -->
+          <view class="order-card__actions">
+            <view v-if="order.status === 1" class="action-btn action-btn--ghost" @click.stop="cancelOrder(order)">
+              取消
+            </view>
+            <view v-if="order.status === 1" class="action-btn action-btn--primary" @click.stop="payOrder(order)">
+              去支付
+            </view>
+            <view v-if="order.status === 3" class="action-btn action-btn--primary" @click.stop="confirmOrder(order)">
+              确认收货
+            </view>
+            <view v-if="order.status === 4" class="action-btn action-btn--ghost" @click.stop="applyRefund(order)">
+              申请退款
+            </view>
           </view>
         </view>
       </view>
 
-      <view v-if="!loading && !orders.length" class="empty">
-        <text class="empty__icon">📦</text>
-        <text class="empty__text">暂无订单</text>
-        <view class="btn-primary btn-sm" @click="goHome">去逛逛</view>
+      <view v-if="!hasMore && orders.length > 0" class="no-more">
+        <text>— 没有更多了 —</text>
       </view>
     </scroll-view>
 
@@ -96,7 +129,6 @@ import { ref, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { orderApi } from '@/utils/api'
 import { checkAuth, requireAuth } from '@/utils/auth'
-import { OrderStatusName, MallTypeName } from '@/constants/mall'
 import { assetStore } from '@/store/asset'
 import AssetStatusBar from '@/components/AssetStatusBar.vue'
 
@@ -111,17 +143,22 @@ const hasMore = ref(true)
 const tabs = [
   { key: 'all', label: '全部' },
   { key: '1', label: '待付款' },
-  { key: '2', label: '待发货' },
   { key: '3', label: '待收货' },
   { key: '4', label: '已完成' },
 ]
 
 function statusName(s: number) {
-  return OrderStatusName[s] || '未知'
+  const map: Record<number, string> = {
+    1: '待付款', 2: '待发货', 3: '待收货', 4: '已完成', 5: '已取消',
+  }
+  return map[s] || '未知'
 }
+
 function typeName(t: number) {
-  return MallTypeName[t] || '订单'
+  const map: Record<number, string> = { 1: '消费订单', 2: '换购订单', 3: '兑换订单' }
+  return map[t] || '订单'
 }
+
 function formatTime(dateStr: string) {
   if (!dateStr) return ''
   const d = new Date(dateStr)
@@ -130,29 +167,18 @@ function formatTime(dateStr: string) {
 
 onMounted(() => {
   statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
-  if (!requireAuth()) return
-  applyStatusFromStorage()
-  loadOrders()
+  if (requireAuth()) loadOrders()
 })
 
 onShow(() => {
   loggedIn.value = checkAuth()
   if (!loggedIn.value) return
   assetStore.fetchBalance()
-  applyStatusFromStorage()
   orders.value = []
   page.value = 1
   hasMore.value = true
   loadOrders()
 })
-
-function applyStatusFromStorage() {
-  const s = uni.getStorageSync('orderListStatus')
-  if (s) {
-    currentTab.value = String(s)
-    uni.removeStorageSync('orderListStatus')
-  }
-}
 
 async function loadOrders() {
   if (loading.value || !checkAuth()) return
@@ -165,14 +191,15 @@ async function loadOrders() {
     orders.value = page.value === 1 ? list : [...orders.value, ...list]
     hasMore.value = list.length >= 20
     page.value++
-  } catch (e: any) {
-    uni.showToast({ title: e.message || '加载失败', icon: 'none' })
+  } catch {
+    if (page.value === 1) orders.value = []
   } finally {
     loading.value = false
   }
 }
 
 function switchTab(key: string) {
+  if (currentTab.value === key) return
   currentTab.value = key
   orders.value = []
   page.value = 1
@@ -184,13 +211,19 @@ function loadMore() {
   if (hasMore.value && !loading.value) loadOrders()
 }
 
+function goBack() { uni.navigateBack() }
+function goCatalog() { uni.switchTab({ url: '/pages/catalog/index' }) }
+function goDetail(order: any) {
+  uni.navigateTo({ url: `/pages/order/confirm?orderNo=${order.orderNo}` })
+}
+
 async function cancelOrder(order: any) {
   try {
     await orderApi.cancel(order.orderNo)
     uni.showToast({ title: '已取消', icon: 'success' })
     switchTab(currentTab.value)
   } catch (e: any) {
-    uni.showToast({ title: e.message, icon: 'none' })
+    uni.showToast({ title: e.message || '取消失败', icon: 'none' })
   }
 }
 
@@ -201,7 +234,7 @@ async function confirmOrder(order: any) {
     assetStore.fetchBalance()
     switchTab(currentTab.value)
   } catch (e: any) {
-    uni.showToast({ title: e.message, icon: 'none' })
+    uni.showToast({ title: e.message || '操作失败', icon: 'none' })
   }
 }
 
@@ -216,178 +249,373 @@ function payOrder(order: any) {
 async function applyRefund(order: any) {
   try {
     await orderApi.applyRefund(order.orderNo, { reason: 1, description: '用户申请退款' })
-    uni.showToast({ title: '已提交退款申请', icon: 'success' })
-    orders.value = []
-    page.value = 1
-    hasMore.value = true
-    loadOrders()
+    uni.showToast({ title: '退款申请已提交', icon: 'success' })
+    switchTab(currentTab.value)
   } catch (e: any) {
     uni.showToast({ title: e.message || '申请失败', icon: 'none' })
   }
-}
-
-function goHome() {
-  uni.switchTab({ url: '/pages/index/index' })
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
 
-.page-header {
-  padding: 16rpx $spacing-base 8rpx;
-  &__title { font-size: 36rpx; font-weight: 800; color: $text-primary; }
+.page-container {
+  min-height: 100vh;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, #F9F9F9 0%, #F0EDE8 100%);
+  display: flex;
+  flex-direction: column;
 }
 
-.status-tabs {
+.safe-area-top { width: 100%; }
+
+.page-nav {
   display: flex;
-  padding: 0 $spacing-base 16rpx;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx $spacing-base;
+
+  &__back {
+    width: 64rpx;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: 50%;
+    font-size: 28rpx;
+    color: $mineral-gray;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    flex: 1;
+    font-size: 32rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    text-align: center;
+    letter-spacing: 0.5rpx;
+  }
+}
+
+.tab-bar {
+  display: flex;
+  padding: 0 $spacing-base $spacing-sm;
   gap: 8rpx;
   overflow-x: auto;
+
   &__item {
     flex-shrink: 0;
-    padding: 12rpx 24rpx;
-    font-size: 26rpx;
+    height: 68rpx;
+    padding: 0 24rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28rpx;
+    font-weight: 500;
     color: $text-muted;
-    border-radius: $radius-full;
-    border: 1rpx solid transparent;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: $radius-lg;
+    transition: all 0.25s ease;
+
     &.active {
       color: $accent-dark;
       background: $warm-yellow;
       border-color: $border-primary;
+      font-weight: 700;
+      box-shadow: $shadow-gold;
     }
   }
 }
 
 .order-scroll {
-  height: calc(100vh - 320rpx);
+  flex: 1;
+  height: calc(100vh - 280rpx);
   padding: 0 $spacing-base;
 }
 
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-base;
+  padding-bottom: $spacing-base;
+}
+
 .order-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.6);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
   padding: $spacing-base;
-  margin-bottom: $spacing-base;
-  &__head { display: flex; justify-content: space-between; }
-  &__type { font-size: 24rpx; color: $primary; font-weight: 600; }
-  &__status { font-size: 26rpx; font-weight: 700; color: $accent-light; &.s4 { color: $text-muted; } }
-  &__no { font-size: 22rpx; color: $text-muted; margin: 8rpx 0 16rpx; display: block; }
-  &__foot { display: flex; justify-content: space-between; margin-top: 16rpx; padding-top: 16rpx; border-top: 1rpx solid $border-light; }
-  &__time { font-size: 22rpx; color: $text-muted; }
-  &__amount { font-size: 32rpx; font-weight: 700; color: $primary-light; }
-  &__reward { font-size: 22rpx; color: $success; margin-top: 8rpx; }
-  &__actions { display: flex; justify-content: flex-end; gap: 12rpx; margin-top: 16rpx; }
+  overflow: hidden;
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16rpx;
+  }
+
+  &__type {
+    font-size: 24rpx;
+    font-weight: 600;
+    color: $mineral-gray;
+  }
+
+  &__status {
+    font-size: 26rpx;
+    font-weight: 700;
+    color: $accent-dark;
+
+    &.status--4, &.status--5 {
+      color: $text-muted;
+    }
+    &.status--3 {
+      color: $success;
+    }
+  }
+
+  &__foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16rpx;
+    padding-top: 16rpx;
+    border-top: 1rpx solid $border-light;
+  }
+
+  &__time {
+    font-size: 22rpx;
+    color: $text-muted;
+  }
+
+  &__amount {
+    display: flex;
+    align-items: baseline;
+    gap: 6rpx;
+  }
+
+  &__amount-label {
+    font-size: 22rpx;
+    color: $text-muted;
+  }
+
+  &__amount-value {
+    font-family: $asset-balance-font;
+    font-size: 32rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__bonus {
+    margin-top: 12rpx;
+    padding: 10rpx 16rpx;
+    background: $warm-yellow;
+    border: 1rpx solid $border-primary;
+    border-radius: $radius-md;
+    font-size: 22rpx;
+    color: $accent-dark;
+    font-weight: 600;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12rpx;
+    margin-top: 16rpx;
+  }
 }
 
 .order-item {
   display: flex;
   align-items: center;
+  gap: 16rpx;
   padding: 12rpx 0;
-  &__img { width: 120rpx; height: 120rpx; border-radius: 12rpx; background: $bg-tertiary; }
-  &__info { flex: 1; margin-left: 16rpx; }
-  &__name { font-size: 26rpx; color: $text-primary; @include line-clamp(2); }
-  &__spec { font-size: 22rpx; color: $text-muted; }
-  &__price { font-size: 28rpx; color: $text-primary; }
+  border-bottom: 1rpx solid $border-light;
+
+  &:last-of-type { border-bottom: none; }
+
+  &__img {
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: $radius-md;
+    background: $bg-tertiary;
+    flex-shrink: 0;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6rpx;
+  }
+
+  &__name {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $text-primary;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.4;
+  }
+
+  &__spec {
+    font-size: 22rpx;
+    color: $text-muted;
+  }
+
+  &__price {
+    font-size: 28rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    flex-shrink: 0;
+  }
 }
 
-.order-skeleton {
+.order-more {
+  text-align: center;
+  padding: 12rpx;
+  font-size: 24rpx;
+  color: $text-muted;
+}
+
+.action-btn {
+  height: 60rpx;
+  padding: 0 28rpx;
+  border-radius: $radius-full;
   display: flex;
-  flex-direction: column;
-  gap: $spacing-base;
-  padding: 0;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  font-weight: 600;
+  transition: all 0.2s ease;
 
-  .sk-card {
-    padding: $spacing-base;
-    border-radius: $radius-lg;
+  &--primary {
+    background: $btn-gold-gradient;
+    box-shadow: $btn-gold-shadow;
+    color: #fff;
 
-    .sk-head {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 16rpx;
-    }
+    &:active { transform: scale(0.97); }
+  }
 
-    .sk-tag {
-      width: 100rpx;
-      height: 28rpx;
-      border-radius: 8rpx;
-      background: $bg-tertiary;
-    }
+  &--ghost {
+    background: transparent;
+    border: 1.5rpx solid $border-color;
+    color: $text-secondary;
 
-    .sk-status {
-      width: 80rpx;
-      height: 28rpx;
-      border-radius: 8rpx;
-      background: $bg-tertiary;
-    }
-
-    .sk-line {
-      height: 20rpx;
-      border-radius: 8rpx;
-      background: $bg-tertiary;
-      margin-bottom: 12rpx;
-      &.sk-long { width: 60%; }
-      &.sk-short { width: 35%; }
-    }
-
-    .sk-items {
-      margin: 16rpx 0;
-    }
-
-    .sk-product {
-      display: flex;
-      align-items: center;
-      gap: 16rpx;
-    }
-
-    .sk-img {
-      width: 120rpx;
-      height: 120rpx;
-      border-radius: 12rpx;
-      background: $bg-tertiary;
-      flex-shrink: 0;
-    }
-
-    .sk-prod-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 12rpx;
-    }
-
-    .sk-price {
-      width: 80rpx;
-      height: 28rpx;
-      border-radius: 8rpx;
-      background: $bg-tertiary;
-    }
-
-    .sk-foot {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 16rpx;
-      padding-top: 16rpx;
-      border-top: 1rpx solid $border-light;
-    }
-
-    .sk-btn {
-      width: 120rpx;
-      height: 56rpx;
-      border-radius: 28rpx;
-      background: $bg-tertiary;
+    &:active {
+      background: rgba(47, 53, 66, 0.04);
     }
   }
 }
 
-.shimmer {
-  animation: shimmer 1.2s ease-in-out infinite;
+// 骨架屏
+.sk-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: $radius-lg;
+  padding: $spacing-base;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+
+  .sk-head {
+    height: 28rpx;
+    width: 40%;
+    border-radius: 8rpx;
+    background: $bg-tertiary;
+  }
+
+  .sk-items {
+    .sk-product {
+      height: 120rpx;
+      border-radius: $radius-md;
+      background: $bg-tertiary;
+    }
+  }
+
+  .sk-foot {
+    height: 28rpx;
+    width: 60%;
+    border-radius: 8rpx;
+    background: $bg-tertiary;
+    align-self: flex-end;
+  }
 }
 
-@keyframes shimmer {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+.shimmer { animation: shim 1.4s ease-in-out infinite; }
+
+@keyframes shim {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
 }
 
-.hint, .empty { text-align: center; padding: 80rpx 0; color: $text-muted; }
-.empty__icon { font-size: 100rpx; display: block; margin-bottom: 16rpx; }
-.empty__text { display: block; margin-bottom: 24rpx; }
+.no-more {
+  text-align: center;
+  padding: $spacing-base;
+  font-size: 26rpx;
+  color: $text-muted;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 40rpx;
+  text-align: center;
+
+  &__icon {
+    width: 140rpx;
+    height: 140rpx;
+    line-height: 140rpx;
+    text-align: center;
+    font-size: 56rpx;
+    font-weight: 800;
+    background: $warm-yellow;
+    border: 1rpx solid $border-primary;
+    border-radius: 50%;
+    color: $accent-dark;
+    margin-bottom: 32rpx;
+  }
+
+  &__text {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 12rpx;
+  }
+
+  &__sub {
+    font-size: 26rpx;
+    color: $text-muted;
+    margin-bottom: 40rpx;
+  }
+
+  &__btn {
+    height: 80rpx;
+    padding: 0 56rpx;
+    background: $btn-gold-gradient;
+    border-radius: $radius-full;
+    box-shadow: $btn-gold-shadow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text {
+      font-size: 30rpx;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1rpx;
+    }
+  }
+}
 </style>
