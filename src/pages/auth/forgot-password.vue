@@ -1,12 +1,6 @@
 <template>
   <view class="auth-page">
 
-    <!-- 深色背景装饰 -->
-    <view class="auth-bg">
-      <view class="bg-glow bg-glow--tl" />
-      <view class="bg-glow bg-glow--br" />
-    </view>
-
     <!-- 顶部导航栏 -->
     <view class="auth-nav">
       <view class="auth-nav__left">
@@ -16,16 +10,27 @@
         <view class="auth-nav__logo">
           <image class="auth-nav__logo-img" src="/static/logo.png" mode="aspectFit" />
         </view>
-        <text class="auth-nav__name">集享公社</text>
+        <view class="auth-nav__text">
+          <text class="auth-nav__name">集享公社</text>
+          <text class="auth-nav__slogan">集轻奢·享财富</text>
+        </view>
       </view>
-      <text class="auth-nav__link" @click="goLogin">登录</text>
+      <text class="nav-link" @click="goLogin">登录</text>
     </view>
 
-    <!-- 表单卡片 -->
-    <view class="auth-card">
-      <view class="auth-card__inner">
+    <!-- Logo 展示区 -->
+    <view class="brand-hero">
+      <view class="brand-hero__logo-wrap">
+        <image class="brand-hero__logo" src="/static/logo.png" mode="aspectFit" />
+      </view>
+      <view class="brand-hero__glow" />
+    </view>
 
-        <!-- ========== Step 1: 验证手机 ========== -->
+    <!-- 表单区 -->
+    <view class="auth-body">
+      <view class="auth-card">
+
+        <!-- ========== Step 1 ========== -->
         <template v-if="step === 1">
           <view class="auth-card__head">
             <text class="auth-card__title">短信验证</text>
@@ -35,18 +40,16 @@
             </view>
           </view>
 
-          <view class="gold-line" />
-
           <!-- 步骤条 -->
           <view class="step-bar">
-            <view class="step-bar__item is-active">
-              <view class="step-bar__dot">1</view>
-              <text class="step-bar__label">验证手机</text>
+            <view class="step-item is-active">
+              <view class="step-item__dot">1</view>
+              <text class="step-item__label">验证手机</text>
             </view>
-            <view class="step-bar__line" />
-            <view class="step-bar__item">
-              <view class="step-bar__dot">2</view>
-              <text class="step-bar__label">设置密码</text>
+            <view class="step-line" />
+            <view class="step-item">
+              <view class="step-item__dot">2</view>
+              <text class="step-item__label">设置密码</text>
             </view>
           </view>
 
@@ -67,7 +70,7 @@
                 @focus="focusState.phone = true"
                 @blur="focusState.phone = false"
               />
-              <view class="field__bar" />
+              <view class="field__line" />
             </view>
           </view>
 
@@ -88,7 +91,7 @@
                 @focus="focusState.code = true"
                 @blur="focusState.code = false"
               />
-              <view class="field__bar" />
+              <view class="field__line" />
             </view>
             <view class="code-btn-row">
               <view
@@ -113,7 +116,7 @@
           </view>
         </template>
 
-        <!-- ========== Step 2: 设置密码 ========== -->
+        <!-- ========== Step 2 ========== -->
         <template v-else>
           <view class="auth-card__head">
             <text class="auth-card__title">设置新密码</text>
@@ -122,18 +125,16 @@
             </text>
           </view>
 
-          <view class="gold-line" />
-
           <!-- 步骤条 -->
           <view class="step-bar">
-            <view class="step-bar__item is-done">
-              <view class="step-bar__dot step-bar__dot--done">✓</view>
-              <text class="step-bar__label">验证手机</text>
+            <view class="step-item is-done">
+              <view class="step-item__dot step-item__dot--done">✓</view>
+              <text class="step-item__label">验证手机</text>
             </view>
-            <view class="step-bar__line is-active" />
-            <view class="step-bar__item is-active">
-              <view class="step-bar__dot">2</view>
-              <text class="step-bar__label">设置密码</text>
+            <view class="step-line is-active" />
+            <view class="step-item is-active">
+              <view class="step-item__dot">2</view>
+              <text class="step-item__label">设置密码</text>
             </view>
           </view>
 
@@ -153,7 +154,7 @@
                 @focus="focusState.pwd = true"
                 @blur="focusState.pwd = false"
               />
-              <view class="field__bar" />
+              <view class="field__line" />
               <view class="field__eye" @click="showPwd = !showPwd">
                 <text class="field__eye-icon">{{ showPwd ? '⊙' : '◉' }}</text>
               </view>
@@ -187,7 +188,7 @@
                 @focus="focusState.confirm = true"
                 @blur="focusState.confirm = false"
               />
-              <view class="field__bar" />
+              <view class="field__line" />
               <view class="field__eye" @click="showConfirm = !showConfirm">
                 <text class="field__eye-icon">{{ showConfirm ? '⊙' : '◉' }}</text>
               </view>
@@ -356,55 +357,21 @@ async function doReset() {
 .auth-page {
   width: 100vw;
   min-height: 100vh;
-  background: #0F1520;
+  background: $bg-primary;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
   box-sizing: border-box;
 }
 
 // ============================================
-//  背景装饰
-// ============================================
-.auth-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.bg-glow {
-  position: absolute;
-  border-radius: 50%;
-
-  &--tl {
-    width: 600rpx;
-    height: 600rpx;
-    top: -200rpx;
-    left: -150rpx;
-    background: radial-gradient(circle, rgba(184, 152, 118, 0.12) 0%, transparent 70%);
-  }
-
-  &--br {
-    width: 500rpx;
-    height: 500rpx;
-    bottom: -150rpx;
-    right: -100rpx;
-    background: radial-gradient(circle, rgba(65, 75, 94, 0.4) 0%, transparent 70%);
-  }
-}
-
-// ============================================
-//  导航栏
+//  顶部导航栏
 // ============================================
 .auth-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(12rpx + env(safe-area-inset-top)) 32rpx 16rpx;
-  position: relative;
-  z-index: 10;
+  padding: calc(12rpx + env(safe-area-inset-top)) 32rpx 12rpx;
+  background: $bg-primary;
   flex-shrink: 0;
 
   &__left {
@@ -414,119 +381,160 @@ async function doReset() {
   }
 
   &__logo {
-    width: 68rpx;
-    height: 68rpx;
-    border-radius: 18rpx;
-    background: rgba(184, 152, 118, 0.12);
-    border: 1rpx solid rgba(184, 152, 118, 0.25);
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 16rpx;
+    background: $mineral-gray;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 0 4rpx 12rpx rgba(47, 53, 66, 0.12);
 
     &-img {
-      width: 46rpx;
-      height: 46rpx;
+      width: 42rpx;
+      height: 42rpx;
       display: block;
     }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4rpx;
   }
 
   &__name {
     font-size: 30rpx;
     font-weight: 700;
-    color: #FFFFFF;
+    color: $mineral-gray;
     letter-spacing: 1rpx;
+    line-height: 1;
   }
 
-  &__link {
-    font-size: 28rpx;
-    color: $bronze-gold;
-    font-weight: 600;
-    padding: 8rpx 4rpx;
+  &__slogan {
+    font-size: 20rpx;
+    color: $mineral-blue;
+    letter-spacing: 0.5rpx;
+    line-height: 1;
   }
 }
 
-// 返回按钮
+.nav-link {
+  font-size: 28rpx;
+  color: $accent-dark;
+  font-weight: 600;
+  padding: 8rpx 4rpx;
+}
+
 .back-btn {
-  width: 64rpx;
-  height: 64rpx;
+  width: 60rpx;
+  height: 60rpx;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(20, 20, 20, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
   &__icon {
-    font-size: 32rpx;
-    color: #FFFFFF;
+    font-size: 30rpx;
+    color: $mineral-gray;
     line-height: 1;
   }
 }
 
 // ============================================
-//  磨砂玻璃卡片
+//  Logo 展示区
 // ============================================
-.auth-card {
+.brand-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx 0 20rpx;
+  position: relative;
+  flex-shrink: 0;
+
+  &__logo-wrap {
+    width: 120rpx;
+    height: 120rpx;
+    border-radius: 32rpx;
+    background: $mineral-gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 6rpx 24rpx rgba(47, 53, 66, 0.18);
+  }
+
+  &__logo {
+    width: 80rpx;
+    height: 80rpx;
+    display: block;
+  }
+
+  &__glow {
+    width: 180rpx;
+    height: 48rpx;
+    background: radial-gradient(ellipse at center, rgba(184, 152, 118, 0.12) 0%, transparent 70%);
+    margin-top: -8rpx;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+// ============================================
+//  表单区
+// ============================================
+.auth-body {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 24rpx 32rpx 48rpx;
-  position: relative;
-  z-index: 10;
+  padding: 8rpx 32rpx 40rpx;
 }
 
-.auth-card__inner {
+.auth-card {
   width: 100%;
-  max-width: 600rpx;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1rpx solid rgba(184, 152, 118, 0.18);
-  border-radius: 40rpx;
-  padding: 48rpx 44rpx;
-  box-sizing: border-box;
-}
+  max-width: 580rpx;
+  background: $bg-secondary;
+  border-radius: $radius-xl;
+  padding: 40rpx 40rpx 48rpx;
+  box-shadow: 0 2rpx 24rpx rgba(47, 53, 66, 0.05);
+  border: 1rpx solid rgba(20, 20, 20, 0.05);
 
-.auth-card__head {
-  margin-bottom: 32rpx;
-}
+  &__head { margin-bottom: 32rpx; }
 
-.auth-card__title {
-  display: block;
-  font-size: 48rpx;
-  font-weight: 700;
-  color: #FFFFFF;
-  letter-spacing: 0;
-  margin-bottom: 12rpx;
-  line-height: 1.1;
-}
+  &__title {
+    display: block;
+    font-size: 44rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    letter-spacing: 0;
+    margin-bottom: 12rpx;
+    line-height: 1.1;
+  }
 
-.auth-card__sub-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 2rpx;
-}
+  &__sub-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 2rpx;
+  }
 
-.auth-card__sub {
-  display: block;
-  font-size: 25rpx;
-  color: rgba(255, 255, 255, 0.45);
-  line-height: 1.5;
+  &__sub {
+    display: block;
+    font-size: 25rpx;
+    color: $text-muted;
+    line-height: 1.5;
+  }
 }
 
 .phone-marked {
-  color: $bronze-gold;
+  color: $accent-dark;
   font-weight: 600;
-}
-
-.gold-line {
-  height: 1rpx;
-  background: linear-gradient(90deg, rgba(184, 152, 118, 0.5) 0%, rgba(184, 152, 118, 0.1) 70%, transparent 100%);
-  margin-bottom: 32rpx;
 }
 
 // ============================================
@@ -536,26 +544,26 @@ async function doReset() {
   display: flex;
   align-items: center;
   margin-bottom: 36rpx;
+}
 
-  &__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8rpx;
-  }
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
 
   &__dot {
     width: 52rpx;
     height: 52rpx;
     border-radius: 50%;
-    border: 2rpx solid rgba(255, 255, 255, 0.12);
+    border: 2rpx solid rgba(20, 20, 20, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 22rpx;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.35);
-    background: rgba(255, 255, 255, 0.03);
+    color: $text-muted;
+    background: rgba(20, 20, 20, 0.02);
     transition: all 0.35s ease;
 
     &--done {
@@ -568,38 +576,38 @@ async function doReset() {
 
   &__label {
     font-size: 21rpx;
-    color: rgba(255, 255, 255, 0.35);
+    color: $text-muted;
     font-weight: 500;
     white-space: nowrap;
   }
 
-  &__line {
-    flex: 1;
-    height: 2rpx;
-    background: rgba(255, 255, 255, 0.08);
-    margin: 0 16rpx;
-    margin-bottom: 32rpx;
-    transition: background 0.35s ease;
-
-    &.is-active {
-      background: rgba(184, 152, 118, 0.5);
-    }
+  &.is-active &__dot {
+    border-color: $accent-dark;
+    background: rgba(142, 116, 89, 0.1);
+    color: $accent-dark;
+    box-shadow: 0 0 16rpx rgba(142, 116, 89, 0.2);
   }
 
-  &__item.is-active &__dot {
-    border-color: $bronze-gold;
-    background: rgba(184, 152, 118, 0.15);
-    color: $bronze-gold;
-    box-shadow: 0 0 16rpx rgba(184, 152, 118, 0.3);
-  }
-
-  &__item.is-active &__label {
-    color: $bronze-gold;
+  &.is-active &__label {
+    color: $accent-dark;
     font-weight: 600;
   }
 
-  &__item.is-done &__label {
+  &.is-done &__label {
     color: $success;
+  }
+}
+
+.step-line {
+  flex: 1;
+  height: 2rpx;
+  background: rgba(20, 20, 20, 0.07);
+  margin: 0 16rpx;
+  margin-bottom: 32rpx;
+  transition: background 0.35s ease;
+
+  &.is-active {
+    background: rgba(142, 116, 89, 0.4);
   }
 }
 
@@ -612,12 +620,11 @@ async function doReset() {
 
 .field-label {
   display: block;
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 23rpx;
+  color: $text-secondary;
   font-weight: 500;
   margin-bottom: 10rpx;
-  letter-spacing: 1rpx;
-  text-transform: uppercase;
+  letter-spacing: 0.5rpx;
 }
 
 .field {
@@ -631,22 +638,22 @@ async function doReset() {
     border-radius: 0;
     font-size: 30rpx;
     font-weight: 500;
-    color: #FFFFFF;
+    color: $mineral-gray;
     padding: 0;
     box-sizing: border-box;
 
-    &::placeholder { color: rgba(255, 255, 255, 0.2); font-weight: 400; }
+    &::placeholder { color: $text-muted; font-weight: 400; }
     &:focus { outline: none; }
   }
 
-  &__bar {
+  &__line {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 2rpx;
-    background: rgba(184, 152, 118, 0.2);
-    transition: background 0.35s ease;
+    background: rgba(20, 20, 20, 0.08);
+    transition: background 0.3s ease;
 
     &::after {
       content: '';
@@ -655,18 +662,13 @@ async function doReset() {
       left: 0;
       width: 0;
       height: 2rpx;
-      background: linear-gradient(90deg, $bronze-gold, $bronze-light);
+      background: linear-gradient(90deg, $accent-dark, $bronze-gold);
       border-radius: 2rpx;
       transition: width 0.4s ease;
     }
 
-    .is-focused & {
-      background: rgba(184, 152, 118, 0.5);
-      &::after { width: 100%; }
-    }
-    .is-filled & {
-      &::after { width: 100%; }
-    }
+    .is-focused & { &::after { width: 100%; } }
+    .is-filled & { &::after { width: 100%; } }
   }
 
   &__eye {
@@ -682,14 +684,14 @@ async function doReset() {
 
     &-icon {
       font-size: 32rpx;
-      color: rgba(255, 255, 255, 0.4);
+      color: $text-muted;
       line-height: 1;
     }
   }
 }
 
 // ============================================
-//  验证码按钮（独立成行）
+//  验证码按钮
 // ============================================
 .code-btn-row {
   margin-top: 14rpx;
@@ -703,22 +705,21 @@ async function doReset() {
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 1.5rpx solid rgba(184, 152, 118, 0.5);
+  border: 1.5rpx solid rgba(142, 116, 89, 0.4);
   border-radius: 30rpx;
   font-size: 23rpx;
-  color: $bronze-gold;
+  color: $accent-dark;
   font-weight: 600;
-  letter-spacing: 0.5rpx;
   transition: all 0.3s ease;
 
   &:active {
-    background: rgba(184, 152, 118, 0.1);
+    background: rgba(142, 116, 89, 0.08);
     transform: scale(0.98);
   }
 
   &.is-counting {
-    color: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.1);
+    color: $text-muted;
+    border-color: rgba(20, 20, 20, 0.1);
   }
 }
 
@@ -735,7 +736,7 @@ async function doReset() {
 .pwd-track {
   flex: 1;
   height: 6rpx;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(20, 20, 20, 0.06);
   border-radius: 3rpx;
   overflow: hidden;
 }
@@ -752,7 +753,7 @@ async function doReset() {
 
 .pwd-hint {
   font-size: 21rpx;
-  color: rgba(255, 255, 255, 0.4);
+  color: $text-muted;
   flex-shrink: 0;
 }
 
@@ -770,20 +771,20 @@ async function doReset() {
 //  提交按钮
 // ============================================
 .btn-submit {
-  height: 104rpx;
-  border-radius: 52rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 8rpx 32rpx rgba(184, 152, 118, 0.25), inset 0 1rpx 0 rgba(255,255,255,0.1);
+  box-shadow: 0 6rpx 28rpx rgba(47, 53, 66, 0.18);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:active {
     transform: scale(0.985);
-    box-shadow: 0 4rpx 16rpx rgba(184, 152, 118, 0.2);
+    box-shadow: 0 3rpx 14rpx rgba(47, 53, 66, 0.12);
   }
 
   &.is-disabled {
-    opacity: 0.4;
+    opacity: 0.45;
     pointer-events: none;
   }
 
@@ -796,7 +797,7 @@ async function doReset() {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, $bronze-gold 0%, $bronze-dark 100%);
+    background: $mineral-gray;
     border-radius: inherit;
   }
 
@@ -838,8 +839,9 @@ async function doReset() {
 
   &__link {
     font-size: 24rpx;
-    color: rgba(255, 255, 255, 0.3);
+    color: $text-muted;
     font-weight: 500;
+    opacity: 0.65;
   }
 }
 </style>

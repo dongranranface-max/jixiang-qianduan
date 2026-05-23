@@ -2,41 +2,43 @@
   <view class="auth-page">
 
     <!-- ============================================
-      深色毛玻璃背景
-    ============================================ -->
-    <view class="auth-bg">
-      <!-- 渐变光晕装饰 -->
-      <view class="bg-glow bg-glow--tl" />
-      <view class="bg-glow bg-glow--br" />
-    </view>
-
-    <!-- ============================================
-      顶部导航栏
+      顶部导航栏（白底）
     ============================================ -->
     <view class="auth-nav">
       <view class="auth-nav__brand">
         <view class="auth-nav__logo">
           <image class="auth-nav__logo-img" src="/static/logo.png" mode="aspectFit" />
         </view>
-        <text class="auth-nav__name">集享公社</text>
+        <view class="auth-nav__text">
+          <text class="auth-nav__name">集享公社</text>
+          <text class="auth-nav__slogan">集轻奢·享财富</text>
+        </view>
       </view>
-      <text class="auth-nav__link" @click="goRegister">注册</text>
+      <view class="auth-nav__actions">
+        <text class="nav-link" @click="goRegister">注册</text>
+      </view>
     </view>
 
     <!-- ============================================
-      表单卡片（磨砂毛玻璃）
+      Logo 展示区（品牌高地）
     ============================================ -->
-    <view class="auth-card">
-      <view class="auth-card__inner">
+    <view class="brand-hero">
+      <view class="brand-hero__logo-wrap">
+        <image class="brand-hero__logo" src="/static/logo.png" mode="aspectFit" />
+      </view>
+      <view class="brand-hero__glow" />
+    </view>
 
-        <!-- 标题 -->
+    <!-- ============================================
+      表单区域
+    ============================================ -->
+    <view class="auth-body">
+      <view class="auth-card">
+
         <view class="auth-card__head">
           <text class="auth-card__title">欢迎回来</text>
           <text class="auth-card__sub">请输入您的账号信息</text>
         </view>
-
-        <!-- 分隔线 -->
-        <view class="gold-line" />
 
         <!-- 手机号 -->
         <view class="field-group">
@@ -55,7 +57,7 @@
               @focus="onFocus('phone')"
               @blur="onBlur('phone')"
             />
-            <view class="field__bar" />
+            <view class="field__line" />
           </view>
         </view>
 
@@ -75,7 +77,7 @@
               @focus="onFocus('pwd')"
               @blur="onBlur('pwd')"
             />
-            <view class="field__bar" />
+            <view class="field__line" />
             <view class="field__eye" @click="showPwd = !showPwd">
               <text class="field__eye-icon">{{ showPwd ? '⊙' : '◉' }}</text>
             </view>
@@ -83,8 +85,8 @@
         </view>
 
         <!-- 忘记密码 -->
-        <view class="row row--end">
-          <text class="link" @click="goForgot">忘记密码？</text>
+        <view class="forget-row">
+          <text class="forget-link" @click="goForgot">忘记密码？</text>
         </view>
 
         <!-- 提交按钮 -->
@@ -183,49 +185,13 @@ async function doLogin() {
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
 
-// ============================================
-//  全屏深色页面
-// ============================================
 .auth-page {
   width: 100vw;
   min-height: 100vh;
-  background: #0F1520;
+  background: $bg-primary;
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
   box-sizing: border-box;
-}
-
-// ============================================
-//  深色背景装饰
-// ============================================
-.auth-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.bg-glow {
-  position: absolute;
-  border-radius: 50%;
-
-  &--tl {
-    width: 600rpx;
-    height: 600rpx;
-    top: -200rpx;
-    left: -150rpx;
-    background: radial-gradient(circle, rgba(184, 152, 118, 0.12) 0%, transparent 70%);
-  }
-
-  &--br {
-    width: 500rpx;
-    height: 500rpx;
-    bottom: -150rpx;
-    right: -100rpx;
-    background: radial-gradient(circle, rgba(65, 75, 94, 0.4) 0%, transparent 70%);
-  }
 }
 
 // ============================================
@@ -235,9 +201,8 @@ async function doLogin() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(16rpx + env(safe-area-inset-top)) 40rpx 20rpx;
-  position: relative;
-  z-index: 10;
+  padding: calc(16rpx + env(safe-area-inset-top)) 40rpx 16rpx;
+  background: $bg-primary;
   flex-shrink: 0;
 
   &__brand {
@@ -250,13 +215,13 @@ async function doLogin() {
     width: 72rpx;
     height: 72rpx;
     border-radius: 20rpx;
-    background: rgba(184, 152, 118, 0.12);
-    border: 1rpx solid rgba(184, 152, 118, 0.25);
+    background: $mineral-gray;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 0 4rpx 16rpx rgba(47, 53, 66, 0.15);
 
     &-img {
       width: 48rpx;
@@ -265,55 +230,108 @@ async function doLogin() {
     }
   }
 
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4rpx;
+  }
+
   &__name {
     font-size: 32rpx;
     font-weight: 700;
-    color: #FFFFFF;
+    color: $mineral-gray;
     letter-spacing: 1rpx;
+    line-height: 1;
   }
 
-  &__link {
-    font-size: 28rpx;
-    color: $bronze-gold;
-    font-weight: 600;
-    padding: 8rpx 4rpx;
+  &__slogan {
+    font-size: 20rpx;
+    color: $mineral-blue;
+    letter-spacing: 0.5rpx;
+    line-height: 1;
+  }
+
+  &__actions { flex-shrink: 0; }
+}
+
+.nav-link {
+  font-size: 28rpx;
+  color: $accent-dark;
+  font-weight: 600;
+  padding: 8rpx 4rpx;
+}
+
+// ============================================
+//  Logo 展示区
+// ============================================
+.brand-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0 24rpx;
+  position: relative;
+  flex-shrink: 0;
+
+  &__logo-wrap {
+    width: 140rpx;
+    height: 140rpx;
+    border-radius: 36rpx;
+    background: $mineral-gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 8rpx 32rpx rgba(47, 53, 66, 0.2);
+  }
+
+  &__logo {
+    width: 96rpx;
+    height: 96rpx;
+    display: block;
+  }
+
+  // Logo 底部光晕
+  &__glow {
+    width: 200rpx;
+    height: 60rpx;
+    background: radial-gradient(ellipse at center, rgba(184, 152, 118, 0.15) 0%, transparent 70%);
+    margin-top: -10rpx;
+    position: relative;
+    z-index: 1;
   }
 }
 
 // ============================================
-//  磨砂玻璃表单卡片
+//  表单区
 // ============================================
-.auth-card {
+.auth-body {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 48rpx 32rpx;
-  position: relative;
-  z-index: 10;
+  padding: 16rpx 32rpx 24rpx;
+}
 
-  &__inner {
-    width: 100%;
-    max-width: 600rpx;
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1rpx solid rgba(184, 152, 118, 0.18);
-    border-radius: 40rpx;
-    padding: 56rpx 48rpx;
-    box-sizing: border-box;
-  }
+.auth-card {
+  width: 100%;
+  max-width: 580rpx;
+  background: $bg-secondary;
+  border-radius: $radius-xl;
+  padding: 44rpx 44rpx;
+  box-shadow: 0 2rpx 24rpx rgba(47, 53, 66, 0.05), 0 1rpx 3rpx rgba(0, 0, 0, 0.03);
+  border: 1rpx solid rgba(20, 20, 20, 0.05);
 
   &__head {
-    margin-bottom: 40rpx;
+    margin-bottom: 36rpx;
   }
 
   &__title {
     display: block;
-    font-size: 52rpx;
+    font-size: 48rpx;
     font-weight: 700;
-    color: #FFFFFF;
+    color: $mineral-gray;
     letter-spacing: 0;
     margin-bottom: 10rpx;
     line-height: 1.1;
@@ -322,34 +340,26 @@ async function doLogin() {
   &__sub {
     display: block;
     font-size: 26rpx;
-    color: rgba(255, 255, 255, 0.45);
+    color: $text-muted;
     font-weight: 400;
     line-height: 1.4;
   }
-}
-
-// 铜金分隔线
-.gold-line {
-  height: 1rpx;
-  background: linear-gradient(90deg, rgba(184, 152, 118, 0.5) 0%, rgba(184, 152, 118, 0.1) 70%, transparent 100%);
-  margin-bottom: 40rpx;
 }
 
 // ============================================
 //  字段组
 // ============================================
 .field-group {
-  margin-bottom: 32rpx;
+  margin-bottom: 28rpx;
 }
 
 .field-label {
   display: block;
   font-size: 23rpx;
-  color: rgba(255, 255, 255, 0.5);
+  color: $text-secondary;
   font-weight: 500;
-  margin-bottom: 12rpx;
-  letter-spacing: 1rpx;
-  text-transform: uppercase;
+  margin-bottom: 10rpx;
+  letter-spacing: 0.5rpx;
 }
 
 .field {
@@ -363,23 +373,22 @@ async function doLogin() {
     border-radius: 0;
     font-size: 30rpx;
     font-weight: 500;
-    color: #FFFFFF;
+    color: $mineral-gray;
     padding: 0;
     box-sizing: border-box;
 
-    &::placeholder { color: rgba(255, 255, 255, 0.25); font-weight: 400; }
-    &:focus { outline: none; }
+    &::placeholder { color: $text-muted; font-weight: 400; }
+    &:focus { outline: none; background: transparent; }
   }
 
-  // 底部铜金条
-  &__bar {
+  &__line {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 2rpx;
-    background: rgba(184, 152, 118, 0.2);
-    transition: background 0.35s ease;
+    background: rgba(20, 20, 20, 0.08);
+    transition: background 0.3s ease;
 
     &::after {
       content: '';
@@ -388,13 +397,13 @@ async function doLogin() {
       left: 0;
       width: 0;
       height: 2rpx;
-      background: linear-gradient(90deg, $bronze-gold, $bronze-light);
+      background: linear-gradient(90deg, $accent-dark, $bronze-gold);
       border-radius: 2rpx;
       transition: width 0.4s ease;
     }
 
     .is-focused & {
-      background: rgba(184, 152, 118, 0.5);
+      background: rgba(20, 20, 20, 0.05);
       &::after { width: 100%; }
     }
     .is-filled & {
@@ -402,7 +411,6 @@ async function doLogin() {
     }
   }
 
-  // 眼睛
   &__eye {
     position: absolute;
     right: 0;
@@ -416,42 +424,40 @@ async function doLogin() {
 
     &-icon {
       font-size: 32rpx;
-      color: rgba(255, 255, 255, 0.4);
+      color: $text-muted;
       line-height: 1;
     }
   }
 }
 
 // ============================================
-//  操作链接
+//  忘记密码
 // ============================================
-.row {
+.forget-row {
   display: flex;
-  margin-bottom: 36rpx;
-
-  &--end { justify-content: flex-end; }
-  &--between { justify-content: space-between; }
+  justify-content: flex-end;
+  margin-bottom: 32rpx;
 }
 
-.link {
+.forget-link {
   font-size: 24rpx;
-  color: $bronze-gold;
+  color: $accent-dark;
   font-weight: 500;
 }
 
 // ============================================
-//  提交按钮（铜金渐变）
+//  提交按钮
 // ============================================
 .btn-submit {
-  height: 104rpx;
-  border-radius: 52rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 8rpx 32rpx rgba(184, 152, 118, 0.25), inset 0 1rpx 0 rgba(255,255,255,0.1);
+  box-shadow: 0 6rpx 28rpx rgba(47, 53, 66, 0.18);
 
   &:active {
     transform: scale(0.985);
-    box-shadow: 0 4rpx 16rpx rgba(184, 152, 118, 0.2);
+    box-shadow: 0 3rpx 14rpx rgba(47, 53, 66, 0.12);
   }
 
   &.is-loading { opacity: 0.75; }
@@ -463,7 +469,7 @@ async function doLogin() {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, $bronze-gold 0%, $bronze-dark 100%);
+    background: $mineral-gray;
     border-radius: inherit;
   }
 
@@ -500,24 +506,22 @@ async function doLogin() {
 //  底部协议
 // ============================================
 .auth-footer {
-  padding: 24rpx 40rpx 48rpx;
+  padding: 20rpx 40rpx 40rpx;
   display: flex;
   justify-content: center;
-  position: relative;
-  z-index: 10;
   flex-shrink: 0;
 
   &__text {
     font-size: 22rpx;
-    color: rgba(255, 255, 255, 0.3);
+    color: $text-muted;
     text-align: center;
     line-height: 1.6;
+    opacity: 0.7;
   }
 
   &__link {
-    color: $bronze-gold;
+    color: $accent-dark;
     font-weight: 500;
-    opacity: 0.8;
   }
 }
 </style>
