@@ -17,22 +17,13 @@
           <text class="auth-nav__slogan">集轻奢 · 享财富</text>
         </view>
       </view>
-      <text class="nav-link" @click="goLogin">登录</text>
-    </view>
-
-    <!-- ============================================
-      品牌英雄区
-    ============================================ -->
-    <view class="brand-hero">
-      <view class="brand-hero__halo" />
-      <view class="brand-hero__logo-card">
-        <image class="brand-hero__logo" src="/static/logo.png" mode="aspectFit" />
+      <view class="nav-pill" @click="goLogin">
+        <text class="nav-pill__text">登录</text>
       </view>
-      <view class="brand-hero__warm-glow" />
     </view>
 
     <!-- ============================================
-      表单区域
+      表单区域（去除品牌英雄区重复 Logo）
     ============================================ -->
     <view class="auth-body">
       <view class="auth-card">
@@ -458,7 +449,7 @@ async function doReset() {
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
-    &-img { width: 42rpx; height: 42rpx; display: block; }
+    &-img { width: 42rpx; height: 42rpx; display: block; object-fit: contain; }
   }
 
   &__text { display: flex; flex-direction: column; gap: 5rpx; }
@@ -498,24 +489,31 @@ async function doReset() {
   }
 }
 
-.nav-link {
-  font-size: 26rpx;
-  color: $bronze-gold;
-  font-weight: 600;
-  padding: 8rpx 2rpx;
-  letter-spacing: 0.5rpx;
-  position: relative;
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background: rgba(184, 152, 118, 0.12);
+  border: 1.5rpx solid rgba(184, 152, 118, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 4rpx;
-    left: 0;
-    right: 0;
-    height: 2rpx;
-    background: $bronze-gold;
-    border-radius: 2rpx;
-    opacity: 0.5;
+  &:active {
+    background: rgba(184, 152, 118, 0.22);
+    border-color: rgba(184, 152, 118, 0.45);
+  }
+
+  &__text {
+    font-size: 24rpx;
+    color: $bronze-gold;
+    font-weight: 600;
+    letter-spacing: 0.5rpx;
+    line-height: 1;
   }
 }
 
@@ -693,7 +691,7 @@ async function doReset() {
 // ============================================
 .fl-field {
   position: relative;
-  margin-bottom: 36rpx;
+  margin-bottom: 48rpx;
 
   &.is-focused .fl-field__body {
     border-color: $auth-input-border-focus;
@@ -729,7 +727,7 @@ async function doReset() {
 
   &__body {
     position: relative;
-    height: 100rpx;
+    height: 104rpx;
     background: $auth-input-bg;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -738,6 +736,7 @@ async function doReset() {
     box-shadow: inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04);
     transition: border-color 0.28s ease, box-shadow 0.28s ease;
     overflow: hidden;
+    box-sizing: border-box;
 
     &--row {
       display: flex;
@@ -799,7 +798,7 @@ async function doReset() {
 
   &__eye {
     position: absolute;
-    right: 8rpx;
+    right: 32rpx;
     top: 50%;
     transform: translateY(-50%);
     width: 72rpx;
@@ -823,8 +822,8 @@ async function doReset() {
 //  圆形倒计时
 // ============================================
 .countdown-ring {
-  width: 100rpx;
-  height: 100rpx;
+  width: 104rpx;
+  height: 104rpx;
   flex-shrink: 0;
   position: relative;
   display: flex;
@@ -832,6 +831,7 @@ async function doReset() {
   justify-content: center;
   cursor: pointer;
   margin-left: 12rpx;
+  right: 0;
 
   &__svg {
     position: absolute;

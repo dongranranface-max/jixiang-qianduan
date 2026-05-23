@@ -15,23 +15,14 @@
         </view>
       </view>
       <view class="auth-nav__actions">
-        <text class="nav-link" @click="goRegister">注册账号</text>
+        <view class="nav-pill" @click="goRegister">
+          <text class="nav-pill__text">注册账号</text>
+        </view>
       </view>
     </view>
 
     <!-- ============================================
-      品牌英雄区
-    ============================================ -->
-    <view class="brand-hero">
-      <view class="brand-hero__halo" />
-      <view class="brand-hero__logo-card">
-        <image class="brand-hero__logo" src="/static/logo.png" mode="aspectFit" />
-      </view>
-      <view class="brand-hero__warm-glow" />
-    </view>
-
-    <!-- ============================================
-      表单区域
+      表单区域（去除品牌英雄区重复 Logo）
     ============================================ -->
     <view class="auth-body">
       <view class="auth-card">
@@ -292,7 +283,7 @@ async function doLogin() {
     overflow: hidden;
     flex-shrink: 0;
 
-    &-img { width: 44rpx; height: 44rpx; display: block; }
+    &-img { width: 44rpx; height: 44rpx; display: block; object-fit: contain; }
   }
 
   &__text { display: flex; flex-direction: column; gap: 5rpx; }
@@ -316,24 +307,31 @@ async function doLogin() {
   &__actions { flex-shrink: 0; }
 }
 
-.nav-link {
-  font-size: 27rpx;
-  color: $bronze-gold;
-  font-weight: 600;
-  padding: 8rpx 2rpx;
-  letter-spacing: 0.5rpx;
-  position: relative;
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background: rgba(184, 152, 118, 0.12);
+  border: 1.5rpx solid rgba(184, 152, 118, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 4rpx;
-    left: 0;
-    right: 0;
-    height: 2rpx;
-    background: $bronze-gold;
-    border-radius: 2rpx;
-    opacity: 0.5;
+  &:active {
+    background: rgba(184, 152, 118, 0.22);
+    border-color: rgba(184, 152, 118, 0.45);
+  }
+
+  &__text {
+    font-size: 24rpx;
+    color: $bronze-gold;
+    font-weight: 600;
+    letter-spacing: 0.5rpx;
+    line-height: 1;
   }
 }
 
@@ -467,7 +465,7 @@ async function doLogin() {
   // 输入区
   &__body {
     position: relative;
-    height: 100rpx;
+    height: 104rpx;
     background: $auth-input-bg;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -478,6 +476,7 @@ async function doLogin() {
       border-color 0.28s ease,
       box-shadow 0.28s ease;
     overflow: hidden;
+    box-sizing: border-box;
   }
 
   // 输入框本体
@@ -732,6 +731,7 @@ async function doLogin() {
     width: 40rpx;
     height: 40rpx;
     display: block;
+    object-fit: contain;
   }
 
   &__label {

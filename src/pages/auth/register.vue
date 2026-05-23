@@ -2,7 +2,7 @@
   <view class="auth-page">
 
     <!-- ============================================
-      顶部导航栏
+      顶部导航栏（只保留这里一个 Logo）
     ============================================ -->
     <view class="auth-nav">
       <view class="auth-nav__brand">
@@ -14,24 +14,16 @@
           <text class="auth-nav__slogan">集轻奢 · 享财富</text>
         </view>
       </view>
+      <!-- 登录入口 → 胶囊按钮 -->
       <view class="auth-nav__actions">
-        <text class="nav-link" @click="goLogin">登录</text>
+        <view class="nav-pill" @click="goLogin">
+          <text class="nav-pill__text">登录</text>
+        </view>
       </view>
     </view>
 
     <!-- ============================================
-      品牌英雄区
-    ============================================ -->
-    <view class="brand-hero">
-      <view class="brand-hero__halo" />
-      <view class="brand-hero__logo-card">
-        <image class="brand-hero__logo" src="/static/logo.png" mode="aspectFit" />
-      </view>
-      <view class="brand-hero__warm-glow" />
-    </view>
-
-    <!-- ============================================
-      表单区域
+      表单区域（去除品牌英雄区重复 Logo）
     ============================================ -->
     <view class="auth-body">
       <scroll-view scroll-y class="auth-scroll" :show-scrollbar="false">
@@ -71,6 +63,7 @@
               <text class="fl-field__label" :class="{ 'is-float': codeFloatState }">短信验证码</text>
             </view>
             <view class="fl-field__body fl-field__body--row">
+              <!-- 输入区 -->
               <view class="fl-field__code-wrap">
                 <input
                   class="fl-field__input"
@@ -86,7 +79,7 @@
                   <text class="fl-field__float-text">6位验证码</text>
                 </view>
               </view>
-              <!-- 圆形倒计时 -->
+              <!-- 圆形倒计时（right: 16px 垂直居中） -->
               <view class="countdown-ring" :class="{ 'is-counting': countdown > 0 }" @click="sendCode">
                 <svg class="countdown-ring__svg" viewBox="0 0 56 56">
                   <circle
@@ -114,7 +107,7 @@
             </view>
           </view>
 
-          <!-- 密码 ─ FL 浮动标签 -->
+          <!-- 密码 ─ FL 浮动标签（眼睛 right: 16px） -->
           <view class="fl-field" :class="pwdFieldClass">
             <view class="fl-field__label-row">
               <text class="fl-field__label" :class="{ 'is-float': pwdFloatState }">登录密码</text>
@@ -131,6 +124,7 @@
               <view class="fl-field__float-label" :class="{ 'is-active': pwdFloatState }">
                 <text class="fl-field__float-text">6位以上数字与字母</text>
               </view>
+              <!-- 眼睛图标（right: 16px） -->
               <view class="fl-field__eye" @click="showPwd = !showPwd">
                 <svg v-if="showPwd" class="fl-field__eye-svg" viewBox="0 0 24 24" fill="none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -144,12 +138,13 @@
             </view>
           </view>
 
-          <!-- 邀请码 ─ FL 浮动标签（弱化） -->
+          <!-- 邀请码 ─ FL 浮动标签 -->
           <view class="fl-field fl-field--muted" :class="inviteFieldClass">
             <view class="fl-field__label-row">
-              <text class="fl-field__label fl-field__label--muted" :class="{ 'is-float': inviteFloatState }">
-                邀请码 <text class="fl-field__optional">（选填）</text>
-              </text>
+              <text
+                class="fl-field__label fl-field__label--muted"
+                :class="{ 'is-float': inviteFloatState }"
+              >邀请码 <text class="fl-field__optional">（选填）</text></text>
             </view>
             <view class="fl-field__body fl-field__body--muted">
               <input
@@ -165,7 +160,7 @@
             </view>
           </view>
 
-          <!-- 协议勾选 -->
+          <!-- 协议勾选 ─ 整行可点击热区 -->
           <view class="terms-row" @click="agreed = !agreed">
             <view class="check-square" :class="{ 'is-checked': agreed }">
               <text v-if="agreed" class="check-square__icon">✓</text>
@@ -261,22 +256,18 @@ const inviteFieldClass = computed(() => ({
   'is-filled': form.value.inviteCode.length > 0,
 }))
 
-// ─── 圆形倒计时 offset ────────────────────────────
-// 圆环周长 = 2 * PI * 24 ≈ 150.79，取 151.9
+// ─── 圆形倒计时 ─────────────────────────────────
 const CIRCUMFERENCE = 151.9
 const countdownOffset = computed(() => {
   if (countdown.value <= 0) return CIRCUMFERENCE
-  const progress = countdown.value / 60
-  return CIRCUMFERENCE * (1 - progress)
+  return CIRCUMFERENCE * (1 - countdown.value / 60)
 })
 
-const canSubmit = computed(() => {
-  return (
-    form.value.phone.length === 11 &&
-    form.value.code.length === 6 &&
-    form.value.password.length >= 6
-  )
-})
+const canSubmit = computed(() =>
+  form.value.phone.length === 11 &&
+  form.value.code.length === 6 &&
+  form.value.password.length >= 6
+)
 
 // ─── Focus / Blur ─────────────────────────────────
 function onFocus(field: 'phone' | 'code' | 'pwd' | 'invite') { focusState[field] = true }
@@ -348,13 +339,19 @@ async function doRegister() {
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
 
+// ============================================================
+//  全局 box-sizing 重置
+// ============================================================
 .auth-page {
-  width: 100vw;
-  min-height: 100vh;
+  width: 100%;
+  min-height: 100vh;          // 改：不用 height: 100vh，避免拉伸
   background: $bg-primary;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
+  box-sizing: border-box;      // 全局强制 border-box
+  overflow-x: hidden;          // 防横向溢出
+  padding-left: 0;
+  padding-right: 0;
 }
 
 // ============================================
@@ -364,115 +361,101 @@ async function doRegister() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(16rpx + env(safe-area-inset-top)) 44rpx 14rpx;
+  padding: calc(14rpx + env(safe-area-inset-top)) 32rpx 14rpx;
   background: $bg-primary;
   flex-shrink: 0;
 
-  &__brand { display: flex; align-items: center; gap: 18rpx; }
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 16rpx;
+  }
+
+  // Logo 图片强制 contain
   &__logo {
     @include logo-card;
-    width: 68rpx;
-    height: 68rpx;
-    border-radius: 20rpx;
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 18rpx;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
-    &-img { width: 44rpx; height: 44rpx; display: block; }
+
+    &-img {
+      width: 42rpx;
+      height: 42rpx;
+      object-fit: contain;     // 修复图片比例
+      display: block;
+    }
   }
-  &__text { display: flex; flex-direction: column; gap: 5rpx; }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 5rpx;
+  }
+
   &__name {
-    font-size: 30rpx;
+    font-size: 28rpx;
     font-weight: 800;
     color: $mineral-gray;
-    letter-spacing: 1.5rpx;
+    letter-spacing: 1.2rpx;
     line-height: 1;
   }
+
   &__slogan {
-    font-size: 19rpx;
+    font-size: 18rpx;
     color: $bronze-gold;
     font-weight: 400;
-    letter-spacing: 0.6rpx;
+    letter-spacing: 0.5rpx;
     line-height: 1;
   }
+
   &__actions { flex-shrink: 0; }
 }
 
-.nav-link {
-  font-size: 27rpx;
-  color: $bronze-gold;
-  font-weight: 600;
-  padding: 8rpx 2rpx;
-  letter-spacing: 0.5rpx;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 4rpx;
-    left: 0;
-    right: 0;
-    height: 2rpx;
-    background: $bronze-gold;
-    border-radius: 2rpx;
-    opacity: 0.5;
-  }
-}
-
-// ============================================
-//  品牌英雄区
-// ============================================
-.brand-hero {
-  display: flex;
-  flex-direction: column;
+// ─── 登录入口 → 胶囊按钮（替代纯文字下划线）──
+.nav-pill {
+  display: inline-flex;
   align-items: center;
-  padding: 32rpx 0 18rpx;
-  position: relative;
-  flex-shrink: 0;
+  justify-content: center;
+  height: 56rpx;              // 触控热区
+  padding: 0 24rpx;
+  border-radius: 999rpx;
+  background: rgba(184, 152, 118, 0.12);
+  border: 1.5rpx solid rgba(184, 152, 118, 0.28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
 
-  &__halo {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 320rpx;
-    height: 200rpx;
-    background: radial-gradient(ellipse at 50% 40%, rgba(184, 152, 118, 0.13) 0%, transparent 68%);
-    pointer-events: none;
+  &:active {
+    background: rgba(184, 152, 118, 0.22);
+    border-color: rgba(184, 152, 118, 0.45);
   }
-  &__logo-card {
-    @include logo-card;
-    width: 148rpx;
-    height: 148rpx;
-    border-radius: 38rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    z-index: 2;
-  }
-  &__logo { width: 96rpx; height: 96rpx; display: block; }
-  &__warm-glow {
-    width: 220rpx;
-    height: 56rpx;
-    background: radial-gradient(ellipse at 50% 50%, rgba(184, 152, 118, 0.18) 0%, transparent 68%);
-    margin-top: -8rpx;
-    position: relative;
-    z-index: 1;
+
+  &__text {
+    font-size: 24rpx;
+    color: $bronze-gold;
+    font-weight: 600;
+    letter-spacing: 0.5rpx;
+    line-height: 1;
   }
 }
 
 // ============================================
-//  表单区域
+//  表单区域（去除重复 Logo）
 // ============================================
 .auth-body {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8rpx 36rpx 0;
+  padding: 0 32rpx;           // 左右各 32rpx 安全区（≈20px）
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .auth-scroll {
@@ -484,10 +467,12 @@ async function doRegister() {
 
 .auth-card {
   width: 100%;
+  box-sizing: border-box;       // 全局 border-box
   @include auth-card;
-  padding: 40rpx 44rpx 48rpx;
+  padding: 40rpx 48rpx 52rpx; // 左右 48rpx ≈ 20px 安全区
 
-  &__head { margin-bottom: 36rpx; }
+  &__head { margin-bottom: 40rpx; }
+
   &__title {
     display: block;
     font-size: 52rpx;
@@ -497,6 +482,7 @@ async function doRegister() {
     margin-bottom: 12rpx;
     line-height: 1.1;
   }
+
   &__sub {
     display: block;
     font-size: 26rpx;
@@ -507,13 +493,13 @@ async function doRegister() {
 }
 
 // ============================================
-//  FL 浮动标签字段
+//  FL 浮动标签字段（统一高度 104rpx ≈ 52px）
 // ============================================
 .fl-field {
   position: relative;
-  margin-bottom: 36rpx;
+  margin-bottom: 48rpx;        // 修复：从 36rpx 改为 48rpx（≈24px）
 
-  // 金色 focus
+  // 金色 focus 描边
   &.is-focused .fl-field__body {
     border-color: $auth-input-border-focus;
     box-shadow:
@@ -521,6 +507,7 @@ async function doRegister() {
       0 0 0 4rpx rgba(184, 152, 118, 0.14);
   }
 
+  // 标签行
   &__label-row {
     height: 36rpx;
     display: flex;
@@ -528,6 +515,7 @@ async function doRegister() {
     margin-bottom: 8rpx;
   }
 
+  // 静态标签文字
   &__label {
     font-size: $fl-label-size;
     color: $fl-label-color;
@@ -545,39 +533,48 @@ async function doRegister() {
       opacity: 0;
     }
 
-    &--muted { color: rgba(92, 92, 92, 0.65); }
+    // 邀请码文字颜色（#888888 提升对比度）
+    &--muted { color: rgba(92, 92, 92, 0.85); }
   }
 
+  // 选填标签
   &__optional {
     font-size: 18rpx;
-    color: $text-muted;
+    color: #888888;           // 修复：提升对比度，不再像 disabled
     font-weight: 400;
   }
 
+  // 输入区容器
   &__body {
     position: relative;
-    height: 100rpx;
+    height: 104rpx;           // 修复：52px 统一高度（原 100rpx）
     background: $auth-input-bg;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1.5rpx solid $auth-input-border;
     border-radius: 24rpx;
     box-shadow: inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04);
-    transition: border-color 0.28s ease, box-shadow 0.28s ease;
+    transition:
+      border-color 0.28s ease,
+      box-shadow 0.28s ease;
     overflow: hidden;
+    box-sizing: border-box;    // 全局 border-box
 
+    // 验证码行：左输入 + 右按钮
     &--row {
       display: flex;
       align-items: center;
-      gap: 0;
     }
 
+    // 邀请码虚线态
     &--muted {
       background: rgba(255, 255, 255, 0.48);
       border-style: dashed;
+      border-color: rgba(142, 116, 89, 0.22);
     }
   }
 
+  // 验证码输入包裹（flex: 1）
   &__code-wrap {
     position: relative;
     flex: 1;
@@ -585,6 +582,7 @@ async function doRegister() {
     overflow: hidden;
   }
 
+  // 输入框本体
   &__input {
     position: absolute;
     inset: 0;
@@ -596,7 +594,7 @@ async function doRegister() {
     font-size: 30rpx;
     font-weight: 500;
     color: $mineral-gray;
-    padding: 48rpx 32rpx 0;
+    padding: 52rpx 32rpx 0;
     box-sizing: border-box;
     z-index: 2;
 
@@ -604,6 +602,7 @@ async function doRegister() {
     &::placeholder { color: transparent; }
   }
 
+  // FL 浮动标签动画层
   &__float-label {
     position: absolute;
     left: 32rpx;
@@ -630,9 +629,10 @@ async function doRegister() {
     letter-spacing: 0.5rpx;
   }
 
+  // 眼睛图标（right: 16px = 32rpx 垂直居中）
   &__eye {
     position: absolute;
-    right: 8rpx;
+    right: 32rpx;              // 修复：从 8rpx 改为 32rpx（16px）
     top: 50%;
     transform: translateY(-50%);
     width: 72rpx;
@@ -641,6 +641,7 @@ async function doRegister() {
     align-items: center;
     justify-content: center;
     z-index: 3;
+    cursor: pointer;
 
     &-svg {
       width: 36rpx;
@@ -648,18 +649,20 @@ async function doRegister() {
       color: $text-muted;
       transition: color 0.2s ease;
       flex-shrink: 0;
+      object-fit: contain;
     }
   }
 
-  &--muted { opacity: 0.6; }
+  // 邀请码弱化（但不再是 disabled 既视感）
+  &--muted { opacity: 0.72; }
 }
 
 // ============================================
-//  圆形倒计时
+//  圆形倒计时（right: 16px = 32rpx）
 // ============================================
 .countdown-ring {
-  width: 100rpx;
-  height: 100rpx;
+  width: 104rpx;              // 与输入区同高，垂直居中
+  height: 104rpx;
   flex-shrink: 0;
   position: relative;
   display: flex;
@@ -667,6 +670,7 @@ async function doRegister() {
   justify-content: center;
   cursor: pointer;
   margin-left: 12rpx;
+  right: 0;                   // 紧贴右边缘
 
   &__svg {
     position: absolute;
@@ -676,18 +680,14 @@ async function doRegister() {
     transform: rotate(-90deg);
   }
 
-  &__track {
-    stroke: rgba(47, 53, 66, 0.07);
-  }
+  &__track { stroke: rgba(47, 53, 66, 0.07); }
 
   &__fill {
     stroke: $bronze-gold;
     transition: stroke-dashoffset 0.95s linear;
   }
 
-  &.is-counting &__fill {
-    stroke: $bronze-dark;
-  }
+  &.is-counting &__fill { stroke: $bronze-dark; }
 
   &__inner {
     position: relative;
@@ -717,29 +717,35 @@ async function doRegister() {
 }
 
 // ============================================
-//  协议勾选
+//  协议勾选 ─ 整行可点击热区
 // ============================================
 .terms-row {
   display: flex;
   align-items: center;
-  gap: 14rpx;
-  margin-bottom: 32rpx;
+  gap: 16rpx;
+  margin-bottom: 36rpx;
   margin-top: 4rpx;
   cursor: pointer;
+  // 增大触控热区：上下额外 8rpx
+  padding: 8rpx 0;
+
+  &:active .check-square { opacity: 0.8; }
 }
 
+// 复选框：24x24px 最小触控尺寸
 .check-square {
-  width: 40rpx;
-  height: 40rpx;
-  border-radius: 10rpx;
+  width: 48rpx;               // 修复：从 40rpx 改为 48rpx（24px）
+  height: 48rpx;              // 修复：最小 24x24px 触控热区
+  border-radius: 12rpx;
   border: 1.5rpx solid rgba(47, 53, 66, 0.15);
-  background: rgba(255, 255, 255, 0.70);
+  background: rgba(255, 255, 255, 0.80);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.25s ease;
   box-shadow: inset 0 2rpx 6rpx rgba(47, 53, 66, 0.04);
   flex-shrink: 0;
+  box-sizing: border-box;
 
   &.is-checked {
     background: $bronze-gold;
@@ -748,19 +754,21 @@ async function doRegister() {
   }
 
   &__icon {
-    font-size: 20rpx;
+    font-size: 22rpx;
     color: #FFFFFF;
     font-weight: 700;
     line-height: 1;
   }
 }
 
+// 协议文字也属于点击热区
 .terms-text {
-  font-size: 23rpx;
-  color: rgba(20, 20, 20, 0.42);
+  font-size: 24rpx;
+  color: rgba(20, 20, 20, 0.50);
   line-height: 1.65;
   flex: 1;
   letter-spacing: 0.2rpx;
+  cursor: pointer;
 }
 
 .terms-link {
@@ -811,9 +819,7 @@ async function doRegister() {
     }
   }
 
-  &__flow {
-    background: $btn-brand-gradient;
-  }
+  &__flow { background: $btn-brand-gradient; }
 
   &__flow-bar {
     position: absolute;
