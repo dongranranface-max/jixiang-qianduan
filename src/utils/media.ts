@@ -1,4 +1,4 @@
-import { LOGO_SRC } from '@/config'
+﻿import { LOGO_SRC } from '@/config'
 
 /** 商品默认封面 */
 export const DEFAULT_PRODUCT_COVER = LOGO_SRC
