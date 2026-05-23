@@ -1,38 +1,33 @@
 <template>
   <view class="auth-page">
 
-    <!-- ============================================
-      页面顶部品牌栏
-    ============================================ -->
-    <view class="auth-header">
-      <view class="auth-header__brand">
-        <view class="auth-header__logo">
-          <image class="auth-header__logo-img" src="/static/logo.png" mode="aspectFit" />
-        </view>
-        <view class="auth-header__name-group">
-          <text class="auth-header__name">集享公社</text>
-          <text class="auth-header__slogan">集轻奢·享财富</text>
-        </view>
-      </view>
-      <view class="auth-header__nav">
-        <text class="auth-header__nav-link" @click="goLogin">登录</text>
-      </view>
+    <!-- 深色背景装饰 -->
+    <view class="auth-bg">
+      <view class="bg-glow bg-glow--tl" />
+      <view class="bg-glow bg-glow--br" />
     </view>
 
-    <!-- ============================================
-      表单卡片区
-    ============================================ -->
-    <view class="auth-body">
-      <view class="auth-card">
+    <!-- 顶部导航栏 -->
+    <view class="auth-nav">
+      <view class="auth-nav__brand">
+        <view class="auth-nav__logo">
+          <image class="auth-nav__logo-img" src="/static/logo.png" mode="aspectFit" />
+        </view>
+        <text class="auth-nav__name">集享公社</text>
+      </view>
+      <text class="auth-nav__link" @click="goLogin">登录</text>
+    </view>
 
-        <!-- 标题组 -->
+    <!-- 表单卡片（磨砂毛玻璃）-->
+    <view class="auth-card">
+      <view class="auth-card__inner">
+
         <view class="auth-card__head">
           <text class="auth-card__title">创建账号</text>
           <text class="auth-card__sub">开启您的生态积分之旅</text>
         </view>
 
-        <!-- 分隔线 -->
-        <view class="auth-divider" />
+        <view class="gold-line" />
 
         <!-- 手机号 -->
         <view class="field-group">
@@ -51,7 +46,7 @@
               @focus="focusState.phone = true"
               @blur="focusState.phone = false"
             />
-            <view class="field__line" />
+            <view class="field__bar" />
           </view>
         </view>
 
@@ -72,9 +67,9 @@
               @focus="focusState.code = true"
               @blur="focusState.code = false"
             />
-            <view class="field__line" />
+            <view class="field__bar" />
           </view>
-          <!-- 验证码按钮：独立成行 -->
+          <!-- 验证码按钮独立行 -->
           <view class="code-btn-row">
             <view
               class="code-btn"
@@ -102,16 +97,16 @@
               @focus="focusState.pwd = true"
               @blur="focusState.pwd = false"
             />
-            <view class="field__line" />
+            <view class="field__bar" />
             <view class="field__eye" @click="showPwd = !showPwd">
               <text class="field__eye-icon">{{ showPwd ? '⊙' : '◉' }}</text>
             </view>
           </view>
         </view>
 
-        <!-- 邀请码（必填）-->
+        <!-- 邀请码 -->
         <view class="field-group">
-          <text class="field-label">邀请码 <text class="field-label__required">必填</text></text>
+          <text class="field-label">邀请码 <text class="field-label__must">必填</text></text>
           <view
             class="field field--muted"
             :class="{ 'is-focused': focusState.invite, 'is-filled': form.inviteCode.length > 0 }"
@@ -124,7 +119,7 @@
               @focus="focusState.invite = true"
               @blur="focusState.invite = false"
             />
-            <view class="field__line" />
+            <view class="field__bar" />
           </view>
         </view>
 
@@ -274,34 +269,69 @@ async function doRegister() {
 .auth-page {
   width: 100vw;
   min-height: 100vh;
-  background: $bg-primary;
+  background: #0F1520;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
 // ============================================
-//  顶部品牌栏
+//  背景装饰
 // ============================================
-.auth-header {
+.auth-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-glow {
+  position: absolute;
+  border-radius: 50%;
+
+  &--tl {
+    width: 600rpx;
+    height: 600rpx;
+    top: -200rpx;
+    left: -150rpx;
+    background: radial-gradient(circle, rgba(184, 152, 118, 0.12) 0%, transparent 70%);
+  }
+
+  &--br {
+    width: 500rpx;
+    height: 500rpx;
+    bottom: -150rpx;
+    right: -100rpx;
+    background: radial-gradient(circle, rgba(65, 75, 94, 0.4) 0%, transparent 70%);
+  }
+}
+
+// ============================================
+//  导航栏
+// ============================================
+.auth-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: calc(16rpx + env(safe-area-inset-top)) 40rpx 20rpx;
-  background: $bg-primary;
+  position: relative;
+  z-index: 10;
   flex-shrink: 0;
 
   &__brand {
     display: flex;
     align-items: center;
-    gap: 20rpx;
+    gap: 16rpx;
   }
 
   &__logo {
-    width: 80rpx;
-    height: 80rpx;
+    width: 72rpx;
+    height: 72rpx;
     border-radius: 20rpx;
-    background: $mineral-gray;
+    background: rgba(184, 152, 118, 0.12);
+    border: 1rpx solid rgba(184, 152, 118, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -309,87 +339,78 @@ async function doRegister() {
     flex-shrink: 0;
 
     &-img {
-      width: 56rpx;
-      height: 56rpx;
+      width: 48rpx;
+      height: 48rpx;
       display: block;
     }
-  }
-
-  &__name-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4rpx;
   }
 
   &__name {
     font-size: 32rpx;
     font-weight: 700;
-    color: $mineral-gray;
+    color: #FFFFFF;
     letter-spacing: 1rpx;
-    line-height: 1;
   }
 
-  &__slogan {
-    font-size: 20rpx;
-    color: $mineral-blue;
-    letter-spacing: 0.5rpx;
-    line-height: 1;
-  }
-
-  &__nav { flex-shrink: 0; }
-
-  &__nav-link {
+  &__link {
     font-size: 28rpx;
-    color: $accent-dark;
+    color: $bronze-gold;
     font-weight: 600;
     padding: 8rpx 4rpx;
   }
 }
 
 // ============================================
-//  内容区
+//  磨砂玻璃卡片
 // ============================================
-.auth-body {
+.auth-card {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32rpx 32rpx 40rpx;
+  justify-content: center;
+  padding: 32rpx 32rpx 48rpx;
+  position: relative;
+  z-index: 10;
 }
 
-.auth-card {
+.auth-card__inner {
   width: 100%;
-  max-width: 580rpx;
-  background: $bg-secondary;
-  border-radius: $radius-xl;
-  padding: 48rpx 40rpx;
-  box-shadow: 0 4rpx 32rpx rgba(47, 53, 66, 0.06), 0 1rpx 4rpx rgba(0, 0, 0, 0.03);
-  border: 1rpx solid rgba(20, 20, 20, 0.05);
-
-  &__head { margin-bottom: 36rpx; }
-
-  &__title {
-    display: block;
-    font-size: 48rpx;
-    font-weight: 700;
-    color: $mineral-gray;
-    letter-spacing: 0;
-    margin-bottom: 10rpx;
-    line-height: 1.1;
-  }
-
-  &__sub {
-    display: block;
-    font-size: 26rpx;
-    color: $text-muted;
-    font-weight: 400;
-    line-height: 1.4;
-  }
+  max-width: 600rpx;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1rpx solid rgba(184, 152, 118, 0.18);
+  border-radius: 40rpx;
+  padding: 52rpx 48rpx;
+  box-sizing: border-box;
 }
 
-.auth-divider {
+.auth-card__head {
+  margin-bottom: 36rpx;
+}
+
+.auth-card__title {
+  display: block;
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0;
+  margin-bottom: 10rpx;
+  line-height: 1.1;
+}
+
+.auth-card__sub {
+  display: block;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.gold-line {
   height: 1rpx;
-  background: linear-gradient(90deg, rgba(184, 152, 118, 0.3) 0%, rgba(184, 152, 118, 0.08) 80%, transparent 100%);
+  background: linear-gradient(90deg, rgba(184, 152, 118, 0.5) 0%, rgba(184, 152, 118, 0.1) 70%, transparent 100%);
   margin-bottom: 36rpx;
 }
 
@@ -397,23 +418,26 @@ async function doRegister() {
 //  字段组
 // ============================================
 .field-group {
-  margin-bottom: 28rpx;
+  margin-bottom: 24rpx;
 }
 
 .field-label {
   display: flex;
   align-items: center;
   gap: 8rpx;
-  font-size: 24rpx;
-  color: $text-secondary;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
   margin-bottom: 10rpx;
-  letter-spacing: 0.5rpx;
+  letter-spacing: 1rpx;
+  text-transform: uppercase;
 
-  &__required {
-    font-size: 20rpx;
-    color: $accent-dark;
-    font-weight: 400;
+  &__must {
+    font-size: 19rpx;
+    color: $bronze-gold;
+    opacity: 0.7;
+    text-transform: none;
+    letter-spacing: 0;
   }
 }
 
@@ -428,33 +452,47 @@ async function doRegister() {
     border-radius: 0;
     font-size: 30rpx;
     font-weight: 500;
-    color: $mineral-gray;
-    padding: 0 8rpx;
+    color: #FFFFFF;
+    padding: 0;
     box-sizing: border-box;
 
-    &::placeholder { color: $text-muted; font-weight: 400; }
-    &:focus { outline: none; background: transparent; }
+    &::placeholder { color: rgba(255, 255, 255, 0.2); font-weight: 400; }
+    &:focus { outline: none; }
   }
 
-  &__line {
+  &__bar {
     position: absolute;
     bottom: 0;
-    left: 8rpx;
-    right: 8rpx;
+    left: 0;
+    right: 0;
     height: 2rpx;
-    background: linear-gradient(90deg, $accent-dark 0%, $bronze-light 50%, $accent-dark 100%);
-    border-radius: 2rpx;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.35s ease;
+    background: rgba(184, 152, 118, 0.2);
+    transition: background 0.35s ease;
 
-    .is-focused & { transform: scaleX(1); }
-    .is-filled & { transform: scaleX(1); }
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2rpx;
+      background: linear-gradient(90deg, $bronze-gold, $bronze-light);
+      border-radius: 2rpx;
+      transition: width 0.4s ease;
+    }
+
+    .is-focused & {
+      background: rgba(184, 152, 118, 0.5);
+      &::after { width: 100%; }
+    }
+    .is-filled & {
+      &::after { width: 100%; }
+    }
   }
 
   &__eye {
     position: absolute;
-    right: 8rpx;
+    right: 0;
     top: 50%;
     transform: translateY(-50%);
     width: 64rpx;
@@ -465,21 +503,20 @@ async function doRegister() {
 
     &-icon {
       font-size: 32rpx;
-      color: $text-muted;
+      color: rgba(255, 255, 255, 0.4);
       line-height: 1;
     }
   }
 
-  // 邀请码弱化
   &--muted {
     .field__input {
       font-size: 28rpx;
-      color: $text-muted;
-      &::placeholder { color: rgba(112, 123, 140, 0.5); }
+      color: rgba(255, 255, 255, 0.5);
+      &::placeholder { color: rgba(255, 255, 255, 0.15); }
     }
-    .field__line {
+    .field__bar {
       height: 1rpx;
-      opacity: 0.5;
+      opacity: 0.4;
     }
   }
 }
@@ -488,33 +525,33 @@ async function doRegister() {
 //  验证码按钮（独立成行）
 // ============================================
 .code-btn-row {
-  margin-top: 16rpx;
+  margin-top: 14rpx;
   display: flex;
 }
 
 .code-btn {
-  height: 64rpx;
-  padding: 0 32rpx;
+  height: 60rpx;
+  padding: 0 28rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 1.5rpx solid $accent-dark;
-  border-radius: 32rpx;
-  font-size: 24rpx;
-  color: $accent-dark;
+  border: 1.5rpx solid rgba(184, 152, 118, 0.5);
+  border-radius: 30rpx;
+  font-size: 23rpx;
+  color: $bronze-gold;
   font-weight: 600;
   letter-spacing: 0.5rpx;
   transition: all 0.3s ease;
 
   &:active {
-    background: rgba(142, 116, 89, 0.08);
+    background: rgba(184, 152, 118, 0.1);
     transform: scale(0.98);
   }
 
   &.is-counting {
-    color: $text-muted;
-    border-color: rgba(20, 20, 20, 0.12);
+    color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -525,7 +562,7 @@ async function doRegister() {
   display: flex;
   align-items: flex-start;
   gap: 14rpx;
-  margin-bottom: 32rpx;
+  margin-bottom: 28rpx;
 }
 
 .terms-check { flex-shrink: 0; padding-top: 2rpx; }
@@ -534,15 +571,15 @@ async function doRegister() {
   width: 40rpx;
   height: 40rpx;
   border-radius: 10rpx;
-  border: 2rpx solid rgba(20, 20, 20, 0.15);
+  border: 1.5rpx solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.25s ease;
 
   &.is-checked {
-    background: $accent-dark;
-    border-color: $accent-dark;
+    background: $bronze-gold;
+    border-color: $bronze-gold;
   }
 
   &__icon {
@@ -554,35 +591,36 @@ async function doRegister() {
 }
 
 .terms-text {
-  font-size: 24rpx;
-  color: $text-muted;
+  font-size: 23rpx;
+  color: rgba(255, 255, 255, 0.35);
   line-height: 1.6;
   flex: 1;
 }
 
 .terms-link {
-  color: $accent-dark;
+  color: $bronze-gold;
   font-weight: 600;
+  opacity: 0.85;
 }
 
 // ============================================
 //  提交按钮
 // ============================================
 .btn-submit {
-  height: 96rpx;
-  border-radius: 48rpx;
+  height: 104rpx;
+  border-radius: 52rpx;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 8rpx 32rpx rgba(47, 53, 66, 0.18);
+  box-shadow: 0 8rpx 32rpx rgba(184, 152, 118, 0.25), inset 0 1rpx 0 rgba(255,255,255,0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:active {
     transform: scale(0.985);
-    box-shadow: 0 4rpx 16rpx rgba(47, 53, 66, 0.12);
+    box-shadow: 0 4rpx 16rpx rgba(184, 152, 118, 0.2);
   }
 
   &.is-disabled {
-    opacity: 0.45;
+    opacity: 0.4;
     pointer-events: none;
   }
 
@@ -595,14 +633,14 @@ async function doRegister() {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: $mineral-gray;
+    background: linear-gradient(135deg, $bronze-gold 0%, $bronze-dark 100%);
     border-radius: inherit;
   }
 
   &__text {
     font-size: 30rpx;
     font-weight: 700;
-    color: $text-inverse;
+    color: #FFFFFF;
     letter-spacing: 6rpx;
   }
 
