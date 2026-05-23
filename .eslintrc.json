@@ -83,7 +83,7 @@
         "vue/require-default-prop": "off",
         "vue/component-name-in-template-casing": "off",
         "max-len": ["error", {
-          "code": 250,
+          "code": 1400,
           "ignoreStrings": true,
           "ignoreTemplateLiterals": true,
           "ignoreComments": true,

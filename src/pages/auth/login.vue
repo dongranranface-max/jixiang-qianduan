@@ -76,7 +76,14 @@
               @blur="onBlur('pwd')"
             />
             <view class="field__eye" @click="showPwd = !showPwd">
-              <text class="field__eye-icon">{{ showPwd ? '✦' : '✧' }}</text>
+              <svg v-if="showPwd" class="field__eye-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
+              </svg>
+              <svg v-else class="field__eye-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
             </view>
           </view>
         </view>
@@ -94,6 +101,41 @@
           <view v-else class="btn-submit__loading">
             <view class="btn-submit__spinner" />
             <text class="btn-submit__loading-text">登录中...</text>
+          </view>
+        </view>
+
+        <!-- 分割线 -->
+        <view class="divider-row">
+          <view class="divider" />
+          <text class="divider__text">其他登录方式</text>
+          <view class="divider" />
+        </view>
+
+        <!-- 第三方登录 -->
+        <view class="third-party">
+          <view class="third-party__item" @click="thirdPartyLogin('wechat')">
+            <view class="third-party__icon">
+              <svg class="third-party__svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.667c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 6.847c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.108.24-.243 0-.06-.022-.12-.038-.173l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.59a5.794 5.794 0 0 0-.406-.056zm-1.834 2.994c.536 0 .97.44.97.983a.976.976 0 0 1-.97.983.976.976 0 0 1-.97-.983c0-.542.434-.983.97-.983zm4.857 0c.536 0 .97.44.97.983a.976.976 0 0 1-.97.983.976.976 0 0 1-.97-.983c0-.542.434-.983.97-.983z" fill="#07C160"/>
+              </svg>
+            </view>
+            <text class="third-party__label">微信</text>
+          </view>
+          <view class="third-party__item" @click="thirdPartyLogin('alipay')">
+            <view class="third-party__icon">
+              <svg class="third-party__svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.03 2 11c0 2.76 1.36 5.22 3.49 6.87L4.23 21.5a.5.5 0 0 0 .61.61l3.63-1.26C9.78 21.72 10.86 22 12 22c5.52 0 10-4.03 10-9S17.52 2 12 2zm.32 13.49c-.47.2-.98.32-1.52.32-.38 0-.75-.06-1.1-.16L9.5 16H8.4c-.6 0-1.1-.4-1.25-.96l-.5-1.9-1.6-6.1A7.94 7.94 0 0 1 12 4.5c.38 0 .75.04 1.1.1l2.2 8.35c.11.43.5.73.95.73h1.1c.42 0 .8-.25.96-.64l.52-1.33a8.02 8.02 0 0 1-.05-.28z" fill="#1677FF"/>
+              </svg>
+            </view>
+            <text class="third-party__label">支付宝</text>
+          </view>
+          <view class="third-party__item" @click="thirdPartyLogin('apple')">
+            <view class="third-party__icon">
+              <svg class="third-party__svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.05 12.54c-.02-1.52 1.23-2.27 1.29-2.3-.7-1.03-1.8-1.17-2.18-1.19-1.03-.1-2 .6-2.52.6-.54 0-1.37-.58-2.26-.56C10.5 8.77 7.89 10.6 7.89 14.18c0 4.37 3.55 6.73 8.68 6.73 4.1 0 6.9-2.6 6.9-6.4-.08-.88-1.03-2.21-2.52-2.97zM14.82 4.36c.9-1.12 1.5-2.67 1.33-4.22-1.29.05-2.85.86-3.77 1.96-.8.93-1.5 2.42-1.32 3.84 1.45.11 2.94-.82 3.76-1.58z" fill="currentColor"/>
+              </svg>
+            </view>
+            <text class="third-party__label">Apple</text>
           </view>
         </view>
 
@@ -146,6 +188,10 @@ function onBlur(field: 'phone' | 'pwd') { focusState[field] = false }
 
 function goRegister() { uni.navigateTo({ url: '/pages/auth/register' }) }
 function goForgot() { uni.navigateTo({ url: '/pages/auth/forgot-password' }) }
+
+function thirdPartyLogin(type: 'wechat' | 'alipay' | 'apple') {
+  uni.showToast({ title: '暂未开放', icon: 'none' })
+}
 
 async function doLogin() {
   if (submitting.value) return
@@ -409,11 +455,12 @@ async function doLogin() {
     align-items: center;
     justify-content: center;
 
-    &-icon {
-      font-size: 30rpx;
+    &-svg {
+      width: 36rpx;
+      height: 36rpx;
       color: $text-muted;
-      line-height: 1;
-      transition: color 0.2s;
+      transition: color 0.2s ease;
+      flex-shrink: 0;
     }
   }
 }
@@ -508,7 +555,7 @@ async function doLogin() {
 //  底部协议
 // ============================================
 .auth-footer {
-  margin-top: 36rpx;
+  margin-top: 32rpx;
   display: flex;
   justify-content: center;
 
@@ -523,6 +570,78 @@ async function doLogin() {
   &__link {
     color: $bronze-gold;
     font-weight: 500;
+  }
+}
+
+// ============================================
+//  分割线
+// ============================================
+.divider-row {
+  display: flex;
+  align-items: center;
+  margin: 28rpx 0 24rpx;
+  gap: 20rpx;
+}
+
+.divider {
+  flex: 1;
+  height: 1rpx;
+  background: rgba(47, 53, 66, 0.08);
+  border-radius: 1rpx;
+
+  &__text {
+    font-size: 21rpx;
+    color: $text-muted;
+    font-weight: 400;
+    white-space: nowrap;
+    letter-spacing: 0.4rpx;
+  }
+}
+
+// ============================================
+//  第三方登录
+// ============================================
+.third-party {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 52rpx;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10rpx;
+    transition: transform 0.2s ease;
+
+    &:active { transform: scale(0.92); }
+  }
+
+  &__icon {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.80);
+    border: 1rpx solid rgba(47, 53, 66, 0.07);
+    box-shadow: 0 4rpx 20rpx rgba(47, 53, 66, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  &__svg {
+    width: 40rpx;
+    height: 40rpx;
+    display: block;
+  }
+
+  &__label {
+    font-size: 20rpx;
+    color: $text-muted;
+    font-weight: 400;
+    letter-spacing: 0.3rpx;
   }
 }
 </style>
