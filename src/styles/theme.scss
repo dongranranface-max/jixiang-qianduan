@@ -512,6 +512,21 @@ $countdown-text-color: $bronze-dark;
 $btn-flow-duration: 1.4s;
 $btn-flow-timing: ease-in-out;
 
+// ──── 品牌线性渐变按钮（浮起感）────
+$btn-gold-gradient: linear-gradient(135deg, #C9A96E 0%, #D4B483 40%, #E8CD9A 70%, #C9A96E 100%);
+$btn-gold-shadow: 0 10rpx 32rpx rgba(212, 180, 131, 0.28);
+$btn-gold-shadow-hover: 0 16rpx 44rpx rgba(212, 180, 131, 0.38);
+
+// ──── 输入框无边框风格 ────
+$input-bg: transparent;
+$input-border: transparent;
+$input-border-focus: #D4B483;
+$input-shadow-focus: 0 0 0 3rpx rgba(212, 180, 131, 0.18);
+$input-padding-x: 20px;  // 20px 水平呼吸边距
+
+// ──── 品牌纹理（若隐若现 Logo 铺底）────
+$brand-texture-opacity: 0.035;
+
 // 输入框
 $auth-input-bg: rgba(255, 255, 255, 0.72);
 $auth-input-border: rgba(47, 53, 66, 0.08);

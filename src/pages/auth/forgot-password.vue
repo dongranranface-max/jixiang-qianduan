@@ -2,7 +2,7 @@
   <view class="auth-page">
 
     <!-- ============================================
-      顶部导航栏
+      顶部导航栏（简洁 Logo + 返回 + 登录入口）
     ============================================ -->
     <view class="auth-nav">
       <view class="auth-nav__left">
@@ -17,13 +17,15 @@
           <text class="auth-nav__slogan">集轻奢 · 享财富</text>
         </view>
       </view>
-      <view class="nav-pill" @click="goLogin">
-        <text class="nav-pill__text">登录</text>
+      <view class="auth-nav__actions">
+        <view class="nav-pill" @click="goLogin">
+          <text class="nav-pill__text">登录</text>
+        </view>
       </view>
     </view>
 
     <!-- ============================================
-      表单区域（去除品牌英雄区重复 Logo）
+      表单区域
     ============================================ -->
     <view class="auth-body">
       <view class="auth-card">
@@ -38,86 +40,64 @@
           <!-- 步骤指示器 -->
           <view class="step-bar">
             <view class="step-item is-active">
-              <view class="step-item__dot">
-                <text class="step-item__num">1</text>
-              </view>
+              <view class="step-item__dot"><text class="step-item__num">1</text></view>
               <text class="step-item__label">验证手机</text>
             </view>
             <view class="step-connector" :class="{ 'is-done': step > 1 }" />
             <view class="step-item" :class="{ 'is-active': step > 1 }">
-              <view class="step-item__dot">
-                <text class="step-item__num">2</text>
-              </view>
+              <view class="step-item__dot"><text class="step-item__num">2</text></view>
               <text class="step-item__label">设置密码</text>
             </view>
           </view>
 
-          <!-- 手机号 ─ FL -->
-          <view class="fl-field" :class="phoneFieldClass">
-            <view class="fl-field__label-row">
-              <text class="fl-field__label" :class="{ 'is-float': phoneFloatState }">注册手机号</text>
+          <!-- 手机号 -->
+          <view class="field-group">
+            <view class="field-group__label-row">
+              <text class="field-group__label">注册手机号</text>
             </view>
-            <view class="fl-field__body">
+            <view class="field-line" :class="{ 'is-focused': focusState.phone }">
               <input
-                class="fl-field__input"
+                class="field-line__input"
                 v-model="form.phone"
                 inputmode="numeric"
                 type="number"
                 maxlength="11"
-                placeholder=" "
+                placeholder="请输入手机号"
                 @focus="onFocus('phone')"
                 @blur="onBlur('phone')"
               />
-              <view class="fl-field__float-label" :class="{ 'is-active': phoneFloatState }">
-                <text class="fl-field__float-text">请输入手机号</text>
+            </view>
+          </view>
+
+          <!-- 验证码 -->
+          <view class="field-group">
+            <view class="field-group__label-row">
+              <text class="field-group__label">短信验证码</text>
+            </view>
+            <view class="field-line field-line--with-code" :class="{ 'is-focused': focusState.code }">
+              <input
+                class="field-line__input"
+                v-model="form.code"
+                inputmode="numeric"
+                type="number"
+                maxlength="6"
+                placeholder="请输入验证码"
+                @focus="onFocus('code')"
+                @blur="onBlur('code')"
+              />
+              <view
+                class="field-line__code-btn"
+                :class="{ 'is-counting': countdown > 0 || sending }"
+                @click="sendCode"
+              >
+                <text v-if="countdown === 0 && !sending">获取验证码</text>
+                <text v-else-if="sending">发送中...</text>
+                <text v-else>{{ countdown }}s</text>
               </view>
             </view>
           </view>
 
-          <!-- 验证码 ─ FL + 圆形倒计时 -->
-          <view class="fl-field" :class="codeFieldClass">
-            <view class="fl-field__label-row">
-              <text class="fl-field__label" :class="{ 'is-float': codeFloatState }">短信验证码</text>
-            </view>
-            <view class="fl-field__body fl-field__body--row">
-              <view class="fl-field__code-wrap">
-                <input
-                  class="fl-field__input"
-                  v-model="form.code"
-                  inputmode="numeric"
-                  type="number"
-                  maxlength="6"
-                  placeholder=" "
-                  @focus="onFocus('code')"
-                  @blur="onBlur('code')"
-                />
-                <view class="fl-field__float-label" :class="{ 'is-active': codeFloatState }">
-                  <text class="fl-field__float-text">6位验证码</text>
-                </view>
-              </view>
-              <!-- 圆形倒计时 -->
-              <view class="countdown-ring" :class="{ 'is-counting': countdown > 0 }" @click="sendCode">
-                <svg class="countdown-ring__svg" viewBox="0 0 56 56">
-                  <circle class="countdown-ring__track" cx="28" cy="28" r="24" fill="none" stroke-width="3" />
-                  <circle
-                    class="countdown-ring__fill"
-                    cx="28" cy="28" r="24"
-                    fill="none" stroke-width="3"
-                    :stroke-dasharray="151.9"
-                    :stroke-dashoffset="countdownOffset"
-                    stroke-linecap="round"
-                  />
-                </svg>
-                <view class="countdown-ring__inner">
-                  <text v-if="countdown === 0 && !sending" class="countdown-ring__text">获取</text>
-                  <text v-else-if="sending" class="countdown-ring__text countdown-ring__text--sending">···</text>
-                  <text v-else class="countdown-ring__text">{{ countdown }}s</text>
-                </view>
-              </view>
-            </view>
-          </view>
-
-          <!-- 提交按钮 ─ 流动加载 -->
+          <!-- 提交按钮 -->
           <view
             class="btn-submit"
             :class="{ 'is-disabled': !canGoStep2, 'is-loading': submitting }"
@@ -145,44 +125,37 @@
           <!-- 步骤指示器 -->
           <view class="step-bar">
             <view class="step-item is-done">
-              <view class="step-item__dot">
-                <text class="step-item__icon">✓</text>
-              </view>
+              <view class="step-item__dot"><text class="step-item__icon">✓</text></view>
               <text class="step-item__label">验证手机</text>
             </view>
             <view class="step-connector is-active" />
             <view class="step-item is-active">
-              <view class="step-item__dot">
-                <text class="step-item__num">2</text>
-              </view>
+              <view class="step-item__dot"><text class="step-item__num">2</text></view>
               <text class="step-item__label">设置密码</text>
             </view>
           </view>
 
-          <!-- 新密码 ─ FL -->
-          <view class="fl-field" :class="pwdFieldClass">
-            <view class="fl-field__label-row">
-              <text class="fl-field__label" :class="{ 'is-float': pwdFloatState }">新密码</text>
+          <!-- 新密码 -->
+          <view class="field-group">
+            <view class="field-group__label-row">
+              <text class="field-group__label">新密码</text>
             </view>
-            <view class="fl-field__body">
+            <view class="field-line field-line--with-eye" :class="{ 'is-focused': focusState.pwd }">
               <input
-                class="fl-field__input"
+                class="field-line__input"
                 v-model="form.password"
                 :type="showPwd ? 'text' : 'password'"
-                placeholder=" "
+                placeholder="6位以上，数字与字母组合"
                 @focus="onFocus('pwd')"
                 @blur="onBlur('pwd')"
                 @input="onPwdInput"
               />
-              <view class="fl-field__float-label" :class="{ 'is-active': pwdFloatState }">
-                <text class="fl-field__float-text">6位以上数字与字母</text>
-              </view>
-              <view class="fl-field__eye" @click="showPwd = !showPwd">
-                <svg v-if="showPwd" class="fl-field__eye-svg" viewBox="0 0 24 24" fill="none">
+              <view class="field-line__action" @click="showPwd = !showPwd">
+                <svg v-if="showPwd" class="field-line__eye" viewBox="0 0 24 24" fill="none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                   <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
                 </svg>
-                <svg v-else class="fl-field__eye-svg" viewBox="0 0 24 24" fill="none">
+                <svg v-else class="field-line__eye" viewBox="0 0 24 24" fill="none">
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                   <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                 </svg>
@@ -197,29 +170,26 @@
             </view>
           </view>
 
-          <!-- 确认密码 ─ FL -->
-          <view class="fl-field" :class="confirmFieldClass">
-            <view class="fl-field__label-row">
-              <text class="fl-field__label" :class="{ 'is-float': confirmFloatState }">确认新密码</text>
+          <!-- 确认密码 -->
+          <view class="field-group">
+            <view class="field-group__label-row">
+              <text class="field-group__label">确认新密码</text>
             </view>
-            <view class="fl-field__body">
+            <view class="field-line field-line--with-eye" :class="{ 'is-focused': focusState.confirm }">
               <input
-                class="fl-field__input"
+                class="field-line__input"
                 v-model="form.confirm"
                 :type="showConfirm ? 'text' : 'password'"
-                placeholder=" "
+                placeholder="再次输入新密码"
                 @focus="onFocus('confirm')"
                 @blur="onBlur('confirm')"
               />
-              <view class="fl-field__float-label" :class="{ 'is-active': confirmFloatState }">
-                <text class="fl-field__float-text">再次输入新密码</text>
-              </view>
-              <view class="fl-field__eye" @click="showConfirm = !showConfirm">
-                <svg v-if="showConfirm" class="fl-field__eye-svg" viewBox="0 0 24 24" fill="none">
+              <view class="field-line__action" @click="showConfirm = !showConfirm">
+                <svg v-if="showConfirm" class="field-line__eye" viewBox="0 0 24 24" fill="none">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                   <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
                 </svg>
-                <svg v-else class="fl-field__eye-svg" viewBox="0 0 24 24" fill="none">
+                <svg v-else class="field-line__eye" viewBox="0 0 24 24" fill="none">
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                   <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                 </svg>
@@ -230,7 +200,7 @@
             </text>
           </view>
 
-          <!-- 提交按钮 ─ 流动加载 -->
+          <!-- 提交按钮 -->
           <view
             class="btn-submit"
             :class="{ 'is-disabled': !canSubmit || submitting, 'is-loading': submitting }"
@@ -301,37 +271,6 @@ const maskedPhone = computed(() => {
   return p.length === 11 ? `${p.slice(0, 3)}****${p.slice(7)}` : p
 })
 
-// ─── FL 浮动状态 ─────────────────────────────────
-const phoneFloatState = computed(() => focusState.phone || form.value.phone.length > 0)
-const codeFloatState = computed(() => focusState.code || form.value.code.length > 0)
-const pwdFloatState = computed(() => focusState.pwd || form.value.password.length > 0)
-const confirmFloatState = computed(() => focusState.confirm || form.value.confirm.length > 0)
-
-// ─── 字段 class computed（规避模板中 >= 被 SFC 解析误判）───
-const phoneFieldClass = computed(() => ({
-  'is-focused': focusState.phone,
-  'is-filled': form.value.phone.length > 0,
-}))
-const codeFieldClass = computed(() => ({
-  'is-focused': focusState.code,
-  'is-filled': form.value.code.length > 0,
-}))
-const pwdFieldClass = computed(() => ({
-  'is-focused': focusState.pwd,
-  'is-filled': form.value.password.length > 0,
-}))
-const confirmFieldClass = computed(() => ({
-  'is-focused': focusState.confirm,
-  'is-filled': form.value.confirm.length > 0,
-}))
-
-// ─── 圆形倒计时 ─────────────────────────────────
-const CIRCUMFERENCE = 151.9
-const countdownOffset = computed(() => {
-  if (countdown.value <= 0) return CIRCUMFERENCE
-  return CIRCUMFERENCE * (1 - countdown.value / 60)
-})
-
 const canGoStep2 = computed(() =>
   /^1\d{10}$/.test(form.value.phone) && /^\d{6}$/.test(form.value.code)
 )
@@ -340,7 +279,6 @@ const canSubmit = computed(() =>
   form.value.password.length > 0 && form.value.confirm === form.value.password
 )
 
-// ─── Focus / Blur ─────────────────────────────────
 function onFocus(field: 'phone' | 'code' | 'pwd' | 'confirm') { focusState[field] = true }
 function onBlur(field: 'phone' | 'code' | 'pwd' | 'confirm') { focusState[field] = false }
 
@@ -418,12 +356,26 @@ async function doReset() {
 @import '@/styles/theme.scss';
 
 .auth-page {
-  width: 100vw;
-  min-height: 100vh;
+  width: 100%;
+  min-height: 100dvh;
   background: $bg-primary;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  overflow-x: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='55' fill='none' stroke='%23B89876' stroke-width='0.5' opacity='0.08'/%3E%3C/svg%3E");
+    background-size: 240rpx 240rpx;
+    background-position: center 15%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 0;
+  }
 }
 
 // ============================================
@@ -433,9 +385,11 @@ async function doReset() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(14rpx + env(safe-area-inset-top)) 36rpx 14rpx;
+  padding: calc(14rpx + env(safe-area-inset-top)) 32rpx 14rpx;
   background: $bg-primary;
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 
   &__left { display: flex; align-items: center; gap: 16rpx; }
 
@@ -449,7 +403,8 @@ async function doReset() {
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
-    &-img { width: 42rpx; height: 42rpx; display: block; object-fit: contain; }
+
+    &-img { width: 42rpx; height: 42rpx; object-fit: contain; display: block; }
   }
 
   &__text { display: flex; flex-direction: column; gap: 5rpx; }
@@ -477,16 +432,11 @@ async function doReset() {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: background 0.2s;
   background: rgba(47, 53, 66, 0.05);
+  transition: background 0.2s;
 
   &:active { background: rgba(47, 53, 66, 0.10); }
-  &__icon {
-    font-size: 32rpx;
-    color: $mineral-gray;
-    font-weight: 500;
-    line-height: 1;
-  }
+  &__icon { font-size: 32rpx; color: $mineral-gray; font-weight: 500; line-height: 1; }
 }
 
 .nav-pill {
@@ -518,50 +468,6 @@ async function doReset() {
 }
 
 // ============================================
-//  品牌英雄区
-// ============================================
-.brand-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 28rpx 0 16rpx;
-  position: relative;
-  flex-shrink: 0;
-
-  &__halo {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 300rpx;
-    height: 180rpx;
-    background: radial-gradient(ellipse at 50% 40%, rgba(184, 152, 118, 0.12) 0%, transparent 68%);
-    pointer-events: none;
-  }
-  &__logo-card {
-    @include logo-card;
-    width: 132rpx;
-    height: 132rpx;
-    border-radius: 34rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-    z-index: 2;
-  }
-  &__logo { width: 86rpx; height: 86rpx; display: block; }
-  &__warm-glow {
-    width: 200rpx;
-    height: 48rpx;
-    background: radial-gradient(ellipse at 50% 50%, rgba(184, 152, 118, 0.16) 0%, transparent 68%);
-    margin-top: -6rpx;
-    position: relative;
-    z-index: 1;
-  }
-}
-
-// ============================================
 //  表单区域
 // ============================================
 .auth-body {
@@ -569,31 +475,43 @@ async function doReset() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8rpx 36rpx 0;
+  padding: 24rpx 40rpx 0;
+  position: relative;
+  z-index: 1;
 }
 
 .auth-card {
   width: 100%;
   max-width: 600rpx;
-  @include auth-card;
-  padding: 40rpx 44rpx;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1rpx solid rgba(184, 152, 118, 0.12);
+  border-radius: 40rpx;
+  box-shadow:
+    0 24rpx 80rpx rgba(47, 53, 66, 0.06),
+    0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+  padding: 48rpx 48rpx;
 
-  &__head { margin-bottom: 36rpx; }
+  &__head { margin-bottom: 40rpx; }
+
   &__title {
     display: block;
     font-size: 52rpx;
-    font-weight: 800;
+    font-weight: 600;
     color: $mineral-gray;
-    letter-spacing: 0;
+    letter-spacing: 2rpx;
     margin-bottom: 12rpx;
     line-height: 1.1;
   }
+
   &__sub {
     display: block;
     font-size: 26rpx;
-    color: $text-muted;
+    color: #888888;
     font-weight: 400;
-    line-height: 1.55;
+    line-height: 1.6;
   }
 }
 
@@ -608,7 +526,7 @@ async function doReset() {
 .step-bar {
   display: flex;
   align-items: center;
-  margin-bottom: 40rpx;
+  margin-bottom: 48rpx;
   padding: 0 12rpx;
 }
 
@@ -687,18 +605,10 @@ async function doReset() {
 }
 
 // ============================================
-//  FL 浮动标签字段
+//  字段组
 // ============================================
-.fl-field {
-  position: relative;
+.field-group {
   margin-bottom: 48rpx;
-
-  &.is-focused .fl-field__body {
-    border-color: $auth-input-border-focus;
-    box-shadow:
-      inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04),
-      0 0 0 4rpx rgba(184, 152, 118, 0.14);
-  }
 
   &__label-row {
     height: 36rpx;
@@ -708,97 +618,84 @@ async function doReset() {
   }
 
   &__label {
-    font-size: $fl-label-size;
-    color: $fl-label-color;
-    font-weight: $fl-label-weight;
-    transition:
-      transform $fl-float-duration $fl-float-timing,
-      font-size $fl-float-duration $fl-float-timing,
-      color $fl-float-duration $fl-float-timing,
-      opacity $fl-float-duration $fl-float-timing;
+    font-size: 22rpx;
+    color: $text-secondary;
+    font-weight: 500;
+    letter-spacing: 0.5rpx;
+  }
+}
 
-    &.is-float {
-      transform: translateY(-44rpx) scale(0.82);
-      font-size: $fl-label-size-float;
-      color: $fl-label-color-focus;
-      opacity: 0;
-    }
+// ============================================
+//  极简输入框
+// ============================================
+.field-line {
+  position: relative;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  border-bottom: 1.5rpx solid rgba(47, 53, 66, 0.12);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &.is-focused {
+    border-bottom-color: $bronze-gold;
+    box-shadow: 0 2rpx 0 $bronze-gold;
   }
 
-  &__body {
-    position: relative;
-    height: 104rpx;
-    background: $auth-input-bg;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1.5rpx solid $auth-input-border;
-    border-radius: 24rpx;
-    box-shadow: inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04);
-    transition: border-color 0.28s ease, box-shadow 0.28s ease;
-    overflow: hidden;
-    box-sizing: border-box;
-
-    &--row {
-      display: flex;
-      align-items: center;
-    }
-  }
-
-  &__code-wrap {
-    position: relative;
-    flex: 1;
-    height: 100%;
-    overflow: hidden;
-  }
+  &--with-code { padding-right: 160rpx; }
+  &--with-eye { padding-right: 72rpx; }
 
   &__input {
-    position: absolute;
-    inset: 0;
-    width: 100%;
+    flex: 1;
     height: 100%;
     background: transparent;
     border: none;
-    border-radius: 0;
+    outline: none;
     font-size: 30rpx;
     font-weight: 500;
     color: $mineral-gray;
-    padding: 48rpx 32rpx 0;
+    padding: 0;
     box-sizing: border-box;
-    z-index: 2;
 
-    &:focus { outline: none; }
-    &::placeholder { color: transparent; }
-  }
-
-  &__float-label {
-    position: absolute;
-    left: 32rpx;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0;
-    transition:
-      opacity 0.18s ease,
-      transform $fl-float-duration $fl-float-timing;
-
-    &.is-active {
-      opacity: 1;
-      transform: translateY(-52rpx) scale(0.82);
+    &::placeholder {
+      color: rgba(138, 138, 138, 0.5);
+      font-weight: 400;
     }
   }
 
-  &__float-text {
-    font-size: $fl-label-size;
-    color: $bronze-gold;
-    font-weight: $fl-label-weight;
-    white-space: nowrap;
-    letter-spacing: 0.5rpx;
+  &__code-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 56rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0 4rpx;
+    border-bottom: 1.5rpx solid $bronze-gold;
+    transition: opacity 0.2s ease, color 0.2s ease;
+
+    text {
+      font-size: 24rpx;
+      color: $bronze-gold;
+      font-weight: 600;
+      letter-spacing: 0.3rpx;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    &.is-counting {
+      border-bottom-color: transparent;
+      text { color: $text-muted; font-weight: 400; }
+    }
+
+    &:active { opacity: 0.6; }
   }
 
-  &__eye {
+  &__action {
     position: absolute;
-    right: 32rpx;
+    right: 0;
     top: 50%;
     transform: translateY(-50%);
     width: 72rpx;
@@ -806,73 +703,18 @@ async function doReset() {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 3;
-
-    &-svg {
-      width: 36rpx;
-      height: 36rpx;
-      color: $text-muted;
-      transition: color 0.2s ease;
-      flex-shrink: 0;
-    }
-  }
-}
-
-// ============================================
-//  圆形倒计时
-// ============================================
-.countdown-ring {
-  width: 104rpx;
-  height: 104rpx;
-  flex-shrink: 0;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin-left: 12rpx;
-  right: 0;
-
-  &__svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    transform: rotate(-90deg);
+    cursor: pointer;
+    z-index: 2;
   }
 
-  &__track { stroke: rgba(47, 53, 66, 0.07); }
-  &__fill {
-    stroke: $bronze-gold;
-    transition: stroke-dashoffset 0.95s linear;
-  }
-
-  &.is-counting &__fill { stroke: $bronze-dark; }
-
-  &__inner {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__text {
-    font-size: 20rpx;
-    font-weight: 700;
-    color: $bronze-gold;
-    letter-spacing: 0.5rpx;
-    line-height: 1;
-
-    &--sending {
-      font-size: 28rpx;
-      color: $bronze-dark;
-    }
-  }
-
-  &.is-counting &__text {
+  &__eye {
+    width: 36rpx;
+    height: 36rpx;
     color: $text-muted;
-    font-weight: 600;
+    object-fit: contain;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+    &:active { color: $bronze-gold; }
   }
 }
 
@@ -898,7 +740,6 @@ async function doReset() {
   height: 100%;
   border-radius: 3rpx;
   transition: width 0.3s ease, background 0.3s ease;
-
   &--1 { background: $warning; }
   &--2 { background: $primary; }
   &--3 { background: $success; }
@@ -922,7 +763,7 @@ async function doReset() {
 }
 
 // ============================================
-//  提交按钮 ─ 流动加载
+//  提交按钮
 // ============================================
 .btn-submit {
   height: 104rpx;
@@ -947,9 +788,9 @@ async function doReset() {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: $btn-brand-gradient;
+    background: $btn-gold-gradient;
     border-radius: inherit;
-    box-shadow: $btn-brand-shadow;
+    box-shadow: $btn-gold-shadow;
     position: relative;
     overflow: hidden;
 
@@ -957,12 +798,12 @@ async function doReset() {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, transparent 55%);
+      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%);
       pointer-events: none;
     }
   }
 
-  &__flow { background: $btn-brand-gradient; }
+  &__flow { background: $btn-gold-gradient; }
 
   &__flow-bar {
     position: absolute;
