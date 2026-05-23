@@ -4,7 +4,7 @@
     <!-- Logo 视觉锚点 -->
     <view class="brand-hero">
       <view class="brand-hero__logo-card">
-        <image class="brand-hero__logo" src="/static/logo.png" mode="aspectFit" />
+        <image class="brand-hero__logo" src="/static/logo.png" mode="widthFix" width="72" height="72" />
       </view>
     </view>
 
@@ -309,10 +309,6 @@ function nextTick(fn: () => void) { setTimeout(fn, 0) }
   }
 
   &__logo {
-    width: 72rpx;
-    height: 72rpx;
-    aspect-ratio: 1 / 1;
-    object-fit: contain;
     display: block;
   }
 }
