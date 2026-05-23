@@ -310,18 +310,6 @@ function togglePwd(field: 'pwd' | 'confirm') {
   setTimeout(() => { el.setSelectionRange(pos, pos) }, 0)
 }
 
-function onPwdInput() {
-  const p = form.value.password
-  let level = 0
-  if (p.length >= 6) level = 1
-  if (p.length >= 8 && /[A-Za-z]/.test(p) && /\d/.test(p)) level = 2
-  if (p.length >= 10 && /[A-Za-z]/.test(p) && /\d/.test(p) && /[^A-Za-z0-9]/.test(p)) level = 3
-  pwdLevel.value = level
-  pwdPercent.value = level === 0 ? Math.min(33, (p.length / 6) * 33) : level * 33
-  const hints = ['', '强度一般', '强度良好', '强度优秀']
-  pwdHint.value = p.length ? hints[level] || '' : ''
-}
-
 async function doReset() {
   if (submitting.value || !canSubmit.value) return
   confirmDirty.value = true

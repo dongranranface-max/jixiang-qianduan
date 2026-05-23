@@ -72,90 +72,7 @@
 //  象牙白底 · 深藏青 · 香槟金 · 克制留白
 // ===========================================
 
-// ===========================================
-//  集享公社 · 轻奢金融主题
-//  象牙白底 · 深藏青 · 香槟金 · 克制留白
-// ===========================================
-
-:root {
-  --bg-primary: #F8F7F4;
-  --bg-secondary: #FFFFFF;
-  --bg-tertiary: #EFEEEA;
-  --bg-elevated: #FFFFFF;
-  --bg-overlay: rgba(255, 255, 255, 0.94);
-  --bg-card: #FFFFFF;
-  --bg-card-hover: #FAFAF8;
-
-  --mineral-gray: #2F3542;
-  --mineral-blue: #707B8C;
-  --bronze-gold: #B89876;
-  --bronze-light: #D4C4AE;
-  --bronze-dark: #8E7459;
-  --mineral-dark: #414B5E;
-  --mineral-line: rgba(47, 53, 66, 0.10);
-
-  --navy: #2F3542;
-  --navy-light: #414B5E;
-  --navy-muted: #707B8C;
-
-  --ai-gradient: linear-gradient(135deg, #2F3542 0%, #414B5E 55%, #4F5D73 100%);
-  --ai-gradient-soft: linear-gradient(135deg, rgba(47, 53, 66, 0.06) 0%, rgba(65, 75, 94, 0.04) 100%);
-  --bronze-gradient: linear-gradient(135deg, #D4C4AE 0%, #B89876 50%, #8E7459 100%);
-
-  --primary: #2F3542;
-  --primary-light: #414B5E;
-  --primary-dark: #1E222D;
-  --primary-glow: rgba(47, 53, 66, 0.12);
-
-  --accent: #B89876;
-  --accent-light: #D4C4AE;
-  --accent-dark: #8E7459;
-  --accent-glow: rgba(184, 152, 118, 0.25);
-
-  --warm-yellow: #EDE9E1;
-  --warm-pink: #F0EDE8;
-  --warm-blue: #ECEEF2;
-
-  --gold: #B89876;
-  --gold-light: #D4C4AE;
-  --gold-dark: #8E7459;
-
-  --success: #5A7A6A;
-  --warning: #A07850;
-  --danger: #B06060;
-  --profit: #8E7459;
-
-  --text-primary: #141414;
-  --text-secondary: #5C5C5C;
-  --text-muted: #8A8A8A;
-  --text-accent: #8E7459;
-  --text-inverse: #FFFFFF;
-
-  --border-color: rgba(20, 20, 20, 0.08);
-  --border-light: rgba(20, 20, 20, 0.05);
-  --border-primary: rgba(184, 152, 118, 0.40);
-  --border-accent: rgba(142, 116, 89, 0.30);
-
-  --glass-bg: #FFFFFF;
-  --glass-border: rgba(20, 20, 20, 0.06);
-  --clay-shadow: 0 12rpx 48rpx rgba(47, 53, 66, 0.06), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
-  --clay-shadow-inset: none;
-  --clay-inset: none;
-
-  --radius: 20rpx;
-  --radius-lg: 24rpx;
-  --radius-xl: 28rpx;
-
-  --shadow-glow: 0 16rpx 48rpx rgba(47, 53, 66, 0.08);
-  --shadow-fire: 0 12rpx 40rpx rgba(184, 152, 118, 0.2);
-  --shadow-card: var(--clay-shadow);
-
-  --spacing-xs: 8rpx;
-  --spacing-sm: 16rpx;
-  --spacing-base: 28rpx;
-  --spacing-lg: 40rpx;
-}
-
+// SCSS Variables
 $bg-primary: #F8F7F4;
 $bg-secondary: #FFFFFF;
 $bg-tertiary: #EFEEEA;
@@ -225,9 +142,181 @@ $spacing-base: 28rpx;
 $spacing-lg: 40rpx;
 $spacing-xl: 56rpx;
 $spacing-2xl: 72rpx;
-/** 首页模块间距、卡片内边距 */
 $home-module-gap: 48rpx;
 $home-card-pad: 20rpx;
+
+// ===========================================
+//  金融风资产卡片 · Design Tokens
+//  深色底纹 + 毛玻璃 + 香槟金
+// ===========================================
+
+// 资产卡片背景渐变（深蓝/暗金）
+$asset-card-bg: linear-gradient(145deg, #1E2433 0%, #2A3142 50%, #1E2433 100%);
+$asset-card-border: rgba(212, 180, 131, 0.18);
+$asset-card-radius: 32rpx;
+$asset-card-shadow: 0 16rpx 64rpx rgba(0, 0, 0, 0.28), 0 4rpx 16rpx rgba(0, 0, 0, 0.14);
+
+// 毛玻璃层
+$asset-glass-bg: rgba(255, 255, 255, 0.06);
+$asset-glass-border: rgba(255, 255, 255, 0.10);
+
+// 资产数值
+$asset-balance-size: 52rpx;
+$asset-balance-weight: 800;
+$asset-balance-color: #FFFFFF;
+$asset-balance-font: 'DIN Alternate', 'Roboto', 'Noto Sans SC', system-ui, sans-serif;
+
+// 昨日收益
+$asset-profit-size: 28rpx;
+$asset-profit-color: $bronze-light;
+$asset-profit-weight: 600;
+
+// 标签文字
+$asset-label-size: 22rpx;
+$asset-label-color: rgba(255, 255, 255, 0.55);
+$asset-label-weight: 500;
+
+// 眼睛图标
+$asset-eye-color: rgba(255, 255, 255, 0.45);
+$asset-eye-active: rgba(255, 255, 255, 0.85);
+
+// 进度条
+$progress-bg: rgba(255, 255, 255, 0.08);
+$progress-fill: linear-gradient(90deg, $bronze-gold 0%, $bronze-light 100%);
+$progress-text: rgba(255, 255, 255, 0.5);
+
+// ===========================================
+//  跑马灯 · Design Tokens
+// ===========================================
+$ticker-bg: rgba(30, 36, 51, 0.90);
+$ticker-border: rgba(212, 180, 131, 0.15);
+$ticker-icon-color: $bronze-light;
+$ticker-text-color: rgba(255, 255, 255, 0.72);
+$ticker-dot-color: rgba(212, 180, 131, 0.40);
+$ticker-radius: 20rpx;
+
+// ===========================================
+//  轻奢登录体系 · Auth Design Tokens
+// ===========================================
+
+$brand-gradient: linear-gradient(145deg, #2F3542 0%, #3D4656 40%, #4A5568 100%);
+$brand-glow: linear-gradient(145deg, rgba(47, 53, 66, 0.92) 0%, rgba(74, 85, 104, 0.88) 100%);
+$brand-gold-gradient: linear-gradient(135deg, #B89876 0%, #D4C4AE 50%, #B89876 100%);
+$logo-card-bg: linear-gradient(160deg, rgba(47, 53, 66, 0.96) 0%, rgba(65, 75, 94, 0.92) 100%);
+$logo-glow-warm: rgba(184, 152, 118, 0.18);
+$hero-orb: radial-gradient(ellipse at 50% 60%, rgba(184, 152, 118, 0.14) 0%, transparent 65%);
+$glass-blur: blur(20px);
+
+// FL 浮动标签
+$fl-label-size: 22rpx;
+$fl-label-size-float: 18rpx;
+$fl-label-color: $text-secondary;
+$fl-label-color-focus: $bronze-gold;
+$fl-label-weight: 500;
+$fl-float-duration: 0.22s;
+$fl-float-timing: cubic-bezier(0.4, 0, 0.2, 1);
+
+// 圆形倒计时
+$countdown-ring-size: 56rpx;
+$countdown-ring-stroke: 3rpx;
+$countdown-ring-color: $bronze-gold;
+$countdown-ring-bg: rgba(47, 53, 66, 0.06);
+$countdown-text-size: 20rpx;
+$countdown-text-color: $bronze-dark;
+
+// 按钮流动加载
+$btn-flow-duration: 1.4s;
+$btn-flow-timing: ease-in-out;
+
+// 品牌线性渐变按钮
+$btn-gold-gradient: linear-gradient(135deg, #E8D5A3 0%, #D4B483 25%, #B5935E 65%, #8B6845 100%);
+$btn-gold-shadow: 0 8rpx 20rpx rgba(212, 180, 131, 0.3);
+$btn-gold-shadow-hover: 0 16rpx 44rpx rgba(212, 180, 131, 0.38);
+
+// 输入框
+$auth-input-bg: rgba(255, 255, 255, 0.72);
+$auth-input-border: rgba(47, 53, 66, 0.08);
+$auth-input-border-focus: rgba(142, 116, 89, 0.55);
+$auth-input-line: rgba(142, 116, 89, 0.50);
+$auth-input-radius: 20rpx;
+$auth-input-height: 96rpx;
+$auth-input-glow: rgba(184, 152, 118, 0.12);
+
+// 卡片
+$auth-card-bg: rgba(255, 255, 255, 0.90);
+$auth-card-border: rgba(255, 255, 255, 0.60);
+$auth-card-radius: 40rpx;
+$auth-card-shadow: 0 24rpx 80rpx rgba(47, 53, 66, 0.08), 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+$auth-card-blur-bg: rgba(255, 255, 255, 0.82);
+
+// 按钮
+$btn-brand-gradient: linear-gradient(135deg, #2F3542 0%, #3D4656 50%, #4A5568 100%);
+$btn-brand-shadow: 0 12rpx 40rpx rgba(47, 53, 66, 0.22);
+$btn-brand-shadow-hover: 0 16rpx 52rpx rgba(47, 53, 66, 0.30);
+$btn-brand-shadow-active: 0 6rpx 24rpx rgba(47, 53, 66, 0.18);
+
+$btn-gold-gradient: $brand-gold-gradient;
+$btn-gold-shadow: 0 12rpx 40rpx rgba(184, 152, 118, 0.28);
+$btn-gold-shadow-hover: 0 16rpx 52rpx rgba(184, 152, 118, 0.36);
+$btn-gold-shadow-active: 0 6rpx 24rpx rgba(184, 152, 118, 0.22);
+$btn-disabled-bg: rgba(47, 53, 66, 0.28);
+$btn-disabled-text: rgba(255, 255, 255, 0.55);
+
+// 协议
+$check-bg: rgba(255, 255, 255, 0.90);
+$check-border: rgba(47, 53, 66, 0.15);
+$check-border-checked: $accent-dark;
+$check-bg-checked: $accent-dark;
+$check-radius: 10rpx;
+$check-size: 40rpx;
+
+// 步骤指示器
+$step-dot-size: 56rpx;
+$step-dot-border: rgba(142, 116, 89, 0.30);
+$step-dot-border-done: $success;
+$step-dot-border-active: $accent-dark;
+$step-dot-bg-active: rgba(142, 116, 89, 0.10);
+$step-line-bg: rgba(47, 53, 66, 0.08);
+$step-line-bg-active: rgba(142, 116, 89, 0.40);
+
+// 品牌文字
+$brand-name-size: 30rpx;
+$brand-slogan-size: 19rpx;
+$brand-slogan-weight: 400;
+$brand-slogan-letter: 0.6rpx;
+
+// 副标题
+$subtitle-size: 26rpx;
+$subtitle-weight: 400;
+$subtitle-color: $text-muted;
+$subtitle-lh: 1.55;
+
+// 页面标题
+$title-size: 52rpx;
+$title-weight: 800;
+$title-lh: 1.1;
+
+// 协议文字
+$terms-text-size: 24rpx;
+$terms-link-color: $accent-dark;
+$terms-link-weight: 500;
+
+// 邀请码（弱化）
+$invite-muted-opacity: 0.55;
+
+// 验证码按钮
+$code-btn-border: rgba(142, 116, 89, 0.42);
+$code-btn-border-counting: rgba(47, 53, 66, 0.10);
+$code-btn-text: $accent-dark;
+$code-btn-text-counting: $text-muted;
+
+// 底部协议
+$footer-text-size: 22rpx;
+$footer-text-color: rgba(20, 20, 20, 0.40);
+
+// ===========================================
+//  Utility Mixins
+// ===========================================
 
 @mixin line-clamp($lines) {
   display: -webkit-box;
@@ -271,6 +360,157 @@ $home-card-pad: 20rpx;
     background: $bronze-gradient;
   }
 }
+
+// Auth mixins
+@mixin auth-card {
+  background: $auth-card-blur-bg;
+  backdrop-filter: $glass-blur;
+  -webkit-backdrop-filter: $glass-blur;
+  border: 1rpx solid $auth-card-border;
+  border-radius: $auth-card-radius;
+  box-shadow: $auth-card-shadow;
+}
+
+@mixin auth-input {
+  height: $auth-input-height;
+  background: $auth-input-bg;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1rpx solid $auth-input-border;
+  border-radius: $auth-input-radius;
+  box-shadow: inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+  &.is-focused {
+    border-color: $auth-input-border-focus;
+    box-shadow: inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04), 0 0 0 4rpx $auth-input-glow;
+  }
+}
+
+@mixin btn-brand {
+  background: $btn-brand-gradient;
+  border-radius: $radius-full;
+  box-shadow: $btn-brand-shadow;
+  transition: box-shadow 0.3s ease, transform 0.25s ease;
+  overflow: hidden;
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  &:hover {
+    box-shadow: $btn-brand-shadow-hover;
+    transform: translateY(-2rpx);
+  }
+  &:active {
+    transform: scale(0.985) translateY(0);
+    box-shadow: $btn-brand-shadow-active;
+  }
+}
+
+@mixin btn-brand-outline {
+  background: transparent;
+  border: 1.5rpx solid $code-btn-border;
+  border-radius: $radius-full;
+  transition: all 0.25s ease;
+  &:active {
+    background: rgba(142, 116, 89, 0.08);
+    transform: scale(0.975);
+  }
+}
+
+@mixin btn-brand-disabled {
+  background: $btn-disabled-bg;
+  color: $btn-disabled-text;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+@mixin logo-card {
+  background: $logo-card-bg;
+  border-radius: 36rpx;
+  box-shadow: 0 12rpx 48rpx rgba(47, 53, 66, 0.28), 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
+}
+
+@mixin hero-glow {
+  background: $hero-orb;
+  border-radius: 50%;
+}
+
+// ===========================================
+//  Global CSS Custom Properties
+// ===========================================
+
+:root {
+  --bg-primary: #F8F7F4;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #EFEEEA;
+  --bg-elevated: #FFFFFF;
+  --bg-overlay: rgba(255, 255, 255, 0.94);
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FAFAF8;
+  --mineral-gray: #2F3542;
+  --mineral-blue: #707B8C;
+  --bronze-gold: #B89876;
+  --bronze-light: #D4C4AE;
+  --bronze-dark: #8E7459;
+  --mineral-dark: #414B5E;
+  --mineral-line: rgba(47, 53, 66, 0.10);
+  --navy: #2F3542;
+  --navy-light: #414B5E;
+  --navy-muted: #707B8C;
+  --ai-gradient: linear-gradient(135deg, #2F3542 0%, #414B5E 55%, #4F5D73 100%);
+  --ai-gradient-soft: linear-gradient(135deg, rgba(47, 53, 66, 0.06) 0%, rgba(65, 75, 94, 0.04) 100%);
+  --bronze-gradient: linear-gradient(135deg, #D4C4AE 0%, #B89876 50%, #8E7459 100%);
+  --primary: #2F3542;
+  --primary-light: #414B5E;
+  --primary-dark: #1E222D;
+  --primary-glow: rgba(47, 53, 66, 0.12);
+  --accent: #B89876;
+  --accent-light: #D4C4AE;
+  --accent-dark: #8E7459;
+  --accent-glow: rgba(184, 152, 118, 0.25);
+  --warm-yellow: #EDE9E1;
+  --warm-pink: #F0EDE8;
+  --warm-blue: #ECEEF2;
+  --gold: #B89876;
+  --gold-light: #D4C4AE;
+  --success: #5A7A6A;
+  --warning: #A07850;
+  --danger: #B06060;
+  --profit: #8E7459;
+  --text-primary: #141414;
+  --text-secondary: #5C5C5C;
+  --text-muted: #8A8A8A;
+  --text-accent: #8E7459;
+  --text-inverse: #FFFFFF;
+  --border-color: rgba(20, 20, 20, 0.08);
+  --border-light: rgba(20, 20, 20, 0.05);
+  --border-primary: rgba(184, 152, 118, 0.40);
+  --border-accent: rgba(142, 116, 89, 0.30);
+  --glass-bg: #FFFFFF;
+  --glass-border: rgba(20, 20, 20, 0.06);
+  --clay-shadow: 0 12rpx 48rpx rgba(47, 53, 66, 0.06), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+  --clay-shadow-inset: none;
+  --clay-inset: none;
+  --radius: 20rpx;
+  --radius-lg: 24rpx;
+  --radius-xl: 28rpx;
+  --shadow-glow: 0 16rpx 48rpx rgba(47, 53, 66, 0.08);
+  --shadow-fire: 0 12rpx 40rpx rgba(184, 152, 118, 0.2);
+  --shadow-card: var(--clay-shadow);
+  --spacing-xs: 8rpx;
+  --spacing-sm: 16rpx;
+  --spacing-base: 28rpx;
+  --spacing-lg: 40rpx;
+}
+
+// ===========================================
+//  Base Component Styles
+// ===========================================
 
 .glass-card,
 .clay-card {
@@ -425,6 +665,10 @@ $home-card-pad: 20rpx;
   }
 }
 
+// ===========================================
+//  Animations
+// ===========================================
+
 @keyframes btn-flow-load {
   0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -448,6 +692,10 @@ $home-card-pad: 20rpx;
 .clay-portal-glow {
   animation: premium-glow-anim 4s ease-in-out infinite;
 }
+
+// ===========================================
+//  Utility Classes
+// ===========================================
 
 .page-container {
   min-height: 100vh;
@@ -475,231 +723,3 @@ $home-card-pad: 20rpx;
 .mb-sm { margin-bottom: $spacing-sm; }
 .mb-base { margin-bottom: $spacing-base; }
 .mb-lg { margin-bottom: $spacing-lg; }
-
-// ============================================
-//  轻奢登录体系 · Auth Design Tokens
-// ============================================
-
-// 品牌渐变（主按钮/Logo区域）
-$brand-gradient: linear-gradient(145deg, #2F3542 0%, #3D4656 40%, #4A5568 100%);
-$brand-glow: linear-gradient(145deg, rgba(47, 53, 66, 0.92) 0%, rgba(74, 85, 104, 0.88) 100%);
-$brand-gold-gradient: linear-gradient(135deg, #B89876 0%, #D4C4AE 50%, #B89876 100%);
-
-// 品牌光效
-$logo-card-bg: linear-gradient(160deg, rgba(47, 53, 66, 0.96) 0%, rgba(65, 75, 94, 0.92) 100%);
-$logo-glow-warm: rgba(184, 152, 118, 0.18);
-$hero-orb: radial-gradient(ellipse at 50% 60%, rgba(184, 152, 118, 0.14) 0%, transparent 65%);
-$glass-blur: blur(20px);
-
-// ──── FL 浮动标签 ────
-$fl-label-size: 22rpx;
-$fl-label-size-float: 18rpx;
-$fl-label-color: $text-secondary;
-$fl-label-color-focus: $bronze-gold;
-$fl-label-weight: 500;
-$fl-float-duration: 0.22s;
-$fl-float-timing: cubic-bezier(0.4, 0, 0.2, 1);
-
-// ──── 圆形倒计时 ────
-$countdown-ring-size: 56rpx;
-$countdown-ring-stroke: 3rpx;
-$countdown-ring-color: $bronze-gold;
-$countdown-ring-bg: rgba(47, 53, 66, 0.06);
-$countdown-text-size: 20rpx;
-$countdown-text-color: $bronze-dark;
-
-// ──── 按钮流动加载 ────
-$btn-flow-duration: 1.4s;
-$btn-flow-timing: ease-in-out;
-
-// ──── 品牌线性渐变按钮（浮起感）────
-$btn-gold-gradient: linear-gradient(135deg, #E8D5A3 0%, #D4B483 25%, #B5935E 65%, #8B6845 100%);
-$btn-gold-shadow: 0 8rpx 20rpx rgba(212, 180, 131, 0.3);
-$btn-gold-shadow-hover: 0 16rpx 44rpx rgba(212, 180, 131, 0.38);
-
-// ──── 输入框无边框风格 ────
-$input-bg: transparent;
-$input-border: transparent;
-$input-border-focus: #D4B483;
-$input-shadow-focus: 0 0 0 3rpx rgba(212, 180, 131, 0.18);
-$input-padding-x: 20px;  // 20px 水平呼吸边距
-
-// ──── 品牌纹理（若隐若现 Logo 铺底）────
-$brand-texture-opacity: 0.035;
-
-// 输入框
-$auth-input-bg: rgba(255, 255, 255, 0.72);
-$auth-input-border: rgba(47, 53, 66, 0.08);
-$auth-input-border-focus: rgba(142, 116, 89, 0.55);
-$auth-input-line: rgba(142, 116, 89, 0.50);
-$auth-input-radius: 20rpx;
-$auth-input-height: 96rpx;
-$auth-input-glow: rgba(184, 152, 118, 0.12);
-
-// 卡片
-$auth-card-bg: rgba(255, 255, 255, 0.90);
-$auth-card-border: rgba(255, 255, 255, 0.60);
-$auth-card-radius: 40rpx;
-$auth-card-shadow: 0 24rpx 80rpx rgba(47, 53, 66, 0.08), 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
-$auth-card-blur-bg: rgba(255, 255, 255, 0.82);
-
-// 按钮
-$btn-brand-gradient: linear-gradient(135deg, #2F3542 0%, #3D4656 50%, #4A5568 100%);
-$btn-brand-shadow: 0 12rpx 40rpx rgba(47, 53, 66, 0.22);
-$btn-brand-shadow-hover: 0 16rpx 52rpx rgba(47, 53, 66, 0.30);
-$btn-brand-shadow-active: 0 6rpx 24rpx rgba(47, 53, 66, 0.18);
-
-$btn-gold-gradient: $brand-gold-gradient;
-$btn-gold-shadow: 0 12rpx 40rpx rgba(184, 152, 118, 0.28);
-$btn-gold-shadow-hover: 0 16rpx 52rpx rgba(184, 152, 118, 0.36);
-$btn-gold-shadow-active: 0 6rpx 24rpx rgba(184, 152, 118, 0.22);
-$btn-disabled-bg: rgba(47, 53, 66, 0.28);
-$btn-disabled-text: rgba(255, 255, 255, 0.55);
-
-// 协议勾选框
-$check-bg: rgba(255, 255, 255, 0.90);
-$check-border: rgba(47, 53, 66, 0.15);
-$check-border-checked: $accent-dark;
-$check-bg-checked: $accent-dark;
-$check-radius: 10rpx;
-$check-size: 40rpx;
-
-// 步骤指示器
-$step-dot-size: 56rpx;
-$step-dot-border: rgba(142, 116, 89, 0.30);
-$step-dot-border-done: $success;
-$step-dot-border-active: $accent-dark;
-$step-dot-bg-active: rgba(142, 116, 89, 0.10);
-$step-line-bg: rgba(47, 53, 66, 0.08);
-$step-line-bg-active: rgba(142, 116, 89, 0.40);
-
-// 品牌文字
-$brand-name-size: 30rpx;
-$brand-slogan-size: 19rpx;
-$brand-name-weight: 800;
-$brand-slogan-weight: 400;
-$brand-slogan-letter: 0.6rpx;
-
-// 副标题
-$subtitle-size: 26rpx;
-$subtitle-weight: 400;
-$subtitle-color: $text-muted;
-$subtitle-lh: 1.55;
-
-// 页面标题
-$title-size: 52rpx;
-$title-weight: 800;
-$title-lh: 1.1;
-
-// 协议文字
-$terms-text-size: 24rpx;
-$terms-link-color: $accent-dark;
-$terms-link-weight: 500;
-
-// 邀请码（弱化）
-$invite-muted-opacity: 0.55;
-
-// 验证码按钮
-$code-btn-border: rgba(142, 116, 89, 0.42);
-$code-btn-border-counting: rgba(47, 53, 66, 0.10);
-$code-btn-text: $accent-dark;
-$code-btn-text-counting: $text-muted;
-
-// 底部协议
-$footer-text-size: 22rpx;
-$footer-text-color: rgba(20, 20, 20, 0.40);
-
-// ============================================
-//  Auth 专用 mixin
-// ============================================
-
-// 统一品牌卡片（毛玻璃风格）
-@mixin auth-card {
-  background: $auth-card-blur-bg;
-  backdrop-filter: $glass-blur;
-  -webkit-backdrop-filter: $glass-blur;
-  border: 1rpx solid $auth-card-border;
-  border-radius: $auth-card-radius;
-  box-shadow: $auth-card-shadow;
-}
-
-// 品牌输入框
-@mixin auth-input {
-  height: $auth-input-height;
-  background: $auth-input-bg;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1rpx solid $auth-input-border;
-  border-radius: $auth-input-radius;
-  box-shadow: inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  box-sizing: border-box;
-
-  &.is-focused {
-    border-color: $auth-input-border-focus;
-    box-shadow: inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04), 0 0 0 4rpx $auth-input-glow;
-  }
-}
-
-// 品牌渐变主按钮
-@mixin btn-brand {
-  background: $btn-brand-gradient;
-  border-radius: $radius-full;
-  box-shadow: $btn-brand-shadow;
-  transition: box-shadow 0.3s ease, transform 0.25s ease;
-  overflow: hidden;
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
-    pointer-events: none;
-  }
-
-  &:hover {
-    box-shadow: $btn-brand-shadow-hover;
-    transform: translateY(-2rpx);
-  }
-
-  &:active {
-    transform: scale(0.985) translateY(0);
-    box-shadow: $btn-brand-shadow-active;
-  }
-}
-
-// 品牌次按钮（描边）
-@mixin btn-brand-outline {
-  background: transparent;
-  border: 1.5rpx solid $code-btn-border;
-  border-radius: $radius-full;
-  transition: all 0.25s ease;
-
-  &:active {
-    background: rgba(142, 116, 89, 0.08);
-    transform: scale(0.975);
-  }
-}
-
-// 禁用主按钮
-@mixin btn-brand-disabled {
-  background: $btn-disabled-bg;
-  color: $btn-disabled-text;
-  box-shadow: none;
-  pointer-events: none;
-}
-
-// Logo 卡片
-@mixin logo-card {
-  background: $logo-card-bg;
-  border-radius: 36rpx;
-  box-shadow: 0 12rpx 48rpx rgba(47, 53, 66, 0.28), 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
-}
-
-// Hero 光晕
-@mixin hero-glow {
-  background: $hero-orb;
-  border-radius: 50%;
-}
-

@@ -144,6 +144,12 @@
 import { ref, reactive } from 'vue'
 import { authApi } from '@/utils/api'
 
+interface UniInputEvent {
+  detail?: {
+    element?: { selectionStart?: number; selectionEnd?: number } | null;
+  };
+}
+
 const submitting = ref(false)
 const showPwd = ref(false)
 
@@ -162,7 +168,7 @@ if (token) {
 function onFocus(field: 'phone' | 'pwd') { focusState[field] = true }
 function onBlur(field: 'phone' | 'pwd') { focusState[field] = false }
 
-function onPwdInput(e: any) {
+function onPwdInput(e: UniInputEvent) {
   const el = e.detail?.element || document.getElementById('pwd-input')
   if (el && showPwd.value) {
     const pos = el.selectionStart ?? form.value.password.length

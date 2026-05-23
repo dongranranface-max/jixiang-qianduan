@@ -1,136 +1,276 @@
 <template>
   <view class="asset-bar" :style="{ paddingTop: statusBarHeight + 'px' }">
-    <view class="asset-bar__inner">
-      <BrandLogo size="sm" :show-text="false" />
-      <scroll-view scroll-x class="asset-bar__scroll" :show-scrollbar="false">
-        <view class="asset-bar__chips">
-          <view class="chip chip--total">
-            <text class="chip__label">总资产</text>
-            <text class="chip__value">{{ assetStore.totalAssetsDisplay }}</text>
-          </view>
-          <view class="chip">
-            <text class="chip__label">生态积分</text>
-            <text class="chip__value chip__value--ice">{{ assetStore.ecoPointsDisplay }}</text>
-          </view>
-          <view class="chip">
-            <text class="chip__label">消费积分</text>
-            <text class="chip__value chip__value--fire">{{ assetStore.consumerPointsDisplay }}</text>
-          </view>
-          <view class="chip">
-            <text class="chip__label">今日分红</text>
-            <text class="chip__value chip__value--gold">+{{ assetStore.yesterdayProfitDisplay }}</text>
+    <!-- 深色金融毛玻璃资产卡片 -->
+    <view class="asset-card">
+      <!-- 左侧：品牌 + 总资产 -->
+      <view class="asset-card__left">
+        <view class="asset-card__logo-wrap">
+          <image
+            class="asset-card__logo"
+            src="/static/logo.png"
+            mode="aspectFit"
+            width="32"
+            height="32"
+          />
+        </view>
+        <view class="asset-card__balance">
+          <text class="asset-card__balance-label">总资产</text>
+          <view class="asset-card__balance-row">
+            <text class="asset-card__balance-value">
+              {{ hidden ? '****' : assetStore.totalAssetsDisplay }}
+            </text>
+            <view class="asset-card__eye" @click="toggleHidden">
+              <svg v-if="!hidden" class="eye-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <svg v-else class="eye-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </view>
           </view>
         </view>
-      </scroll-view>
-      <view class="asset-bar__profit" @click="goWealth">
-        <text class="asset-bar__profit-label">增值</text>
-        <text class="asset-bar__profit-arrow">›</text>
+      </view>
+
+      <!-- 右侧：昨日收益 -->
+      <view class="asset-card__profit" @click="goWealth">
+        <text class="asset-card__profit-tag">昨日收益</text>
+        <text class="asset-card__profit-value">+{{ hidden ? '**' : assetStore.yesterdayProfitDisplay }}</text>
+        <view class="asset-card__profit-arrow">
+          <text>增值 ›</text>
+        </view>
       </view>
     </view>
-    <view class="asset-bar__formula">生态 + 消费 + 待收分红</view>
+
+    <!-- 积分明细 -->
+    <view class="asset-strip">
+      <view class="asset-strip__item">
+        <text class="asset-strip__label">生态积分</text>
+        <text class="asset-strip__value asset-strip__value--ice">
+          {{ hidden ? '****' : assetStore.ecoPointsDisplay }}
+        </text>
+      </view>
+      <view class="asset-strip__divider" />
+      <view class="asset-strip__item">
+        <text class="asset-strip__label">消费积分</text>
+        <text class="asset-strip__value asset-strip__value--fire">
+          {{ hidden ? '****' : assetStore.consumerPointsDisplay }}
+        </text>
+      </view>
+      <view class="asset-strip__divider" />
+      <view class="asset-strip__item">
+        <text class="asset-strip__label">待收分红</text>
+        <text class="asset-strip__value asset-strip__value--gold">
+          {{ hidden ? '****' : '—' }}
+        </text>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { assetStore } from '@/store/asset'
-import BrandLogo from '@/components/BrandLogo.vue'
 
 const statusBarHeight = ref(20)
+const hidden = ref(false)
 
-onMounted(() => {
-  statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
-})
+statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
+
+function toggleHidden() {
+  hidden.value = !hidden.value
+}
 
 function goWealth() {
-  uni.navigateTo({ url: '/pages/wealth/index' })
+  uni.switchTab({ url: '/pages/wealth/index' })
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
 
-.asset-bar {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  background: linear-gradient(
-    180deg,
-    rgba(47, 53, 66, 0.96) 0%,
-    rgba(47, 53, 66, 0.90) 100%
-  );
-  border-bottom: 1rpx solid rgba(112, 123, 140, 0.12);
-  backdrop-filter: blur(24px);
+// 深色毛玻璃资产卡片
+.asset-card {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  margin: 0 28rpx 16rpx;
+  padding: 24rpx;
+  background: $asset-card-bg;
+  border: 1rpx solid $asset-card-border;
+  border-radius: $asset-card-radius;
+  box-shadow: $asset-card-shadow;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+
+  // 左上角光晕装饰
+  &::before {
+    content: '';
+    position: absolute;
+    top: -20rpx;
+    left: -20rpx;
+    width: 160rpx;
+    height: 160rpx;
+    background: radial-gradient(circle, rgba(184, 152, 118, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
 }
 
-.asset-bar__inner {
+.asset-card__left {
   display: flex;
   align-items: center;
-  padding: 12rpx 20rpx 8rpx;
-  gap: 12rpx;
+  gap: 16rpx;
 }
 
-.asset-bar__scroll {
-  flex: 1;
-  white-space: nowrap;
-}
-
-.asset-bar__chips {
-  display: inline-flex;
-  gap: 12rpx;
-}
-
-.chip {
-  display: inline-flex;
-  flex-direction: column;
-  padding: 10rpx 20rpx;
-  background: rgba(112, 123, 140, 0.08);
-  border: 1rpx solid rgba(112, 123, 140, 0.15);
+.asset-card__logo-wrap {
+  width: 64rpx;
+  height: 64rpx;
   border-radius: 16rpx;
-  min-width: 140rpx;
-}
-.chip--total {
-  background: linear-gradient(135deg, rgba(112, 123, 140, 0.12), rgba(184, 152, 118, 0.08));
-  border-color: rgba(112, 123, 140, 0.28);
-}
-.chip__label {
-  font-size: 18rpx;
-  color: $text-muted;
-}
-.chip__value {
-  font-size: 26rpx;
-  font-weight: 800;
-  color: $text-primary;
-  margin-top: 4rpx;
-}
-.chip__value--ice { color: $primary-light; }
-.chip__value--fire { color: $accent-light; }
-.chip__value--gold { color: $bronze-light; }
-
-.asset-bar__profit {
-  flex-shrink: 0;
-  padding: 12rpx 16rpx;
-  background: rgba(184, 152, 118, 0.18);
-  border: 1rpx solid rgba(184, 152, 118, 0.35);
-  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1rpx solid rgba(212, 180, 131, 0.15);
   display: flex;
   align-items: center;
-  gap: 4rpx;
-}
-.asset-bar__profit-label {
-  font-size: 22rpx;
-  color: $bronze-light;
-  font-weight: 700;
-}
-.asset-bar__profit-arrow {
-  color: $bronze-light;
-  font-size: 28rpx;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.asset-bar__formula {
-  font-size: 18rpx;
-  color: rgba(112, 123, 140, 0.5);
-  text-align: center;
-  padding-bottom: 10rpx;
+.asset-card__logo {
+  width: 40rpx;
+  height: 40rpx;
+  display: block;
+}
+
+.asset-card__balance {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.asset-card__balance-label {
+  font-size: $asset-label-size;
+  color: $asset-label-color;
+  font-weight: $asset-label-weight;
+}
+
+.asset-card__balance-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.asset-card__balance-value {
+  font-family: $asset-balance-font;
+  font-size: $asset-balance-size;
+  font-weight: $asset-balance-weight;
+  color: $asset-balance-color;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5rpx;
+  line-height: 1;
+}
+
+.asset-card__eye {
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.eye-icon {
+  width: 32rpx;
+  height: 32rpx;
+  color: $asset-eye-color;
+  transition: color 0.2s ease;
+  display: block;
+
+  &:active {
+    color: $asset-eye-active;
+  }
+}
+
+// 右侧昨日收益
+.asset-card__profit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-left: 24rpx;
+  border-left: 1rpx solid rgba(212, 180, 131, 0.12);
+  gap: 6rpx;
+}
+
+.asset-card__profit-tag {
+  font-size: $asset-label-size;
+  color: $asset-label-color;
+  font-weight: $asset-label-weight;
+}
+
+.asset-card__profit-value {
+  font-family: $asset-balance-font;
+  font-size: $asset-profit-size;
+  font-weight: $asset-profit-weight;
+  color: $asset-profit-color;
+  font-variant-numeric: tabular-nums;
+}
+
+.asset-card__profit-arrow {
+  font-size: 20rpx;
+  color: rgba(184, 152, 118, 0.6);
+  font-weight: 600;
+
+  text {
+    letter-spacing: 0.5rpx;
+  }
+}
+
+// 积分明细条
+.asset-strip {
+  display: flex;
+  align-items: center;
+  margin: 0 28rpx 20rpx;
+  padding: 20rpx 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  border-radius: $radius-lg;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.asset-strip__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  padding: 0 16rpx;
+}
+
+.asset-strip__label {
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 500;
+}
+
+.asset-strip__value {
+  font-family: $asset-balance-font;
+  font-size: 30rpx;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+
+  &--ice { color: rgba(212, 196, 174, 0.85); }
+  &--fire { color: rgba(212, 180, 131, 0.9); }
+  &--gold { color: $bronze-light; }
+}
+
+.asset-strip__divider {
+  width: 1rpx;
+  height: 48rpx;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
 }
 </style>

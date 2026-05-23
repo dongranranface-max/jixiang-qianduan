@@ -5,6 +5,7 @@
 // ============================================
 import { API_BASE_URL } from '@/config'
 import { sanitizeKeyword, sanitizeOrderNo, sanitizeId, escapeHtml } from './security'
+import { generateSignHeaders, needsSign } from './signature'
 
 const BASE_URL = API_BASE_URL
 
@@ -59,9 +60,16 @@ function request<T = unknown>(options: RequestOptions): Promise<T> {
     // 安全增强：清理请求 URL 中的特殊字符（防 XSS）
     const cleanUrl = options.url.replace(/[<>'"`;]/g, '')
 
+    // 防篡改签名（金额/积分相关写操作）
+    const method = options.method || 'GET'
+    if (needsSign(method, cleanUrl)) {
+      const signHeaders = generateSignHeaders(options.data || {})
+      Object.assign(header, signHeaders)
+    }
+
     uni.request({
       url: `${BASE_URL}${cleanUrl}`,
-      method: options.method || 'GET',
+      method,
       data: options.data,
       header,
       success: (res: any) => {

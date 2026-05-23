@@ -3,6 +3,7 @@
     class="page-container"
     :style="{ '--home-top-offset': homeTopOffset + 'px' }"
   >
+    <!-- 顶部导航：Logo + 搜索框 + 购物车 -->
     <view
       class="home-top"
       :class="{ 'home-top--scrolled': pageScrolled }"
@@ -18,20 +19,33 @@
       </view>
     </view>
 
+    <!-- 页面主体 -->
     <view class="page-body">
+
+      <!-- Banner 轮播 -->
       <view class="banner-wrap">
         <swiper
           class="banner"
           indicator-dots
-          indicator-active-color="#B89876"
-          indicator-color="rgba(0,0,0,0.1)"
+          indicator-active-color="#D4B483"
+          indicator-color="rgba(255,255,255,0.35)"
           autoplay
           circular
           :interval="4500"
         >
           <swiper-item v-for="(b, i) in banners" :key="i">
-            <view class="banner__slide" :class="'banner__slide--' + (b.theme || 'consume')" @click="onBanner(i)">
-              <image v-if="b.image" class="banner__img" :src="b.image" mode="aspectFill" :lazy-load="i > 0" />
+            <view
+              class="banner__slide"
+              :class="'banner__slide--' + (b.theme || 'consume')"
+              @click="onBanner(i)"
+            >
+              <image
+                v-if="b.image"
+                class="banner__img"
+                :src="b.image"
+                mode="aspectFill"
+                :lazy-load="i > 0"
+              />
               <view class="banner__shade" />
               <view class="banner__content">
                 <text v-if="b.tag" class="banner__tag">{{ b.tag }}</text>
@@ -49,18 +63,21 @@
         </swiper>
       </view>
 
+      <!-- 跑马灯通知 -->
       <view class="home-block">
         <RewardTicker variant="feed" label="动态信息" @click="goWealthTab" />
       </view>
 
       <view v-if="loggedIn" class="home-divider" />
 
+      <!-- 资产状态栏（已登录） -->
       <view v-if="loggedIn" class="home-block">
-        <HomeAssetStrip />
+        <AssetStatusBar />
       </view>
 
       <view class="home-divider" />
 
+      <!-- 商城服务入口 -->
       <view class="home-block home-section">
         <text class="home-section__title">商城服务</text>
         <MallPortalGrid @select="onPortal" />
@@ -68,6 +85,7 @@
 
       <view class="home-divider" />
 
+      <!-- 热门分类 -->
       <view class="home-block home-block--category">
         <view class="block-head">
           <text class="block-head__title">热门分类</text>
@@ -82,6 +100,7 @@
 
       <view class="home-divider" />
 
+      <!-- 商品列表 -->
       <view id="feed-anchor" class="home-block feed-section">
         <view class="feed-tabs feed-tabs--sticky">
           <view
@@ -147,7 +166,7 @@ import HomeCategoryNav from '@/components/HomeCategoryNav.vue'
 import type { HomeCategory } from '@/utils/category'
 import { normalizeCategoryTree, flattenCategories, HOME_CATEGORY_FALLBACK } from '@/utils/category'
 import { HOME_BANNERS, DEFAULT_PRODUCT_COVER } from '@/utils/media'
-import HomeAssetStrip from '@/components/HomeAssetStrip.vue'
+import AssetStatusBar from '@/components/AssetStatusBar.vue'
 import HomeProductCard from '@/components/HomeProductCard.vue'
 import HomeProductSkeleton from '@/components/HomeProductSkeleton.vue'
 import RewardTicker from '@/components/RewardTicker.vue'
@@ -245,7 +264,6 @@ async function loadCategories() {
     homeCategories.value = flat.length ? flat : [...HOME_CATEGORY_FALLBACK]
   } catch (e) {
     if (seq !== categoriesLoadSeq) return
-    console.warn('[home] loadCategories failed, use fallback', e)
     homeCategories.value = [...HOME_CATEGORY_FALLBACK]
   }
 }
@@ -262,7 +280,7 @@ async function loadProducts() {
     exchangeList.value = e.list || []
     redeemList.value = r.list || []
   } catch (err) {
-    console.error('[home] loadProducts', err)
+    // silent fail, show empty state
   } finally {
     feedLoading.value = false
   }
@@ -327,26 +345,16 @@ function onBanner(i: number) {
   const link = banners[i]?.link
   if (link === 'consume') goBuy()
   else if (link === 'exchange') goExchange()
-  else if (link === 'wealth') {
-    goWealthTab()
-  }
+  else if (link === 'wealth') goWealthTab()
 }
 
 function onPortal(type: PortalType) {
   if (type !== 'consume' && !requireAuth()) return
   switch (type) {
-    case 'consume':
-      goBuy()
-      break
-    case 'exchange':
-      goExchange()
-      break
-    case 'redeem':
-      goRedeem()
-      break
-    case 'wealth':
-      goWealthTab()
-      break
+    case 'consume': goBuy(); break
+    case 'exchange': goExchange(); break
+    case 'redeem': goRedeem(); break
+    case 'wealth': goWealthTab(); break
   }
 }
 </script>
@@ -363,7 +371,6 @@ function onPortal(type: PortalType) {
   padding: 12rpx 0 $spacing-xl;
 }
 
-/* 首页模块间距 48rpx + 区块分隔线 */
 .home-block {
   margin-bottom: $home-module-gap;
 }
@@ -373,6 +380,7 @@ function onPortal(type: PortalType) {
   margin-bottom: $home-module-gap;
 }
 
+// 顶部导航：Logo + 搜索 + 购物车
 .home-top {
   display: flex;
   align-items: center;
@@ -384,12 +392,18 @@ function onPortal(type: PortalType) {
   position: sticky;
   top: 0;
   z-index: 110;
-  background: linear-gradient(180deg, rgba(245, 244, 241, 0.98), rgba(245, 244, 241, 0.92));
+  background: linear-gradient(180deg, rgba(245, 244, 241, 0.96) 0%, rgba(245, 244, 241, 0.88) 100%);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+
   &--scrolled {
-    box-shadow: 0 8rpx 32rpx rgba(26, 36, 56, 0.06);
+    background: rgba(245, 244, 241, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8rpx 32rpx rgba(26, 36, 56, 0.08);
     border-bottom: 1rpx solid $border-light;
   }
 }
+
 .home-top__cart {
   padding: 0 20rpx;
   height: 64rpx;
@@ -411,6 +425,7 @@ function onPortal(type: PortalType) {
   @include section-head;
   margin-bottom: 24rpx;
 }
+
 .search-bar {
   flex: 1;
   display: flex;
@@ -420,12 +435,14 @@ function onPortal(type: PortalType) {
   @include premium-surface($bg-secondary);
   border-radius: $radius-full;
   min-width: 0;
+
   &__icon {
     color: $text-accent;
     margin-right: 12rpx;
     font-size: 28rpx;
     font-weight: var(--weight-medium);
   }
+
   &__ph {
     font-size: var(--font-sm);
     color: $text-muted;
@@ -436,13 +453,13 @@ function onPortal(type: PortalType) {
   }
 }
 
-/* 全屏沉浸式 Banner：突破 page 左右内边距，圆角 0，16:9 */
+// Banner
 .banner-wrap {
   margin: 0 (-$spacing-base) $home-module-gap;
   width: calc(100% + #{$spacing-base * 2});
 }
 .banner {
-  height: 422rpx; /* 750rpx 宽 × 16:9 */
+  height: 422rpx;
   border-radius: 0;
   overflow: hidden;
 }
@@ -455,11 +472,9 @@ function onPortal(type: PortalType) {
   &--exchange {
     background: linear-gradient(135deg, #ECEEF2 0%, #D4C4AE 50%, #8E7459 100%);
   }
-
   &--wealth {
     background: linear-gradient(135deg, #2F3542 0%, #414B5E 55%, #8E7459 100%);
   }
-
   &--wealth .banner__title,
   &--wealth .banner__sub {
     color: #f5f4f1;
@@ -472,7 +487,6 @@ function onPortal(type: PortalType) {
   height: 100%;
   display: block;
 }
-/* 底部 20% 文字区渐变遮罩：下深上浅 */
 .banner__shade {
   position: absolute;
   left: 0;
@@ -559,6 +573,7 @@ function onPortal(type: PortalType) {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24rpx;
+
   &__title {
     @include section-head;
   }
@@ -596,11 +611,13 @@ function onPortal(type: PortalType) {
   padding: 20rpx 10rpx;
   border-radius: $radius-lg;
   @include premium-surface($bg-secondary);
+
   &.active {
     border-color: $border-primary;
     background: $warm-yellow;
     box-shadow: $shadow-gold;
   }
+
   &__abbr {
     width: 48rpx;
     height: 48rpx;
@@ -632,6 +649,7 @@ function onPortal(type: PortalType) {
   padding: $home-card-pad $home-card-pad + 4rpx;
   @include premium-surface($bg-secondary);
   border-radius: $radius-lg;
+
   &__row {
     display: flex;
     justify-content: space-between;
