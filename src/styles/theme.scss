@@ -460,3 +460,194 @@ $home-card-pad: 20rpx;
 .mb-sm { margin-bottom: $spacing-sm; }
 .mb-base { margin-bottom: $spacing-base; }
 .mb-lg { margin-bottom: $spacing-lg; }
+
+// ============================================
+//  轻奢登录体系 · Auth Design Tokens
+// ============================================
+
+// 品牌渐变（主按钮/Logo区域）
+$brand-gradient: linear-gradient(145deg, #2F3542 0%, #3D4656 40%, #4A5568 100%);
+$brand-glow: linear-gradient(145deg, rgba(47, 53, 66, 0.92) 0%, rgba(74, 85, 104, 0.88) 100%);
+$brand-gold-gradient: linear-gradient(135deg, #B89876 0%, #D4C4AE 50%, #B89876 100%);
+
+// 品牌光效
+$logo-card-bg: linear-gradient(160deg, rgba(47, 53, 66, 0.96) 0%, rgba(65, 75, 94, 0.92) 100%);
+$logo-glow-warm: rgba(184, 152, 118, 0.18);
+$hero-orb: radial-gradient(ellipse at 50% 60%, rgba(184, 152, 118, 0.14) 0%, transparent 65%);
+$glass-blur: blur(20px);
+
+// 输入框
+$auth-input-bg: rgba(255, 255, 255, 0.72);
+$auth-input-border: rgba(47, 53, 66, 0.08);
+$auth-input-border-focus: rgba(142, 116, 89, 0.55);
+$auth-input-line: rgba(142, 116, 89, 0.50);
+$auth-input-radius: 20rpx;
+$auth-input-height: 96rpx;
+$auth-input-glow: rgba(184, 152, 118, 0.12);
+
+// 卡片
+$auth-card-bg: rgba(255, 255, 255, 0.90);
+$auth-card-border: rgba(255, 255, 255, 0.60);
+$auth-card-radius: 40rpx;
+$auth-card-shadow: 0 24rpx 80rpx rgba(47, 53, 66, 0.08), 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+$auth-card-blur-bg: rgba(255, 255, 255, 0.82);
+
+// 按钮
+$btn-brand-gradient: linear-gradient(135deg, #2F3542 0%, #3D4656 50%, #4A5568 100%);
+$btn-brand-shadow: 0 12rpx 40rpx rgba(47, 53, 66, 0.22);
+$btn-brand-shadow-hover: 0 16rpx 52rpx rgba(47, 53, 66, 0.30);
+$btn-brand-shadow-active: 0 6rpx 24rpx rgba(47, 53, 66, 0.18);
+
+$btn-gold-gradient: $brand-gold-gradient;
+$btn-gold-shadow: 0 12rpx 40rpx rgba(184, 152, 118, 0.28);
+$btn-gold-shadow-hover: 0 16rpx 52rpx rgba(184, 152, 118, 0.36);
+$btn-gold-shadow-active: 0 6rpx 24rpx rgba(184, 152, 118, 0.22);
+$btn-disabled-bg: rgba(47, 53, 66, 0.28);
+$btn-disabled-text: rgba(255, 255, 255, 0.55);
+
+// 协议勾选框
+$check-bg: rgba(255, 255, 255, 0.90);
+$check-border: rgba(47, 53, 66, 0.15);
+$check-border-checked: $accent-dark;
+$check-bg-checked: $accent-dark;
+$check-radius: 10rpx;
+$check-size: 40rpx;
+
+// 步骤指示器
+$step-dot-size: 56rpx;
+$step-dot-border: rgba(142, 116, 89, 0.30);
+$step-dot-border-done: $success;
+$step-dot-border-active: $accent-dark;
+$step-dot-bg-active: rgba(142, 116, 89, 0.10);
+$step-line-bg: rgba(47, 53, 66, 0.08);
+$step-line-bg-active: rgba(142, 116, 89, 0.40);
+
+// 品牌文字
+$brand-name-size: 30rpx;
+$brand-slogan-size: 19rpx;
+$brand-name-weight: 800;
+$brand-slogan-weight: 400;
+$brand-slogan-letter: 0.6rpx;
+
+// 副标题
+$subtitle-size: 26rpx;
+$subtitle-weight: 400;
+$subtitle-color: $text-muted;
+$subtitle-lh: 1.55;
+
+// 页面标题
+$title-size: 52rpx;
+$title-weight: 800;
+$title-lh: 1.1;
+
+// 协议文字
+$terms-text-size: 24rpx;
+$terms-link-color: $accent-dark;
+$terms-link-weight: 500;
+
+// 邀请码（弱化）
+$invite-muted-opacity: 0.55;
+
+// 验证码按钮
+$code-btn-border: rgba(142, 116, 89, 0.42);
+$code-btn-border-counting: rgba(47, 53, 66, 0.10);
+$code-btn-text: $accent-dark;
+$code-btn-text-counting: $text-muted;
+
+// 底部协议
+$footer-text-size: 22rpx;
+$footer-text-color: rgba(20, 20, 20, 0.40);
+
+// ============================================
+//  Auth 专用 mixin
+// ============================================
+
+// 统一品牌卡片（毛玻璃风格）
+@mixin auth-card {
+  background: $auth-card-blur-bg;
+  backdrop-filter: $glass-blur;
+  -webkit-backdrop-filter: $glass-blur;
+  border: 1rpx solid $auth-card-border;
+  border-radius: $auth-card-radius;
+  box-shadow: $auth-card-shadow;
+}
+
+// 品牌输入框
+@mixin auth-input {
+  height: $auth-input-height;
+  background: $auth-input-bg;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1rpx solid $auth-input-border;
+  border-radius: $auth-input-radius;
+  box-shadow: inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+
+  &.is-focused {
+    border-color: $auth-input-border-focus;
+    box-shadow: inset 0 2rpx 8rpx rgba(47, 53, 66, 0.04), 0 0 0 4rpx $auth-input-glow;
+  }
+}
+
+// 品牌渐变主按钮
+@mixin btn-brand {
+  background: $btn-brand-gradient;
+  border-radius: $radius-full;
+  box-shadow: $btn-brand-shadow;
+  transition: box-shadow 0.3s ease, transform 0.25s ease;
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  &:hover {
+    box-shadow: $btn-brand-shadow-hover;
+    transform: translateY(-2rpx);
+  }
+
+  &:active {
+    transform: scale(0.985) translateY(0);
+    box-shadow: $btn-brand-shadow-active;
+  }
+}
+
+// 品牌次按钮（描边）
+@mixin btn-brand-outline {
+  background: transparent;
+  border: 1.5rpx solid $code-btn-border;
+  border-radius: $radius-full;
+  transition: all 0.25s ease;
+
+  &:active {
+    background: rgba(142, 116, 89, 0.08);
+    transform: scale(0.975);
+  }
+}
+
+// 禁用主按钮
+@mixin btn-brand-disabled {
+  background: $btn-disabled-bg;
+  color: $btn-disabled-text;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+// Logo 卡片
+@mixin logo-card {
+  background: $logo-card-bg;
+  border-radius: 36rpx;
+  box-shadow: 0 12rpx 48rpx rgba(47, 53, 66, 0.28), 0 4rpx 16rpx rgba(0, 0, 0, 0.12);
+}
+
+// Hero 光晕
+@mixin hero-glow {
+  background: $hero-orb;
+  border-radius: 50%;
+}
