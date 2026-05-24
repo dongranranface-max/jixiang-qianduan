@@ -1,465 +1,676 @@
 <template>
   <view class="page-container">
-    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
+    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }" />
 
-    <view class="nav-bar">
-      <view class="nav-back" @click="goBack"><text>←</text></view>
-      <view class="nav-tabs">
-        <view :class="['nav-tab', { active: currentTab === 'detail' }]" @click="currentTab = 'detail'">商品</view>
-        <view :class="['nav-tab', { active: currentTab === 'review' }]" @click="currentTab = 'review'">评价</view>
-      </view>
-      <view class="nav-share" @click="share"><text>⋮</text></view>
+    <!-- 页面导航 -->
+    <view class="page-nav">
+      <view class="page-nav__back" @click="goBack"><text>←</text></view>
+      <text class="page-nav__title">商品详情</text>
+      <view class="page-nav__action" @click="goHome"><text>首</text></view>
     </view>
 
-    <!-- 商品图片（懒加载轮播） -->
-    <ProductGallery :images="productImages" />
-
-    <!-- 商品信息 -->
-    <view class="product-info">
-      <view class="price-row">
-        <text class="current-price">
-          <text class="symbol" v-if="mode !== 'redeem'">¥</text>{{ mode === 'redeem' ? product.requiredPoints + '积分' : product.price }}
-        </text>
-        <text class="original-price" v-if="mode !== 'redeem'">¥{{ product.originalPrice || product.price }}</text>
-        <text class="mode-tag" :class="'mode-' + mode">{{ modeLabel }}</text>
-      </view>
-      <view class="name-row">
-        <text class="product-name">{{ product.name || '商品加载中...' }}</text>
-      </view>
-      <view class="desc-row">
-        <text class="description">{{ product.description }}</text>
-      </view>
-      <view class="points-info" v-if="mode !== 'redeem' && product.ecoPoints">
-        <text class="points-icon">积</text>
-        <text class="points-text">购买可得 {{ product.ecoPoints }} 生态积分</text>
-      </view>
-
-      <!-- ========== 支付公式透明化（换购商品专属） ========== -->
-      <view class="settlement-formula" v-if="mode === 'exchange'">
-        <view class="formula-bar">
-          <text class="formula-icon">式</text>
-          <text class="formula-text">
-            {{ product.totalPrice || product.price }}元 = 
-            <text class="formula-cash">{{ product.cashPrice || 0 }}元现金</text>
-            + 
-            <text class="formula-points">{{ product.requiredPoints || 0 }}生态积分</text>
-          </text>
-        </view>
-        <view class="reward-hint" v-if="product.ecoPoints">
-          <text class="reward-icon">返</text>
-          <text class="reward-text">下单预计返 {{ product.ecoPoints }} 消费积分</text>
-        </view>
-      </view>
-      <view class="settlement-formula" v-else-if="mode === 'consume' && product.ecoPoints">
-        <view class="formula-bar formula-simple">
-          <text class="formula-icon">返</text>
-          <text class="reward-text">下单得 {{ product.ecoPoints }} 生态积分</text>
-        </view>
+    <!-- 商品不存在 -->
+    <view v-if="!loading && !product.id" class="empty-state">
+      <view class="empty-state__icon">商</view>
+      <text class="empty-state__text">商品不存在或已下架</text>
+      <view class="empty-state__btn" @click="goHome">
+        <text>返回首页</text>
       </view>
     </view>
 
-    <!-- SKU 选择 -->
-    <view class="sku-section" @click="showSkuModal = true">
-      <view class="sku-label"><text>已选</text></view>
-      <view class="sku-content"><text>{{ selectedSku || '请选择' }}</text></view>
-      <text class="sku-arrow">›</text>
-    </view>
-
-    <!-- 商品详情 -->
-    <view class="detail-section" v-if="currentTab === 'detail'">
-      <view class="section-title"><text>商品详情</text></view>
-      <view class="detail-content">
-        <LaxImage v-for="(img, index) in productImages" :key="'d' + index" class="detail-image" :src="img" mode="widthFix" aspect-ratio="0" />
-      </view>
-    </view>
-
-    <!-- 评价 -->
-    <view class="review-section" v-if="currentTab === 'review'">
-      <view class="review-list">
-        <view class="review-item" v-for="r in []" :key="r.id">
-          <text class="review-content">{{ r.content }}</text>
-        </view>
-        <view class="empty-review"><text>暂无评价</text></view>
-      </view>
-    </view>
-
-    <!-- 底部操作 -->
-    <view class="bottom-bar">
-      <view class="action-icons">
-        <view class="action-icon-item" @click="goHome">
-          <text class="bar-icon">首</text><text class="icon-label">首页</text>
-        </view>
-        <view class="action-icon-item" @click="goCart">
-          <text class="bar-icon">购</text>
-          <view v-if="cartCount > 0" class="cart-badge">{{ cartCount }}</view>
-          <text class="icon-label">购物车</text>
+    <template v-else>
+      <!-- 加载骨架屏 -->
+      <view v-if="loading" class="detail-skeleton">
+        <view class="sk-banner shimmer" />
+        <view class="sk-content">
+          <view class="sk-line sk-long shimmer" />
+          <view class="sk-line sk-short shimmer" />
+          <view class="sk-line sk-medium shimmer" />
         </view>
       </view>
-      <view class="action-buttons">
-        <view class="btn-add-cart" @click="handleAddCart">加入购物车</view>
-        <view class="btn-buy-now" :class="'btn-' + mode" @click="handleBuy">{{ actionLabel }}</view>
-      </view>
-    </view>
 
-    <!-- SKU 弹窗 -->
-    <view class="sku-modal" v-if="showSkuModal" @click="showSkuModal = false">
-      <view class="sku-panel" @click.stop>
-        <view class="sku-header">
-          <image class="sku-image" :src="productImages[0]" mode="aspectFill" />
-          <view class="sku-info">
-            <text class="sku-price">
-              {{ mode === 'redeem' ? product.requiredPoints + '积分' : '¥' + product.price }}
-            </text>
-            <text class="sku-stock">库存: {{ product.stock || 999 }}</text>
+      <template v-else>
+        <!-- ========== 商品轮播图 ========== -->
+        <view class="gallery-wrap">
+          <swiper
+            class="gallery-swiper"
+            :current="currentSwiper"
+            @change="onSwiperChange"
+            autoplay
+            interval="4000"
+            circular
+          >
+            <swiper-item
+              v-for="(img, idx) in galleryImages"
+              :key="idx"
+              class="gallery-item"
+            >
+              <LaxImage :src="img" mode="aspectFill" class="gallery-img" />
+            </swiper-item>
+          </swiper>
+
+          <!-- 轮播指示器 -->
+          <view class="gallery-dots">
+            <view
+              v-for="(_, idx) in galleryImages"
+              :key="idx"
+              class="gallery-dot"
+              :class="{ active: currentSwiper === idx }"
+            />
           </view>
-          <view class="sku-close" @click="showSkuModal = false">×</view>
+
+          <!-- 图片计数 -->
+          <view class="gallery-counter">
+            <text>{{ currentSwiper + 1 }}/{{ galleryImages.length }}</text>
+          </view>
         </view>
-        <view class="sku-content">
-          <view class="quantity-row">
-            <text class="quantity-label">数量</text>
-            <view class="quantity-stepper">
-              <view class="stepper-btn" @click="quantity > 1 && quantity--">-</view>
-              <text class="stepper-value">{{ quantity }}</text>
-              <view class="stepper-btn" @click="quantity++">+</view>
+
+        <!-- ========== 价格 + 换购公式 ========== -->
+        <view class="price-section">
+          <view class="price-card">
+            <!-- 价格行 -->
+            <view class="price-row">
+              <template v-if="product.type === 3">
+                <!-- 兑换型：仅积分 -->
+                <view class="price-main price-main--points">
+                  <text class="price-points-value">{{ product.requiredPoints }}</text>
+                  <text class="price-points-unit">消费积分</text>
+                </view>
+              </template>
+              <template v-else-if="product.type === 2">
+                <!-- 换购型：¥X = 现金 + N积分 -->
+                <view class="price-main price-main--exchange">
+                  <text class="price-cash">¥{{ product.price }}</text>
+                  <text class="price-plus">+</text>
+                  <text class="price-points">{{ product.requiredPoints }}积分</text>
+                </view>
+                <view class="exchange-formula">
+                  <text>换购价 = ¥{{ product.price }} 现金 + {{ product.requiredPoints }} 消费积分</text>
+                </view>
+              </template>
+              <template v-else>
+                <!-- 消费型 -->
+                <view class="price-main price-main--cash">
+                  <text class="price-cash">¥{{ product.price }}</text>
+                </view>
+                <view v-if="product.pointsEarned" class="earn-hint">
+                  <text>🎁 购买即返 {{ product.pointsEarned }} 积分</text>
+                </view>
+              </template>
+            </view>
+
+            <!-- 商品名称 + 分类标签 -->
+            <view class="product-meta">
+              <text class="product-name">{{ product.name }}</text>
+              <view class="product-tags">
+                <text class="product-tag">类型：{{ typeName(product.type) }}</text>
+                <text v-if="product.categoryName" class="product-tag">{{ product.categoryName }}</text>
+              </view>
+            </view>
+
+            <!-- 销量 -->
+            <view v-if="product.salesCount" class="sales-row">
+              <text class="sales-text">已售 {{ formatSales(product.salesCount) }}</text>
             </view>
           </view>
         </view>
-        <view class="sku-footer">
-          <view class="btn-buy-now-lg" :class="'btn-' + mode" @click="handleBuy">立即{{ mode === 'redeem' ? '兑换' : '购买' }}</view>
-        </view>
-      </view>
-    </view>
 
-    <view class="safe-area-bottom"></view>
+        <!-- ========== 商品详情 ========== -->
+        <view class="detail-section">
+          <view class="detail-section__title">
+            <text>商品详情</text>
+          </view>
+          <view class="detail-content" v-html="product.description || '<p style=\'color:#8A8A8A;text-align:center;\' >暂无详情</p>'" />
+        </view>
+
+        <!-- ========== 底部购买栏 ========== -->
+        <view class="bottom-bar">
+          <!-- 首页入口 -->
+          <view class="bottom-bar__home" @click="goHome">
+            <text class="bottom-bar__home-icon">首</text>
+          </view>
+
+          <!-- 购买按钮 -->
+          <view class="bottom-bar__cta" @click="handleBuy">
+            <template v-if="product.type === 3">
+              <text>立即兑换</text>
+            </template>
+            <template v-else-if="product.type === 2">
+              <text>立即换购</text>
+            </template>
+            <template v-else>
+              <text>立即购买</text>
+            </template>
+          </view>
+        </view>
+      </template>
+    </template>
+
+    <view class="safe-area-bottom" />
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { productApi, cartApi } from '@/utils/api'
-import { requireAuth, checkAuth } from '@/utils/auth'
-import { resolveProductCover } from '@/utils/media'
-import type { Product, MallType } from '@/types/api'
-import ProductGallery from '@/components/product/ProductGallery.vue'
+import { onShow } from '@dcloudio/uni-app'
+import { productApi } from '@/utils/api'
+import { checkAuth, requireAuth } from '@/utils/auth'
+import { assetStore } from '@/store/asset'
 import LaxImage from '@/components/lazy/LaxImage.vue'
 
+interface Query {
+  id?: string | number
+  type?: string | number
+}
+
 const statusBarHeight = ref(20)
-const currentTab = ref('detail')
-const showSkuModal = ref(false)
-const quantity = ref(1)
-const cartCount = ref(0)
-const productId = ref('')
-const mode = ref<'consume' | 'exchange' | 'redeem'>('consume')
+const loading = ref(false)
+const product = ref<any>({})
+const currentSwiper = ref(0)
 
-const product = ref<Partial<Product>>({
-  name: '',
-  price: 0,
-  originalPrice: 0,
-  requiredPoints: 0,
-  ecoPoints: 0,
-  stock: 999,
-  description: '',
-})
-
-const productImages = computed(() => {
-  const imgs = product.value.coverImages || []
-  if (imgs.length > 0) return imgs
-  const cover = product.value.coverImage
-  if (cover) return [cover]
-  return [resolveProductCover(product.value)]
-})
-
-const modeLabel = computed(() => ({
-  consume: '消费商城',
-  exchange: '换购商城',
-  redeem: '兑换商城',
-}[mode.value] || '商品'))
-
-const actionLabel = computed(() => ({
-  consume: '立即购买',
-  exchange: '立即换购',
-  redeem: '立即兑换',
-}[mode.value] || '购买'))
-
-const selectedSku = computed(() => quantity.value > 1 ? `× ${quantity.value}` : '')
+const query = ref<Query>({})
 
 onMounted(() => {
-  const sys = uni.getSystemInfoSync()
-  statusBarHeight.value = sys.statusBarHeight || 20
-
+  statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
   const pages = getCurrentPages()
   const current = pages[pages.length - 1]
-  const opts = (current as any).options || {}
-  productId.value = opts.id || ''
-  mode.value = opts.mode === 'exchange' ? 'exchange' : opts.mode === 'redeem' ? 'redeem' : 'consume'
+  const options = (current as any)?.options || {}
+  query.value = {
+    id: options.id,
+    type: options.type ? Number(options.type) : 1,
+  }
+  loadProduct()
+})
 
-  if (productId.value) {
-    loadProduct()
-    loadCartCount()
+onShow(() => {
+  if (product.value.id) {
+    assetStore.fetchBalance()
   }
 })
 
-async function loadCartCount() {
-  if (!checkAuth()) return
+async function loadProduct() {
+  if (!query.value.id) return
+  loading.value = true
   try {
-    const res = await cartApi.count()
-    cartCount.value = res.count || 0
+    const res = await productApi.getDetail(query.value.id)
+    product.value = res || {}
   } catch {
-    cartCount.value = 0
+    product.value = {}
+  } finally {
+    loading.value = false
   }
 }
 
-async function loadProduct() {
-  try {
-    const res = await productApi.getDetail(productId.value)
-    product.value = res
-  } catch (e: any) {
-    uni.showToast({ title: '加载商品失败', icon: 'none' })
+const galleryImages = computed(() => {
+  const imgs = product.value.galleryImages || product.value.images || []
+  if (!imgs.length && product.value.coverImage) {
+    return [product.value.coverImage]
   }
+  return imgs.length ? imgs : ['/static/logo.png']
+})
+
+function typeName(type: number) {
+  const map = { 1: '消费', 2: '换购', 3: '兑换' }
+  return map[type] || '消费'
+}
+
+function formatSales(n: number) {
+  if (!n) return '0'
+  if (n >= 10000) return `${(n / 10000).toFixed(1)}万`
+  return String(n)
+}
+
+function onSwiperChange(e: any) {
+  currentSwiper.value = e.detail.current
 }
 
 function goBack() { uni.navigateBack() }
 function goHome() { uni.switchTab({ url: '/pages/index/index' }) }
-function goCart() { uni.switchTab({ url: '/pages/cart/index' }) }
-function share() { uni.showShareMenu() }
-
-async function handleAddCart() {
-  if (!requireAuth()) return
-  if (!productId.value) return
-  try {
-    await cartApi.add({ productId: productId.value, quantity: quantity.value })
-    cartCount.value++
-    uni.showToast({ title: '已加入购物车', icon: 'success' })
-    showSkuModal.value = false
-  } catch (e: any) {
-    uni.showToast({ title: e.message || '加入失败', icon: 'none' })
-  }
-}
 
 function handleBuy() {
-  showSkuModal.value = false
   if (!requireAuth()) return
-  if (!productId.value) return
-
-  if (mode.value === 'redeem') {
-    uni.navigateTo({ url: `/pages/order/confirm?productId=${productId.value}&mode=redeem` })
-  } else if (mode.value === 'exchange') {
-    uni.navigateTo({ url: `/pages/order/confirm?productId=${productId.value}&mode=exchange` })
+  const type = product.value.type || 1
+  const id = product.value.id
+  if (type === 3) {
+    // 积分兑换 → 直接下单
+    uni.navigateTo({ url: `/pages/order/confirm?type=3&productId=${id}&quantity=1` })
   } else {
-    uni.navigateTo({ url: `/pages/order/confirm?productId=${productId.value}&mode=consume` })
+    // 消费/换购 → 加入购物车或直接下单
+    uni.navigateTo({ url: `/pages/order/confirm?type=${type}&productId=${id}&quantity=1` })
   }
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
-@import '@/styles/page-shell.scss';
 
-.page-container { min-height: 100vh; background: var(--bg-primary); padding-bottom: 120rpx; }
-
-.nav-bar { display: flex; align-items: center; padding: 16rpx 32rpx; gap: 32rpx;
-  .nav-back, .nav-share {
-    width: 64rpx; height: 64rpx;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 36rpx; color: $navy;
-    @include premium-surface(rgba(255, 255, 255, 0.92));
-    border-radius: 50%;
-  }
-  .nav-tabs { flex: 1; display: flex; justify-content: center; gap: 48rpx;
-    .nav-tab { font-size: 30rpx; color: rgba(255,255,255,0.55); padding-bottom: 4rpx;
-      &.active { color: #fff; font-weight: 700; border-bottom: 4rpx solid $accent; }
-    }
-  }
+.page-container {
+  min-height: 100vh;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, #F9F9F9 0%, #F0EDE8 100%);
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
 }
 
-.product-swiper { width: 100%; height: 750rpx;
-  .product-image { width: 100%; height: 100%; }
-}
+.safe-area-top { width: 100%; }
 
-.product-info { padding: var(--spacing-base) var(--spacing-lg);
-  .price-row { display: flex; align-items: baseline; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm);
-    .current-price {
-      font-size: 48rpx; font-weight: 800;
-      @include ai-jelly-text;
-      letter-spacing: -1rpx;
-      .symbol { font-size: 28rpx; }
-    }
-    .original-price { font-size: 28rpx; color: var(--text-muted); text-decoration: line-through; }
-    .mode-tag { font-size: 22rpx; padding: 4rpx 16rpx; border-radius: 6rpx; margin-left: auto;
-      &.mode-exchange { background: rgba(201,162,39,0.15); color: var(--primary-light); border: 1rpx solid rgba(201,162,39,0.3); }
-      &.mode-redeem { background: rgba(255,140,0,0.15); color: var(--accent); border: 1rpx solid rgba(255,140,0,0.3); }
-    }
-  }
-  .name-row { margin-bottom: var(--spacing-xs);
-    .product-name { font-size: 32rpx; font-weight: 600; color: var(--text-primary); }
-  }
-  .desc-row { margin-bottom: var(--spacing-xs);
-    .description { font-size: 26rpx; color: var(--text-secondary); }
-  }
-  .points-info { display: flex; align-items: center; gap: var(--spacing-xs);
-    .points-icon {
-      font-size: 22rpx; font-weight: var(--weight-heavy);
-      color: $navy; background: $warm-yellow;
-      padding: 4rpx 10rpx; border-radius: 8rpx;
-    }
-    .points-text { font-size: 26rpx; color: $accent-dark; }
-  }
-}
-
-.sku-section {
+.page-nav {
   display: flex;
   align-items: center;
-  padding: var(--spacing-base) var(--spacing-lg);
-  background: var(--glass-bg);
-  border-top: 1rpx solid var(--glass-border);
-  border-bottom: 1rpx solid var(--glass-border);
-  .sku-label {
+  gap: 16rpx;
+  padding: 12rpx $spacing-base;
+
+  &__back,
+  &__action {
+    width: 64rpx;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: 50%;
     font-size: 28rpx;
-    color: var(--text-secondary);
-    margin-right: var(--spacing-base);
+    color: $mineral-gray;
+    flex-shrink: 0;
   }
-  .sku-content { flex: 1; font-size: 28rpx; color: var(--text-primary); }
-  .sku-arrow { font-size: 32rpx; color: var(--text-muted); }
+
+  &__title {
+    flex: 1;
+    font-size: 32rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    text-align: center;
+    letter-spacing: 0.5rpx;
+  }
 }
 
-// 支付公式透明化
-.settlement-formula {
-  padding: var(--spacing-base) var(--spacing-lg);
+// ========== 轮播图 ==========
+.gallery-wrap {
+  position: relative;
+  width: 100%;
+  background: $bg-tertiary;
+}
 
-  .formula-bar {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: 16rpx 20rpx;
-    background: $ai-gradient-soft;
-    border: 1rpx solid $border-color;
+.gallery-swiper {
+  width: 100%;
+  height: 750rpx;
+}
+
+.gallery-item {
+  width: 100%;
+  height: 100%;
+}
+
+.gallery-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.gallery-dots {
+  position: absolute;
+  bottom: 24rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10rpx;
+  z-index: 2;
+}
+
+.gallery-dot {
+  width: 32rpx;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+
+  &.active {
+    background: #fff;
+    width: 48rpx;
+  }
+}
+
+.gallery-counter {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  z-index: 2;
+  padding: 6rpx 16rpx;
+  background: rgba(47, 53, 66, 0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 20rpx;
+
+  text {
+    font-size: 22rpx;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// ========== 价格区块 ==========
+.price-section {
+  margin: $spacing-base;
+}
+
+.price-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.6);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
+  padding: $spacing-lg;
+}
+
+.price-row {
+  margin-bottom: $spacing-base;
+}
+
+.price-main {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+
+  &--cash {
+    .price-cash {
+      font-family: $asset-balance-font;
+      font-size: 56rpx;
+      font-weight: 700;
+      color: $mineral-gray;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -1rpx;
+    }
+  }
+
+  &--points {
+    .price-points-value {
+      font-family: $asset-balance-font;
+      font-size: 56rpx;
+      font-weight: 700;
+      color: $accent-dark;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .price-points-unit {
+      font-size: 28rpx;
+      color: $accent-dark;
+      font-weight: 600;
+    }
+  }
+
+  &--exchange {
+    .price-cash {
+      font-family: $asset-balance-font;
+      font-size: 48rpx;
+      font-weight: 700;
+      color: $mineral-gray;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .price-plus {
+      font-size: 32rpx;
+      color: $text-muted;
+      font-weight: 600;
+    }
+
+    .price-points {
+      font-family: $asset-balance-font;
+      font-size: 36rpx;
+      font-weight: 700;
+      color: $accent-dark;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+.exchange-formula {
+  display: inline-flex;
+  padding: 8rpx 16rpx;
+  background: rgba(184, 152, 118, 0.08);
+  border: 1rpx solid rgba(184, 152, 118, 0.20);
+  border-radius: $radius-full;
+
+  text {
+    font-size: 22rpx;
+    color: $accent-dark;
+    font-weight: 500;
+  }
+}
+
+.earn-hint {
+  display: inline-flex;
+  padding: 6rpx 16rpx;
+  background: rgba(90, 122, 106, 0.08);
+  border: 1rpx solid rgba(90, 122, 106, 0.20);
+  border-radius: $radius-full;
+
+  text {
+    font-size: 22rpx;
+    color: $success;
+    font-weight: 500;
+  }
+}
+
+.product-meta {
+  padding-top: $spacing-base;
+  border-top: 1rpx solid $border-light;
+}
+
+.product-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: $text-primary;
+  line-height: 1.4;
+  margin-bottom: 12rpx;
+}
+
+.product-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.product-tag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  background: rgba(47, 53, 66, 0.06);
+  color: $text-secondary;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(47, 53, 66, 0.08);
+}
+
+.sales-row {
+  margin-top: 12rpx;
+}
+
+.sales-text {
+  font-size: 24rpx;
+  color: $text-muted;
+}
+
+// ========== 详情区 ==========
+.detail-section {
+  margin: $spacing-base;
+
+  &__title {
+    font-size: 30rpx;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: $spacing-base;
+  }
+}
+
+.detail-content {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.6);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
+  padding: $spacing-lg;
+  overflow: hidden;
+
+  // 使富文本内容样式美观
+  :deep(img) {
+    max-width: 100%;
+    height: auto;
+    display: block;
     border-radius: $radius-md;
-    margin-bottom: 8rpx;
-
-    .formula-icon { font-size: 28rpx; }
-    .formula-text { font-size: 26rpx; color: var(--text-secondary); }
-    .formula-cash { color: var(--primary-light); font-weight: 700; }
-    .formula-points { color: var(--accent); font-weight: 700; }
   }
 
-  .formula-simple {
-    background: $warm-yellow;
-    border-color: $border-primary;
+  :deep(p) {
+    font-size: 28rpx;
+    color: $text-primary;
+    line-height: 1.7;
+    margin-bottom: 16rpx;
   }
+}
 
-  .reward-hint {
+// ========== 底部购买栏 ==========
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx $spacing-base;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1rpx solid rgba(20, 20, 20, 0.06);
+  box-shadow: 0 -8rpx 32rpx rgba(47, 53, 66, 0.06);
+
+  &__home {
+    width: 88rpx;
+    height: 88rpx;
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
-    padding: 10rpx 20rpx;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.95);
+      background: rgba(47, 53, 66, 0.04);
+    }
+
+    &-icon {
+      font-size: 24rpx;
+      font-weight: 700;
+      color: $mineral-gray;
+    }
+  }
+
+  &__cta {
+    flex: 1;
+    height: 88rpx;
+    background: $btn-gold-gradient;
+    border-radius: $radius-full;
+    box-shadow: $btn-gold-shadow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2rpx;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:active {
+      transform: scale(0.97);
+      box-shadow: $btn-gold-shadow-active;
+    }
+  }
+}
+
+// ========== 骨架屏 ==========
+.detail-skeleton {
+  .sk-banner {
+    width: 100%;
+    height: 750rpx;
+    background: $bg-tertiary;
+  }
+
+  .sk-content {
+    padding: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: 16rpx;
+  }
+
+  .sk-line {
+    height: 28rpx;
+    border-radius: 8rpx;
+    background: $bg-tertiary;
+
+    &.sk-long { width: 80%; }
+    &.sk-medium { width: 55%; }
+    &.sk-short { width: 35%; }
+  }
+}
+
+.shimmer {
+  animation: shim 1.4s ease-in-out infinite;
+}
+
+@keyframes shim {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 40rpx;
+  text-align: center;
+
+  &__icon {
+    width: 140rpx;
+    height: 140rpx;
+    line-height: 140rpx;
+    text-align: center;
+    font-size: 56rpx;
+    font-weight: 800;
     background: $warm-yellow;
     border: 1rpx solid $border-primary;
-    border-radius: $radius-md;
-
-    .reward-icon {
-      font-size: 22rpx; font-weight: var(--weight-heavy); color: $accent-dark;
-    }
-    .reward-text { font-size: 24rpx; color: $accent-dark; font-weight: 600; }
+    border-radius: 50%;
+    color: $accent-dark;
+    margin-bottom: 32rpx;
   }
-}
 
-.detail-section { padding: var(--spacing-base) var(--spacing-lg);
-  .section-title { font-size: 32rpx; font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-base); }
-  .detail-image { width: 100%; display: block; margin-bottom: var(--spacing-xs); }
-}
-
-.review-section { padding: var(--spacing-base) var(--spacing-lg);
-  .empty-review { text-align: center; padding: 80rpx 0; color: var(--text-muted); font-size: 28rpx; }
-}
-
-.bottom-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  display: flex; align-items: center;
-  padding: 16rpx 32rpx;
-  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
-  background: var(--bg-overlay);
-  backdrop-filter: blur(20px);
-  border-top: 1rpx solid $border-color;
-  box-shadow: 0 -8rpx 32rpx rgba(26, 36, 56, 0.06);
-  .action-icons { display: flex; gap: var(--spacing-xl); margin-right: var(--spacing-base);
-    .action-icon-item { display: flex; flex-direction: column; align-items: center; gap: 4rpx; position: relative;
-      .bar-icon {
-        width: 44rpx; height: 44rpx; line-height: 44rpx; text-align: center;
-        font-size: 24rpx; font-weight: var(--weight-heavy); color: $navy;
-        background: $bg-tertiary;
-        border-radius: 50%;
-      }
-      .cart-badge {
-        position: absolute;
-        top: -8rpx;
-        right: -16rpx;
-        min-width: 32rpx;
-        height: 32rpx;
-        background: var(--danger);
-        border-radius: 16rpx;
-        font-size: 20rpx;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .icon-label { font-size: 20rpx; color: var(--text-secondary); }
-    }
+  &__text {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 40rpx;
   }
-  .action-buttons { flex: 1; display: flex; gap: var(--spacing-sm);
-    .btn-add-cart {
-      flex: 1; height: 80rpx; line-height: 80rpx; text-align: center;
-      background: $warm-yellow; border: 1rpx solid $border-primary;
-      border-radius: 40rpx; font-size: 28rpx; color: $navy;
-    }
-    .btn-buy-now {
-      flex: 1; height: 80rpx; line-height: 80rpx; text-align: center;
-      border-radius: 40rpx; font-size: 28rpx; font-weight: 700; color: $text-inverse;
-      &.btn-consume, &.btn-exchange { background: $accent-fire; box-shadow: $shadow-glow; }
-      &.btn-redeem { background: $gold-gradient; box-shadow: $shadow-glow; color: $navy; }
-    }
-  }
-}
 
-.sku-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; display: flex; align-items: flex-end;
-  .sku-panel { width: 100%; background: var(--bg-card); border-radius: 24rpx 24rpx 0 0; max-height: 80vh;
-    .sku-header { display: flex; align-items: center; padding: var(--spacing-base); border-bottom: 1rpx solid var(--border-color);
-      .sku-image { width: 160rpx; height: 160rpx; border-radius: $radius-sm; }
-      .sku-info { flex: 1; margin-left: var(--spacing-base);
-        .sku-price { font-size: 36rpx; font-weight: 700; color: var(--primary); display: block; }
-        .sku-stock { font-size: 24rpx; color: var(--text-muted); display: block; margin-top: 8rpx; }
-      }
-      .sku-close { font-size: 48rpx; color: var(--text-muted); padding: 0 var(--spacing-base); }
-    }
-    .sku-content { padding: var(--spacing-base); max-height: 40vh; overflow-y: auto;
-      .quantity-row { display: flex; align-items: center; justify-content: space-between;
-        .quantity-label { font-size: 28rpx; color: var(--text-secondary); }
-        .quantity-stepper {
-          display: flex;
-          align-items: center;
-          gap: var(--spacing-base);
-          .stepper-btn {
-            width: 56rpx;
-            height: 56rpx;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-tertiary);
-            border-radius: 8rpx;
-            font-size: 32rpx;
-            color: var(--text-primary);
-          }
-          .stepper-value { font-size: 32rpx; color: var(--text-primary); min-width: 60rpx; text-align: center; }
-        }
-      }
-    }
-    .sku-footer { padding: var(--spacing-base);
-      .btn-buy-now-lg {
-        height: 88rpx; line-height: 88rpx; text-align: center;
-        border-radius: 44rpx; font-size: 32rpx; font-weight: 600; color: $text-inverse;
-        &.btn-consume, &.btn-exchange { background: $accent-fire; box-shadow: $shadow-glow; }
-        &.btn-redeem { background: $gold-gradient; color: $navy; }
-      }
+  &__btn {
+    height: 80rpx;
+    padding: 0 56rpx;
+    background: $btn-gold-gradient;
+    border-radius: $radius-full;
+    box-shadow: $btn-gold-shadow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text {
+      font-size: 30rpx;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1rpx;
     }
   }
 }
