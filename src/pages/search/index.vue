@@ -109,8 +109,8 @@ import HomeProductCard from '@/components/HomeProductCard.vue'
 
 const keyword = ref('')
 const searchResult = ref<any[]>([])
-const statusBarHeight = ref(20);
-const loading = ref(false);
+const statusBarHeight = ref(20)
+const loading = ref(false)
 const currentType = ref(1)
 const historyList = ref<string[]>([])
 const hotList = ref<any[]>([
@@ -121,8 +121,8 @@ const hotList = ref<any[]>([
 ])
 
 onMounted(() => {
-  statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20;
-  loadHistory();
+  statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
+  loadHistory()
 })
 
 onShow(() => {

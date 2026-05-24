@@ -300,7 +300,7 @@ async function handleSubmit() {
     if (productId) { payload.productId = Number(productId); payload.quantity = Number(quantity || 1) }
 
     const res = await orderApi.create(payload)
-    uni.redirectTo({ url: `/pages/order/list?tab=1` })
+    uni.redirectTo({ url: '/' + 'pages/order/list?tab=1' })
     uni.showToast({ title: '下单成功', icon: 'success' })
   } catch (e: any) {
     uni.showToast({ title: e.message || '下单失败', icon: 'none' })

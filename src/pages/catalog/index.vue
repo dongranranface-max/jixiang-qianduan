@@ -114,7 +114,7 @@ import { productApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import { HOME_CATEGORY_FALLBACK, flattenCategories, normalizeCategoryTree } from '@/utils/category'
-import { DEFAULT_PRODUCT_COVER } from '@/utils/media';
+import { DEFAULT_PRODUCT_COVER } from '@/utils/media'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
 import AssetStatusBar from '@/components/AssetStatusBar.vue'
 import HomeProductCard from '@/components/HomeProductCard.vue'
