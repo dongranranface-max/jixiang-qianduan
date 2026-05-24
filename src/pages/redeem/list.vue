@@ -1,243 +1,481 @@
 <template>
   <view class="page-container">
-    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }" />
 
     <view class="page-header">
-      <text class="page-title">兑换商城</text>
-      <text class="page-sub">消费积分免费换商品</text>
+      <view class="header-left">
+        <text class="page-title">积分兑换</text>
+        <text class="page-sub">生态积分抵现金</text>
+      </view>
+      <view class="search-btn" @click="goSearch">
+        <text>🔍</text>
+      </view>
     </view>
 
-    <view class="user-points-banner" v-if="consumerPointsData">
-      <text class="label">我的消费积分</text>
-      <text class="value">{{ Number(consumerPointsData.consumerPoints || 0).toLocaleString() }}</text>
-      <text class="tip">仅限消费积分兑换，兑换后不退</text>
-    </view>
-    <view class="user-points-banner loading" v-else>
-      <text class="value">--</text>
-      <text class="tip">加载中...</text>
+    <view class="mall-tabs">
+      <view
+        v-for="tab in tabs"
+        :key="tab.key"
+        class="mall-tab"
+        :class="{ active: currentTab === tab.key }"
+        @click="switchTab(tab.key)"
+      >
+        <text class="mall-tab__label">{{ tab.label }}</text>
+      </view>
     </view>
 
     <scroll-view scroll-y class="product-list" @scrolltolower="loadMore">
-      <view class="product-grid">
+      <view v-if="loading && !products.length" class="skeleton-grid">
+        <view v-for="i in 4" :key="i" class="sk-card">
+          <view class="sk-img shimmer" />
+          <view class="sk-info">
+            <view class="sk-line shimmer" />
+            <view class="sk-line sk-short shimmer" />
+          </view>
+        </view>
+      </view>
+
+      <view v-else class="product-grid">
         <view
-          v-for="item in products"
+          v-for="item in filteredProducts"
           :key="item.id"
           class="product-card"
-          @click="goExchange(item)"
+          @click="goDetail(item)"
         >
-          <image class="cover" :src="item.coverImage" mode="aspectFill" />
-          <view class="info">
-            <text class="name">{{ item.name }}</text>
-            <view class="points-price">
-              <text class="points">{{ item.requiredPoints }}积分</text>
-              <text class="free">免费兑换</text>
+          <view class="product-card__cover">
+            <image class="cover-img" :src="item.coverImage || '/static/logo.png'" mode="aspectFill" />
+            <view class="cover-tag">
+              <text>换购</text>
             </view>
-            <view
-              :class="['exchange-btn', { disabled: !canRedeem(item) }]"
-            >
-              {{ canRedeem(item) ? '立即兑换' : '积分不足' }}
+          </view>
+          <view class="product-card__info">
+            <text class="product-name">{{ item.name }}</text>
+            <view class="price-row">
+              <text class="price-symbol">¥</text>
+              <text class="price-value">{{ item.price }}</text>
+              <text class="price-plus">+{{ item.ecoPoints || 0 }}积分</text>
+            </view>
+            <view class="action-row">
+              <view class="exchange-btn">
+                <text>立即换购</text>
+              </view>
             </view>
           </view>
         </view>
       </view>
-      <view v-if="loading" class="loading">加载中...</view>
-      <view v-if="!loading && products.length === 0" class="empty">
-        <text>暂无兑换商品</text>
+
+      <view v-if="loading && products.length" class="load-more">
+        <view class="loading-spinner" />
+        <text>加载中...</text>
+      </view>
+
+      <view v-if="!loading && !products.length" class="empty-state">
+        <view class="empty-state__icon">换</view>
+        <text class="empty-state__text">暂无换购商品</text>
+        <text class="empty-state__sub">看看其他频道吧</text>
+      </view>
+
+      <view v-if="!hasMore && products.length > 0" class="no-more">
+        <text>— 没有更多了 —</text>
       </view>
     </scroll-view>
 
-    <view class="safe-area-bottom"></view>
+    <view class="safe-area-bottom" :style="{ height: (100 + safeAreaBottom) + 'px' }" />
+
+    <LuxuryTabbar />
+    <AssetStatusBar v-if="loggedIn" />
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { walletApi, productApi } from '@/utils/api'
-import { requireAuth } from '@/utils/auth'
+import { onShow } from '@dcloudio/uni-app'
+import { productApi } from '@/utils/api'
+import { checkAuth } from '@/utils/auth'
+import { assetStore } from '@/store/asset'
+import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
+import AssetStatusBar from '@/components/AssetStatusBar.vue'
 
 const statusBarHeight = ref(20)
-const loading = ref(false)
-const consumerPointsData = ref<{ consumerPoints: string } | null>(null)
+const safeAreaBottom = ref(0)
+const loggedIn = ref(checkAuth())
+const currentTab = ref('all')
 const products = ref<any[]>([])
+const categories = ref<any[]>([])
+const loading = ref(false)
 const page = ref(1)
 const hasMore = ref(true)
+let reqSeq = 0
 
-function canRedeem(item: any): boolean {
-  if (!consumerPointsData.value) return false
-  return Number(consumerPointsData.value.consumerPoints || 0) >= Number(item.requiredPoints || 0)
-}
+const tabs = computed(() => {
+  const base = [{ key: 'all', label: '全部' }]
+  const cats = categories.value.map((c: any) => ({ key: c.id, label: c.name }))
+  return [...base, ...cats]
+})
+
+const filteredProducts = computed(() => {
+  if (currentTab.value === 'all') return products.value
+  return products.value.filter((p: any) => p.categoryId === currentTab.value)
+})
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
   statusBarHeight.value = sys.statusBarHeight || 20
-  loadData()
+  safeAreaBottom.value = sys.safeAreaInsets?.bottom || 0
+  loadCategories()
   loadProducts()
 })
 
-async function loadData() {
+onShow(() => {
+  loggedIn.value = checkAuth()
+  if (loggedIn.value) assetStore.fetchBalance()
+})
+
+async function loadCategories() {
   try {
-    consumerPointsData.value = await walletApi.getBalance()
-  } catch (e) {
-    console.error('获取积分失败', e)
+    const res = await productApi.getCategories()
+    categories.value = res || []
+  } catch {}
+}
+
+async function loadProducts(reset = false) {
+  if (loading.value) return
+  if (reset) { page.value = 1; hasMore.value = true }
+  if (!hasMore.value) return
+  loading.value = true
+  const seq = ++reqSeq
+  try {
+    const res = await productApi.getList({ type: 2, page: page.value, limit: 20 })
+    if (seq !== reqSeq) return
+    const list = res.list || []
+    if (reset) products.value = list
+    else products.value.push(...list)
+    hasMore.value = list.length === 20
+    page.value++
+  } catch {
+    if (seq !== reqSeq) return
+  } finally {
+    if (seq === reqSeq) loading.value = false
   }
 }
 
-async function loadProducts() {
-  if (loading.value || !hasMore.value) return
-  loading.value = true
-  try {
-    const res = await productApi.getList({ type: 3, page: page.value, limit: 20 })
-    const list = res.list || []
-    if (page.value === 1) {
-      products.value = list
-    } else {
-      products.value.push(...list)
-    }
-    hasMore.value = list.length === 20
-    page.value++
-  } catch (e: any) {
-    uni.showToast({ title: e.message || '加载失败', icon: 'none' })
-  } finally {
-    loading.value = false
-  }
+function switchTab(key: string) {
+  if (currentTab.value === key) return
+  currentTab.value = key
+  products.value = []
+  page.value = 1
+  hasMore.value = true
+  loadProducts(true)
 }
 
 function loadMore() {
-  loadProducts()
+  if (hasMore.value && !loading.value) loadProducts(false)
 }
 
-function goExchange(item: any) {
-  if (!canRedeem(item)) {
-    uni.showToast({ title: '消费积分不足', icon: 'none' })
-    return
-  }
-  if (!requireAuth()) return
-  uni.navigateTo({ url: `/pages/order/confirm?productId=${item.id}&mode=redeem` })
+function goSearch() { uni.navigateTo({ url: '/pages/search/index' }) }
+function goDetail(item: any) {
+  uni.navigateTo({ url: `/pages/product/detail?id=${item.id}&type=2` })
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
-@import '@/styles/page-shell.scss';
 
-.page-container { @include tab-page-shell; }
+.page-container {
+  min-height: 100vh;
+  @include page-bg;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
 
+.status-bar { width: 100%; }
+
+// ========== 顶部标题 ==========
 .page-header {
-  padding: var(--spacing-base) 0 var(--spacing-sm);
-  .page-title { @include page-title-text; display: block; }
-  .page-sub { font-size: 24rpx; color: $accent-dark; display: block; margin-top: 4rpx; }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx $spacing-base;
 }
 
-.user-points-banner {
-  @include premium-surface($warm-yellow);
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
+}
+
+.page-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: $mineral-gray;
+  letter-spacing: 0.5rpx;
+}
+
+.page-sub {
+  font-size: 22rpx;
+  color: $accent-dark;
+  font-weight: 500;
+}
+
+.search-btn {
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1rpx solid rgba(20, 20, 20, 0.06);
+  border-radius: 50%;
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+// ========== Tab切换 ==========
+.mall-tabs {
+  display: flex;
+  padding: 0 $spacing-base $spacing-base;
+  gap: 12rpx;
+  overflow-x: auto;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.mall-tab {
+  flex-shrink: 0;
+  height: 72rpx;
+  padding: 0 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1rpx solid rgba(20, 20, 20, 0.06);
   border-radius: $radius-lg;
-  padding: var(--spacing-lg);
-  text-align: center;
-  margin-bottom: var(--spacing-base);
+  transition: all 0.25s ease;
 
-  .label {
-    font-size: 24rpx;
-    color: var(--text-secondary);
-    display: block;
+  &.active {
+    background: $warm-yellow;
+    border-color: $border-primary;
+    box-shadow: $shadow-gold;
+
+    .mall-tab__label { color: $accent-dark; font-weight: 700; }
   }
 
-  .value {
-    font-size: 64rpx;
-    font-weight: 700;
-    color: var(--primary);
-    display: block;
-    margin: 8rpx 0;
-  }
-
-  .tip {
-    font-size: 22rpx;
-    color: var(--text-muted);
+  &__label {
+    font-size: 26rpx;
+    font-weight: 500;
+    color: $text-muted;
+    white-space: nowrap;
   }
 }
 
+// ========== 商品列表 ==========
 .product-list {
-  height: calc(100vh - 400rpx);
+  flex: 1;
+  padding: 0 $spacing-base;
 }
 
 .product-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-base);
+  gap: $spacing-base;
 }
 
 .product-card {
-  @include premium-surface($bg-secondary);
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.60);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+
+  &:active { transform: scale(0.98); }
+
+  &__cover {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    overflow: hidden;
+    background: $bg-tertiary;
+  }
+
+  &__info {
+    padding: $spacing-base;
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+  }
+}
+
+.cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-tag {
+  position: absolute;
+  top: 12rpx;
+  left: 12rpx;
+  padding: 4rpx 12rpx;
+  background: rgba(142, 116, 89, 0.85);
+  backdrop-filter: blur(8px);
+  border-radius: $radius-full;
+  text {
+    font-size: 18rpx;
+    font-weight: 700;
+    color: #fff;
+  }
+}
+
+.product-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: $text-primary;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.price-symbol {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: $mineral-gray;
+}
+
+.price-value {
+  font-family: $asset-balance-font;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: $mineral-gray;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5rpx;
+}
+
+.price-plus {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: $accent-dark;
+}
+
+.action-row { margin-top: 4rpx; }
+
+.exchange-btn {
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $accent-gradient;
+  border-radius: $radius-full;
+  box-shadow: 0 6rpx 20rpx rgba(184, 152, 118, 0.3);
+  transition: transform 0.2s ease;
+
+  text {
+    font-size: 26rpx;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  &:active { transform: scale(0.97); }
+}
+
+// ========== 骨架屏 ==========
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-base;
+}
+
+.sk-card {
+  background: rgba(255, 255, 255, 0.70);
   border-radius: $radius-lg;
   overflow: hidden;
 
-  .cover {
-    width: 100%;
-    height: 320rpx;
-  }
-
-  .info {
-    padding: var(--spacing-sm);
-
-    .name {
-      font-size: 28rpx;
-      color: var(--text-primary);
-      display: block;
-      margin-bottom: 8rpx;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .points-price {
-      display: flex;
-      align-items: center;
-      gap: 8rpx;
-      margin-bottom: 8rpx;
-
-      .points {
-        font-size: 28rpx;
-        font-weight: 700;
-        color: var(--primary);
-      }
-
-      .free {
-        font-size: 22rpx;
-        color: $success;
-        background: rgba(61, 139, 110, 0.12);
-        padding: 2rpx 8rpx;
-        border-radius: 4rpx;
-      }
-    }
-
-    .exchange-btn {
-      background: $accent-fire;
-      border-radius: $radius-full;
-      text-align: center;
-      font-size: 26rpx;
-      font-weight: 600;
-      color: $text-inverse;
-      padding: 10rpx 0;
-
-      &.disabled {
-        background: var(--bg-tertiary);
-        color: var(--text-muted);
-      }
-    }
-  }
-
+  .sk-img { width: 100%; aspect-ratio: 1; background: $bg-tertiary; }
+  .sk-info { padding: $spacing-base; display: flex; flex-direction: column; gap: 10rpx; }
+  .sk-line { height: 22rpx; border-radius: 8rpx; background: $bg-tertiary; width: 80%; }
+  .sk-line.sk-short { width: 40%; }
 }
 
-.loading {
-  text-align: center;
-  padding: var(--spacing-base);
-  color: var(--text-muted);
+.shimmer { animation: shim 1.4s ease-in-out infinite; }
+
+@keyframes shim {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
+}
+
+// ========== 加载/空状态 ==========
+.load-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  padding: $spacing-lg 0;
   font-size: 26rpx;
+  color: $text-muted;
 }
 
-.empty {
-  text-align: center;
-  padding: 80rpx 0;
-  color: var(--text-muted);
-  font-size: 28rpx;
+.loading-spinner {
+  width: 40rpx;
+  height: 40rpx;
+  border: 3rpx solid rgba(184, 152, 118, 0.2);
+  border-top-color: $accent-dark;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.no-more {
+  text-align: center;
+  padding: $spacing-lg 0;
+  font-size: 24rpx;
+  color: $text-muted;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 40rpx;
+  text-align: center;
+
+  &__icon {
+    width: 120rpx;
+    height: 120rpx;
+    line-height: 120rpx;
+    text-align: center;
+    font-size: 48rpx;
+    font-weight: 800;
+    background: $warm-yellow;
+    border: 1rpx solid $border-primary;
+    border-radius: 50%;
+    color: $accent-dark;
+    margin-bottom: 24rpx;
+  }
+
+  &__text {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 8rpx;
+  }
+
+  &__sub { font-size: 26rpx; color: $text-muted; }
+}
+
+.safe-area-bottom { width: 100%; }
 </style>

@@ -187,24 +187,24 @@ async function doSubscribe() {
 .page-container { @include tab-page-shell; }
 
 .page-header {
-  padding: var(--spacing-base) 0;
+  padding: $spacing-base 0;
   .page-title { @include page-title-text; }
 }
 
 .invest-detail {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: $spacing-lg;
 }
 
 .product-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-base);
+  gap: $spacing-base;
 
   .product-icon {
     width: 88rpx; height: 88rpx; line-height: 88rpx; text-align: center;
-    font-size: 40rpx; font-weight: var(--weight-heavy); color: $navy;
+    font-size: 40rpx; font-weight: 700; color: $navy;
     background: $warm-yellow; border-radius: 50%;
   }
 
@@ -212,13 +212,13 @@ async function doSubscribe() {
     .product-name {
       font-size: 36rpx;
       font-weight: 700;
-      color: var(--text-primary);
+      color: $text-primary;
       display: block;
     }
 
     .product-type {
       font-size: 24rpx;
-      color: var(--text-secondary);
+      color: $text-secondary;
     }
   }
 }
@@ -226,7 +226,7 @@ async function doSubscribe() {
 .yield-card {
   @include premium-surface($warm-yellow);
   border-radius: $radius-lg;
-  padding: var(--spacing-xl);
+  padding: $spacing-xl;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -241,13 +241,13 @@ async function doSubscribe() {
 
     .yield-label {
       font-size: 24rpx;
-      color: var(--text-secondary);
+      color: $text-secondary;
     }
   }
 
   .yield-stats {
     display: flex;
-    gap: var(--spacing-xl);
+    gap: $spacing-xl;
 
     .stat-item {
       text-align: center;
@@ -255,13 +255,13 @@ async function doSubscribe() {
       .stat-val {
         font-size: 28rpx;
         font-weight: 600;
-        color: var(--text-primary);
+        color: $text-primary;
         display: block;
       }
 
       .stat-lbl {
         font-size: 22rpx;
-        color: var(--text-muted);
+        color: $text-muted;
       }
     }
   }
@@ -270,47 +270,47 @@ async function doSubscribe() {
 .amount-section, .expected-section {
   @include premium-surface($bg-secondary);
   border-radius: $radius-lg;
-  padding: var(--spacing-base) var(--spacing-lg);
+  padding: $spacing-base $spacing-lg;
 
   .section-title {
     font-size: 26rpx;
-    color: var(--text-secondary);
+    color: $text-secondary;
     display: block;
-    margin-bottom: var(--spacing-base);
+    margin-bottom: $spacing-base;
   }
 }
 
 .amount-input {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  border-bottom: 2rpx solid var(--primary);
+  gap: $spacing-sm;
+  border-bottom: 2rpx solid $accent-dark;
 
   .input {
     flex: 1;
     font-size: 48rpx;
     font-weight: 700;
-    color: var(--text-primary);
-    padding: var(--spacing-sm) 0;
+    color: $text-primary;
+    padding: $spacing-sm 0;
   }
 
   .unit {
     font-size: 28rpx;
-    color: var(--text-secondary);
+    color: $text-secondary;
   }
 }
 
 .quick-amounts {
   display: flex;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-base);
+  gap: $spacing-sm;
+  margin-top: $spacing-base;
 
   .quick-btn {
-    background: var(--bg-secondary);
+    background: $bg-secondary;
     padding: 8rpx 24rpx;
     border-radius: 20rpx;
     font-size: 24rpx;
-    color: var(--text-secondary);
+    color: $text-secondary;
 
     &.active {
       background: $warm-yellow;
@@ -321,9 +321,9 @@ async function doSubscribe() {
 }
 
 .balance-info {
-  margin-top: var(--spacing-base);
+  margin-top: $spacing-base;
   font-size: 24rpx;
-  color: var(--text-muted);
+  color: $text-muted;
   text-align: right;
 }
 
@@ -336,25 +336,25 @@ async function doSubscribe() {
 
   .earning-label {
     font-size: 24rpx;
-    color: var(--text-secondary);
-    margin-left: var(--spacing-sm);
+    color: $text-secondary;
+    margin-left: $spacing-sm;
   }
 }
 
 .expected-tip {
   font-size: 22rpx;
-  color: var(--text-muted);
+  color: $text-muted;
   margin-top: 8rpx;
   display: block;
 }
 
 .agreement {
   font-size: 24rpx;
-  color: var(--text-muted);
+  color: $text-muted;
   text-align: center;
 
   .link {
-    color: var(--primary);
+    color: $accent-dark;
   }
 }
 
@@ -364,7 +364,7 @@ async function doSubscribe() {
   font-size: 32rpx;
   font-weight: 700;
   text-align: center;
-  padding: var(--spacing-base);
+  padding: $spacing-base;
   border-radius: 50rpx;
   box-shadow: $shadow-glow;
 
@@ -379,15 +379,15 @@ async function doSubscribe() {
   background: rgba($danger, 0.08);
   border: 1rpx solid rgba($danger, 0.25);
   border-radius: $radius-sm;
-  padding: var(--spacing-sm) var(--spacing-base);
+  padding: $spacing-sm $spacing-base;
   font-size: 22rpx;
-  color: var(--danger);
+  color: $danger;
   line-height: 1.6;
 }
 
 .loading {
   text-align: center;
-  padding: var(--spacing-xl);
-  color: var(--text-muted);
+  padding: $spacing-xl;
+  color: $text-muted;
 }
 </style>

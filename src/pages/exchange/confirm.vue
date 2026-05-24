@@ -1,209 +1,161 @@
 <template>
   <view class="page-container">
-    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
-    <view class="page-header">
-      <text class="back" @click="goBack">&lt;</text>
-      <text class="page-title">确认换购</text>
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }" />
+
+    <view class="page-nav">
+      <view class="page-nav__back" @click="goBack"><text>←</text></view>
+      <text class="page-nav__title">确认换购</text>
+      <view class="page-nav__action" />
     </view>
 
-    <view v-if="product" class="confirm-body">
-      <!-- 商品信息 -->
-      <view class="product-card">
-        <image class="cover" :src="product.coverImages?.[0]" mode="aspectFill" />
-        <view class="info">
-          <text class="name">{{ product.name }}</text>
-          <view class="price-row">
-            <text class="cash-price">¥{{ product.cashPrice }}</text>
-            <text class="points-price">+ {{ product.pointsPrice }}积分</text>
-          </view>
-        </view>
+    <scroll-view scroll-y class="confirm-body">
+      <view v-if="loading" class="loading-wrap">
+        <view class="loading-spinner" />
+        <text>加载中...</text>
       </view>
 
-      <!-- 银行卡信息 -->
-      <view class="section bank-section">
-        <view class="section-title">结算账户</view>
-        <view v-if="bankCard" class="bank-card">
-          <text class="bank-name">{{ bankCard.bankName }}</text>
-          <text class="card-no">{{ maskCard(bankCard.bankCard) }}</text>
-          <text class="bind-tip">已绑定</text>
-        </view>
-        <view v-else class="no-bank" @click="goBindCard">
-          <text>请先绑定银行卡</text>
-          <text class="arrow">&gt;</text>
-        </view>
-      </view>
-
-      <!-- 收货地址 -->
-      <view class="section address-section" @click="goSelectAddress">
-        <view class="section-title">收货地址</view>
-        <view v-if="address" class="address-info">
-          <text class="consignee">{{ address.consignee }} {{ address.phone }}</text>
-          <text class="addr-text">{{ address.province }} {{ address.city }} {{ address.district }} {{ address.detail }}</text>
-        </view>
-        <view v-else class="no-address">
-          <text>请选择收货地址</text>
-          <text class="arrow">&gt;</text>
-        </view>
-      </view>
-
-      <!-- 积分使用说明 -->
-      <view class="section points-info">
-        <view class="section-title">积分说明</view>
-        <view class="points-rules">
-          <view class="rule-item">
-            <text class="rule-icon">提</text>
-            <text class="rule-text">使用 {{ product.pointsPrice }} 生态积分抵扣 {{ product.pointsPrice }} 元现金</text>
-          </view>
-          <view class="rule-item">
-            <text class="rule-icon">付</text>
-            <text class="rule-text">实际支付：¥{{ product.cashPrice }} 现金 + {{ product.pointsPrice }} 积分</text>
-          </view>
-          <view class="rule-item">
-            <text class="rule-icon">赠</text>
-            <text class="rule-text">换购成功后，支付金额的 30% 将转为消费积分</text>
-          </view>
-        </view>
-      </view>
-
-      <!-- 支付方式 -->
-      <view class="section pay-way">
-        <view class="section-title">支付方式</view>
-        <radio-group @change="payMethodChange">
-          <label class="pay-option">
-            <view class="pay-left">
-              <text class="pay-icon">微</text>
-              <text>微信支付</text>
+      <template v-else-if="product">
+        <!-- 商品卡片 -->
+        <view class="product-card">
+          <image class="product-card__cover" :src="product.coverImage || '/static/logo.png'" mode="aspectFill" />
+          <view class="product-card__info">
+            <text class="product-card__name">{{ product.name }}</text>
+            <view class="price-row">
+              <text class="price-cash">¥{{ product.price }}</text>
+              <text class="price-plus">+{{ product.requiredPoints || product.ecoPoints || 0 }}积分</text>
             </view>
-            <radio value="wechat" checked="true" color="#C4A574" />
-          </label>
-          <label class="pay-option">
-            <view class="pay-left">
-              <text class="pay-icon">付</text>
-              <text>支付宝</text>
+          </view>
+        </view>
+
+        <!-- 收货地址 -->
+        <view class="section-card" @click="goSelectAddress">
+          <view class="section-card__icon-wrap">
+            <text class="section-card__icon">📦</text>
+          </view>
+          <view class="section-card__content" v-if="address">
+            <view class="address-row">
+              <text class="address-name">{{ address.consignee }}</text>
+              <text class="address-phone">{{ address.phone }}</text>
             </view>
-            <radio value="alipay" color="#C4A574" />
-          </label>
-        </radio-group>
+            <text class="address-detail">{{ address.province }} {{ address.city }} {{ address.district }} {{ address.detail }}</text>
+          </view>
+          <view class="section-card__empty" v-else>
+            <text>请选择收货地址</text>
+          </view>
+          <text class="section-card__arrow">›</text>
+        </view>
+
+        <!-- 积分说明 -->
+        <view class="info-card">
+          <view class="info-card__header">
+            <text class="info-card__title">换购说明</text>
+          </view>
+          <view class="rule-list">
+            <view class="rule-item">
+              <view class="rule-dot" />
+              <text class="rule-text">使用 {{ product.requiredPoints || 0 }} 生态积分，抵扣 {{ product.requiredPoints || 0 }} 元现金</text>
+            </view>
+            <view class="rule-item">
+              <view class="rule-dot" />
+              <text class="rule-text">实际支付：¥{{ product.price }} 现金 + {{ product.requiredPoints || 0 }} 积分</text>
+            </view>
+            <view class="rule-item">
+              <view class="rule-dot" />
+              <text class="rule-text">换购成功后，支付金额的 30% 将转为消费积分</text>
+            </view>
+          </view>
+        </view>
+      </template>
+
+      <view v-else-if="!loading" class="empty-state">
+        <view class="empty-state__icon">商</view>
+        <text class="empty-state__text">商品不存在</text>
+        <view class="empty-state__btn" @click="goBack"><text>返回</text></view>
       </view>
 
-      <view class="safe-area-bottom"></view>
-    </view>
+      <view class="bottom-placeholder" :style="{ height: (160 + safeAreaBottom) + 'px' }" />
+    </scroll-view>
 
     <!-- 底部提交栏 -->
     <view v-if="product" class="submit-bar">
-      <view class="submit-info">
-        <text class="submit-label">合计：</text>
-        <text class="submit-cash">¥{{ product.cashPrice }}</text>
-        <text class="submit-points">+ {{ product.pointsPrice }}积分</text>
-      </view>
-      <view :class="['submit-btn', { disabled: !canSubmit }]" @click="doSubmit">
-        确认换购
+      <view class="submit-bar__inner">
+        <view class="submit-info">
+          <text class="submit-label">合计</text>
+          <text class="submit-cash">¥{{ product.price }}</text>
+          <text class="submit-points">+{{ product.requiredPoints || 0 }}积分</text>
+        </view>
+        <view
+          class="submit-btn"
+          :class="{ 'submit-btn--disabled': !canSubmit }"
+          @click="doSubmit"
+        >
+          <text>确认换购</text>
+        </view>
       </view>
     </view>
+
+    <view class="safe-area-bottom" :style="{ height: safeAreaBottom + 'px' }" />
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { productApi, userApi, addressApi, orderApi } from '@/utils/api'
-import { requireAuth } from '@/utils/auth'
+import { productApi, addressApi, orderApi } from '@/utils/api'
+import { checkAuth } from '@/utils/auth'
 
 const statusBarHeight = ref(20)
+const safeAreaBottom = ref(0)
+const loading = ref(false)
 const productId = ref('')
 const product = ref<any>(null)
-const bankCard = ref<any>(null)
 const address = ref<any>(null)
-const payMethod = ref('wechat')
-const loading = ref(false)
 const submitting = ref(false)
+
+const canSubmit = computed(() => !!address.value && !submitting.value)
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
   statusBarHeight.value = sys.statusBarHeight || 20
-  if (!requireAuth()) return
+  safeAreaBottom.value = sys.safeAreaInsets?.bottom || 0
 
   const pages = getCurrentPages()
   const current = pages[pages.length - 1]
-  const opts = (current as any).options || {}
+  const opts = (current as any)?.options || {}
   productId.value = opts.productId || ''
 
-  if (productId.value) loadData()
+  if (checkAuth() && productId.value) loadData()
 })
 
 async function loadData() {
   loading.value = true
   try {
-    const [prodRes, profileRes] = await Promise.all([
+    const [prodRes, addrRes] = await Promise.all([
       productApi.getDetail(productId.value),
-      userApi.getProfile(),
+      addressApi.getDefault().catch(() => null),
     ])
     product.value = prodRes
-    if (profileRes.bankCard) {
-      bankCard.value = profileRes.bankCard
-    }
-
-    // 优先读 storage 中的选中地址
     const savedAddr = uni.getStorageSync('selectedAddress')
     if (savedAddr) {
       try { address.value = JSON.parse(savedAddr) } catch {}
     }
-    if (!address.value) {
-      try {
-        const defaultAddr = await addressApi.getDefault()
-        address.value = defaultAddr
-      } catch {}
+    if (!address.value && addrRes) {
+      address.value = addrRes
     }
-  } catch { /* ignore */ } finally {
+  } catch {} finally {
     loading.value = false
   }
 }
 
-const canSubmit = computed(() => !!bankCard.value && !!address.value && !submitting.value)
-
 function goBack() { uni.navigateBack() }
-
-function goBindCard() {
-  uni.navigateTo({ url: '/pages/user/bank-card' })
-}
 
 function goSelectAddress() {
   uni.navigateTo({ url: '/pages/address/list?mode=select' })
 }
 
-function payMethodChange(e: any) {
-  payMethod.value = e.detail.value
-}
-
-function maskCard(no: string) {
-  if (!no || no.length < 8) return no
-  return no.replace(/(\d{4})\d+(\d{4})/, '$1 **** **** $2')
-}
-
 async function doSubmit() {
-  if (!canSubmit.value) {
-    if (!bankCard.value) {
-      uni.showToast({ title: '请先绑定银行卡', icon: 'none' })
-      return
-    }
-    if (!address.value) {
-      uni.showToast({ title: '请选择收货地址', icon: 'none' })
-      return
-    }
-    return
-  }
-
-  if (!canSubmit.value) {
-    if (!bankCard.value) {
-      uni.showToast({ title: '请先绑定银行卡', icon: 'none' }); return
-    }
-    if (!address.value) {
-      uni.showToast({ title: '请选择收货地址', icon: 'none' }); return
-    }
-    return
-  }
-
-  uni.showLoading({ title: '提交中...' })
+  if (!canSubmit.value) return
   submitting.value = true
+  uni.showLoading({ title: '提交中...' })
   try {
     await orderApi.create({
       orderType: 2,
@@ -211,9 +163,7 @@ async function doSubmit() {
       items: [{ productId: productId.value, quantity: 1 }],
     })
     uni.showToast({ title: '换购成功', icon: 'success' })
-    setTimeout(() => {
-      uni.redirectTo({ url: '/pages/order/list' })
-    }, 1500)
+    setTimeout(() => uni.redirectTo({ url: '/pages/order/list' }), 1500)
   } catch (e: any) {
     uni.showToast({ title: e.message || '提交失败', icon: 'none' })
   } finally {
@@ -225,193 +175,383 @@ async function doSubmit() {
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
-@import '@/styles/page-shell.scss';
 
 .page-container {
   min-height: 100vh;
-  background: var(--bg-primary);
+  @include page-bg;
   display: flex;
   flex-direction: column;
 }
 
-.page-header {
+.status-bar { width: 100%; }
+
+// ========== 导航栏 ==========
+.page-nav {
   display: flex;
   align-items: center;
-  gap: var(--spacing-base);
-  padding: var(--spacing-base) var(--spacing-lg);
-  background: var(--bg-card);
-  border-bottom: 1rpx solid var(--border-color);
+  gap: 16rpx;
+  padding: 12rpx $spacing-base;
+  background: rgba(249, 249, 249, 0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1rpx solid rgba(20, 20, 20, 0.04);
 
-  .back { font-size: 40rpx; color: var(--text-primary); }
-  .page-title { font-size: 36rpx; font-weight: 700; color: var(--text-primary); }
-}
-
-.confirm-body {
-  flex: 1;
-  padding: 0 var(--spacing-lg);
-  padding-bottom: 160rpx;
-}
-
-.product-card {
-  display: flex;
-  gap: var(--spacing-base);
-  @include premium-surface($bg-secondary);
-  border-radius: $radius-lg;
-  padding: var(--spacing-base);
-  margin: var(--spacing-base) 0;
-
-  .cover {
-    width: 180rpx;
-    height: 180rpx;
-    border-radius: $radius-sm;
-    background: var(--bg-secondary);
+  &__back,
+  &__action {
+    width: 64rpx;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: 50%;
+    font-size: 28rpx;
+    color: $mineral-gray;
+    flex-shrink: 0;
   }
 
-  .info {
+  &__title {
+    flex: 1;
+    font-size: 32rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    text-align: center;
+    letter-spacing: 0.5rpx;
+  }
+}
+
+// ========== 内容区 ==========
+.confirm-body {
+  flex: 1;
+  padding: $spacing-base;
+}
+
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+  padding: 120rpx;
+  font-size: 28rpx;
+  color: $text-muted;
+}
+
+.loading-spinner {
+  width: 56rpx;
+  height: 56rpx;
+  border: 3rpx solid rgba(184, 152, 118, 0.2);
+  border-top-color: $accent-dark;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ========== 商品卡片 ==========
+.product-card {
+  display: flex;
+  gap: $spacing-base;
+  padding: $spacing-base;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.60);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
+  margin-bottom: $spacing-base;
+
+  &__cover {
+    width: 180rpx;
+    height: 180rpx;
+    border-radius: $radius-md;
+    background: $bg-tertiary;
+    flex-shrink: 0;
+  }
+
+  &__info {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-
-    .name {
-      font-size: 28rpx;
-      color: var(--text-primary);
-      display: block;
-    }
-
-    .price-row {
-      display: flex;
-      align-items: baseline;
-      gap: var(--spacing-base);
-      margin-top: 8rpx;
-
-      .cash-price {
-        font-size: 36rpx;
-        font-weight: 700;
-        color: var(--danger);
-      }
-
-      .points-price {
-        font-size: 26rpx;
-        color: var(--primary);
-      }
-    }
-  }
-}
-
-.section {
-  background: var(--bg-card);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-base) var(--spacing-lg);
-  margin-bottom: var(--spacing-base);
-  border: 1rpx solid var(--border-color);
-
-  .section-title {
-    font-size: 26rpx;
-    color: var(--text-secondary);
-    display: block;
-    margin-bottom: var(--spacing-sm);
-  }
-}
-
-.bank-section {
-  .bank-card {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-base);
-
-    .bank-name { font-size: 30rpx; font-weight: 600; color: var(--text-primary); }
-    .card-no { font-size: 26rpx; color: var(--text-secondary); flex: 1; }
-    .bind-tip { font-size: 22rpx; color: var(--profit); }
+    gap: 12rpx;
   }
 
-  .no-bank, .no-address {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-sm) 0;
-    color: var(--text-muted);
+  &__name {
     font-size: 28rpx;
-
-    .arrow { color: var(--text-muted); }
+    font-weight: 600;
+    color: $text-primary;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 }
 
-.address-section {
-  .address-info {
-    .consignee { font-size: 28rpx; font-weight: 600; color: var(--text-primary); }
-    .addr-text { font-size: 24rpx; color: var(--text-secondary); display: block; margin-top: 4rpx; }
-  }
+.price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
 }
 
-.points-info {
-  .points-rules {
+.price-cash {
+  font-family: $asset-balance-font;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: $danger;
+  font-variant-numeric: tabular-nums;
+}
+
+.price-plus {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: $accent-dark;
+}
+
+// ========== Section 通用卡片 ==========
+.section-card {
+  display: flex;
+  align-items: center;
+  gap: $spacing-base;
+  padding: $spacing-base $spacing-lg;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.60);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
+  margin-bottom: $spacing-base;
+
+  &__icon-wrap {
+    width: 72rpx;
+    height: 72rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(184, 152, 118, 0.10);
+    border-radius: $radius-md;
+    border: 1rpx solid rgba(184, 152, 118, 0.20);
+    flex-shrink: 0;
+  }
+
+  &__icon { font-size: 28rpx; }
+
+  &__content {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8rpx;
+    gap: 6rpx;
   }
 
-  .rule-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 8rpx;
+  &__empty {
+    flex: 1;
+    font-size: 28rpx;
+    color: $text-muted;
+  }
 
-    .rule-icon { font-size: 24rpx; }
-    .rule-text { font-size: 24rpx; color: var(--text-secondary); line-height: 1.6; }
+  &__arrow {
+    font-size: 36rpx;
+    color: $text-muted;
+    flex-shrink: 0;
   }
 }
 
-.pay-way {
-  .pay-option {
+.address-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+
+  .address-name {
+    font-size: 28rpx;
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  .address-phone {
+    font-size: 26rpx;
+    color: $text-secondary;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.address-detail {
+  font-size: 24rpx;
+  color: $text-muted;
+  line-height: 1.5;
+}
+
+// ========== 积分说明卡片 ==========
+.info-card {
+  padding: $spacing-base $spacing-lg;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.60);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
+  margin-bottom: $spacing-base;
+
+  &__header {
+    margin-bottom: $spacing-base;
+  }
+
+  &__title {
+    font-size: 28rpx;
+    font-weight: 700;
+    color: $text-primary;
+  }
+}
+
+.rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.rule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+}
+
+.rule-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: $accent;
+  flex-shrink: 0;
+  margin-top: 10rpx;
+}
+
+.rule-text {
+  font-size: 26rpx;
+  color: $text-secondary;
+  line-height: 1.6;
+}
+
+// ========== 空状态 ==========
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 40rpx;
+  text-align: center;
+
+  &__icon {
+    width: 120rpx;
+    height: 120rpx;
+    line-height: 120rpx;
+    text-align: center;
+    font-size: 48rpx;
+    font-weight: 800;
+    background: $warm-yellow;
+    border: 1rpx solid $border-primary;
+    border-radius: 50%;
+    color: $accent-dark;
+    margin-bottom: 24rpx;
+  }
+
+  &__text {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 40rpx;
+  }
+
+  &__btn {
+    height: 80rpx;
+    padding: 0 56rpx;
+    background: $accent-gradient;
+    border-radius: $radius-full;
+    box-shadow: $btn-gold-shadow;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-sm) 0;
+    justify-content: center;
 
-    .pay-left {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-
-      .pay-icon { font-size: 32rpx; }
-      text { font-size: 28rpx; color: var(--text-primary); }
+    text {
+      font-size: 30rpx;
+      font-weight: 700;
+      color: #fff;
     }
   }
 }
 
+.bottom-placeholder { width: 100%; }
+
+// ========== 底部提交栏 ==========
 .submit-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--bg-card);
-  border-top: 1rpx solid var(--border-color);
-  display: flex;
-  align-items: center;
-  padding: var(--spacing-base) var(--spacing-lg);
-  padding-bottom: calc(#{var(--spacing-base)} + constant(safe-area-inset-bottom));
-  padding-bottom: calc(#{var(--spacing-base)} + env(safe-area-inset-bottom));
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  border-top: 1rpx solid rgba(20, 20, 20, 0.06);
+  box-shadow: 0 -8rpx 32rpx rgba(47, 53, 66, 0.06);
 
-  .submit-info {
-    flex: 1;
+  &__inner {
     display: flex;
-    align-items: baseline;
-
-    .submit-label { font-size: 24rpx; color: var(--text-secondary); }
-    .submit-cash { font-size: 36rpx; font-weight: 700; color: var(--danger); }
-    .submit-points { font-size: 24rpx; color: var(--primary); margin-left: 8rpx; }
-  }
-
-  .submit-btn {
-    background: $accent-fire;
-    color: $text-inverse;
-    font-size: 28rpx;
-    font-weight: 700;
-    padding: 16rpx 48rpx;
-    border-radius: 50rpx;
-    box-shadow: $shadow-glow;
-
-    &.disabled { background: $bg-tertiary; color: $text-muted; box-shadow: none; }
+    align-items: center;
+    gap: 16rpx;
+    padding: 16rpx $spacing-base;
+    padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
   }
 }
+
+.submit-info {
+  display: flex;
+  align-items: baseline;
+  gap: 6rpx;
+  flex: 1;
+
+  .submit-label {
+    font-size: 24rpx;
+    color: $text-muted;
+  }
+
+  .submit-cash {
+    font-family: $asset-balance-font;
+    font-size: 40rpx;
+    font-weight: 700;
+    color: $danger;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .submit-points {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: $accent-dark;
+  }
+}
+
+.submit-btn {
+  height: 88rpx;
+  padding: 0 56rpx;
+  background: $accent-gradient;
+  border-radius: $radius-full;
+  box-shadow: $btn-gold-shadow;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+
+  text {
+    font-size: 30rpx;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1rpx;
+  }
+
+  &:active { transform: scale(0.97); }
+
+  &--disabled {
+    background: rgba(47, 53, 66, 0.18);
+    box-shadow: none;
+    pointer-events: none;
+
+    text { color: rgba(255, 255, 255, 0.5); }
+  }
+}
+
+.safe-area-bottom { width: 100%; }
 </style>

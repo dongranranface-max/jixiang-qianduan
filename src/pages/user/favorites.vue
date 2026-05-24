@@ -1,24 +1,60 @@
 <template>
   <view class="page-container">
-    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }" />
-    <view class="nav-bar">
-      <text class="nav-back" @click="goBack">←</text>
-      <text class="nav-title">我的收藏</text>
-      <text class="nav-placeholder" />
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }" />
+
+    <view class="page-nav">
+      <view class="page-nav__back" @click="goBack"><text>←</text></view>
+      <text class="page-nav__title">我的收藏</text>
+      <view class="page-nav__action" />
     </view>
 
-    <scroll-view class="list-scroll" scroll-y @scrolltolower="loadMore">
-      <view v-for="item in list" :key="item.favoriteId" class="card" @click="goDetail(item)">
-        <image class="cover" :src="resolveProductCover(item)" mode="aspectFill" />
-        <view class="info">
-          <text class="name">{{ item.name }}</text>
-          <text class="type">{{ item.typeName }}</text>
-          <text class="price">¥{{ item.price }}</text>
-        </view>
-        <view class="remove" @click.stop="remove(item)">取消收藏</view>
+    <scroll-view scroll-y class="fav-list" @scrolltolower="loadMore">
+      <view v-if="loading && !list.length" class="loading-wrap">
+        <view class="loading-spinner" />
+        <text>加载中...</text>
       </view>
-      <view v-if="!loading && !list.length" class="empty">暂无收藏，去逛逛吧</view>
-      <view v-if="loading" class="hint">加载中...</view>
+
+      <view
+        class="fav-card"
+        v-for="item in list"
+        :key="item.favoriteId"
+        @click="goDetail(item)"
+      >
+        <view class="fav-card__cover">
+          <image
+            class="fav-card__img"
+            :src="item.coverImage || '/static/logo.png'"
+            mode="aspectFill"
+          />
+          <view class="fav-card__tag">
+            <text>{{ getTypeName(item) }}</text>
+          </view>
+        </view>
+        <view class="fav-card__body">
+          <text class="fav-card__name">{{ item.name }}</text>
+          <text class="fav-card__price">¥{{ item.price }}</text>
+          <view class="fav-card__action" @click.stop="remove(item)">
+            <text>取消收藏</text>
+          </view>
+        </view>
+      </view>
+
+      <view v-if="!loading && !list.length" class="empty-state">
+        <view class="empty-state__icon">藏</view>
+        <text class="empty-state__text">暂无收藏</text>
+        <text class="empty-state__sub">去逛逛发现心仪好物吧</text>
+      </view>
+
+      <view v-if="loading && list.length" class="load-more">
+        <view class="loading-spinner" />
+        <text>加载中...</text>
+      </view>
+
+      <view v-if="!hasMore && list.length > 0" class="no-more">
+        <text>— 没有更多了 —</text>
+      </view>
+
+      <view class="list-bottom" :style="{ height: (100 + safeAreaBottom) + 'px' }" />
     </scroll-view>
   </view>
 </template>
@@ -26,63 +62,68 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { favoriteApi } from '@/utils/api'
-import { requireAuth } from '@/utils/auth'
-import { resolveProductCover } from '@/utils/media'
+import { checkAuth } from '@/utils/auth'
 
 const statusBarHeight = ref(20)
+const safeAreaBottom = ref(0)
 const list = ref<any[]>([])
 const loading = ref(false)
 const page = ref(1)
 const hasMore = ref(true)
+let reqSeq = 0
+
+function getTypeName(item: any): string {
+  const map: Record<number, string> = { 1: '消费', 2: '换购', 3: '兑换' }
+  return map[item.productType] || '商品'
+}
 
 onMounted(() => {
-  statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
-  if (!requireAuth()) return
-  loadData(true)
+  const sys = uni.getSystemInfoSync()
+  statusBarHeight.value = sys.statusBarHeight || 20
+  safeAreaBottom.value = sys.safeAreaInsets?.bottom || 0
+  if (checkAuth()) loadData(true)
 })
 
 async function loadData(reset = false) {
   if (loading.value) return
-  if (reset) {
-    page.value = 1
-    hasMore.value = true
-    list.value = []
-  }
+  if (reset) { page.value = 1; hasMore.value = true }
   if (!hasMore.value) return
   loading.value = true
+  const seq = ++reqSeq
   try {
     const res = await favoriteApi.list({ page: page.value, limit: 20 })
-    const rows = res.list || []
-    list.value = reset ? rows : [...list.value, ...rows]
+    if (seq !== reqSeq) return
+    const rows = res?.list || []
+    if (reset) list.value = rows
+    else list.value.push(...rows)
     hasMore.value = rows.length >= 20
     page.value++
-  } catch (e: any) {
-    uni.showToast({ title: e.message || '加载失败', icon: 'none' })
+  } catch {
+    if (seq !== reqSeq) return
   } finally {
-    loading.value = false
+    if (seq === reqSeq) loading.value = false
   }
 }
 
 function loadMore() {
-  loadData()
+  if (hasMore.value && !loading.value) loadData(false)
 }
 
-function goBack() {
-  uni.navigateBack()
-}
+function goBack() { uni.navigateBack() }
 
 function goDetail(item: any) {
-  const mode = item.productType === 2 ? 'exchange' : item.productType === 3 ? 'redeem' : 'consume'
+  const modeMap: Record<number, string> = { 2: 'exchange', 3: 'redeem' }
+  const mode = modeMap[item.productType] || 'consume'
   uni.navigateTo({ url: `/pages/product/detail?id=${item.productId}&mode=${mode}` })
 }
 
 async function remove(item: any) {
   try {
     await favoriteApi.remove(item.productId)
-    list.value = list.value.filter((i) => i.favoriteId !== item.favoriteId)
+    list.value = list.value.filter(i => i.favoriteId !== item.favoriteId)
     uni.showToast({ title: '已取消', icon: 'none' })
   } catch (e: any) {
-    uni.showToast({ title: e.message || '操作失败', icon: 'none' })
+    uni.showToast({ title: e?.message || '操作失败', icon: 'none' })
   }
 }
 </script>
@@ -92,42 +133,190 @@ async function remove(item: any) {
 
 .page-container {
   min-height: 100vh;
-  background: $bg-primary;
-  padding: 0 $spacing-base;
+  @include page-bg;
+  display: flex;
+  flex-direction: column;
 }
 
-.nav-bar {
+.status-bar { width: 100%; }
+
+// ========== 导航栏 ==========
+.page-nav {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16rpx 0 24rpx;
-  .nav-back { font-size: 40rpx; }
-  .nav-title { font-size: 34rpx; font-weight: 700; }
-  .nav-placeholder { width: 40rpx; }
+  gap: 16rpx;
+  padding: 12rpx $spacing-base;
+  background: rgba(249, 249, 249, 0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1rpx solid rgba(20, 20, 20, 0.04);
+
+  &__back, &__action {
+    width: 64rpx; height: 64rpx;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: 50%;
+    font-size: 28rpx; color: $mineral-gray; flex-shrink: 0;
+  }
+
+  &__title {
+    flex: 1; font-size: 32rpx; font-weight: 700;
+    color: $mineral-gray; text-align: center;
+  }
 }
 
-.list-scroll {
-  height: calc(100vh - 160rpx);
-}
-
-.card {
-  display: flex;
-  align-items: center;
+// ========== 列表 ==========
+.fav-list {
+  flex: 1;
   padding: $spacing-base;
-  margin-bottom: $spacing-sm;
-  background: $bg-secondary;
-  border-radius: $radius-md;
-  .cover { width: 140rpx; height: 140rpx; border-radius: 12rpx; }
-  .info { flex: 1; margin-left: 16rpx; }
-  .name { font-size: 28rpx; font-weight: 600; display: block; }
-  .type { font-size: 22rpx; color: $text-muted; }
-  .price { font-size: 30rpx; color: $primary; font-weight: 700; margin-top: 8rpx; display: block; }
-  .remove { font-size: 24rpx; color: $danger; }
 }
 
-.empty, .hint {
-  text-align: center;
-  padding: 80rpx 0;
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+  padding: 80rpx;
+  font-size: 28rpx;
   color: $text-muted;
 }
+
+.loading-spinner {
+  width: 48rpx;
+  height: 48rpx;
+  border: 3rpx solid rgba(184, 152, 118, 0.2);
+  border-top-color: $accent-dark;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ========== 收藏卡片 ==========
+.fav-card {
+  display: flex;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.60);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
+  overflow: hidden;
+  margin-bottom: $spacing-base;
+  transition: transform 0.2s ease;
+
+  &:active { transform: scale(0.99); }
+
+  &__cover {
+    position: relative;
+    width: 200rpx;
+    height: 200rpx;
+    flex-shrink: 0;
+    background: $bg-tertiary;
+  }
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__tag {
+    position: absolute;
+    top: 8rpx;
+    left: 8rpx;
+    padding: 4rpx 10rpx;
+    background: rgba(47, 53, 66, 0.7);
+    backdrop-filter: blur(8px);
+    border-radius: $radius-full;
+
+    text {
+      font-size: 18rpx;
+      font-weight: 700;
+      color: #fff;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    padding: $spacing-base;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  &__name {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $text-primary;
+    line-height: 1.4;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  &__price {
+    font-family: $asset-balance-font;
+    font-size: 34rpx;
+    font-weight: 700;
+    color: $mineral-gray;
+    font-variant-numeric: tabular-nums;
+    margin-top: auto;
+  }
+
+  &__action {
+    align-self: flex-start;
+    padding: 6rpx 20rpx;
+    background: rgba(192, 69, 74, 0.06);
+    border: 1rpx solid rgba(192, 69, 74, 0.15);
+    border-radius: $radius-full;
+
+    text {
+      font-size: 22rpx;
+      font-weight: 600;
+      color: $danger;
+    }
+  }
+}
+
+// ========== 空状态 ==========
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 40rpx;
+  text-align: center;
+
+  &__icon {
+    width: 120rpx; height: 120rpx;
+    line-height: 120rpx; text-align: center;
+    font-size: 48rpx; font-weight: 800;
+    background: $warm-yellow;
+    border: 1rpx solid $border-primary;
+    border-radius: 50%;
+    color: $accent-dark;
+    margin-bottom: 24rpx;
+  }
+
+  &__text {
+    font-size: 30rpx; font-weight: 600; color: $text-primary; margin-bottom: 8rpx;
+  }
+
+  &__sub { font-size: 26rpx; color: $text-muted; }
+}
+
+.load-more, .no-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  padding: $spacing-lg 0;
+  font-size: 24rpx;
+  color: $text-muted;
+}
+
+.list-bottom { width: 100%; }
 </style>

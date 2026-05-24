@@ -1,75 +1,89 @@
 <template>
   <view class="page-container">
-    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
-    <view class="page-header">
-      <text class="back" @click="goBack">&lt;</text>
-      <text class="page-title">邀请有礼</text>
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }" />
+
+    <view class="page-nav">
+      <view class="page-nav__back" @click="goBack"><text>←</text></view>
+      <text class="page-nav__title">邀请有礼</text>
+      <view class="page-nav__action" />
     </view>
 
-    <view class="invite-banner">
-      <text class="banner-title">邀请好友加入</text>
-      <text class="banner-sub">好友消费，你躺赚{{ rewardConfig?.referralRewardRate || '10' }}%积分奖励</text>
-      <text class="banner-rule">无层级上限，永续收益</text>
-    </view>
+    <scroll-view scroll-y class="invite-body">
+      <!-- Banner -->
+      <view class="invite-banner">
+        <view class="invite-banner__icon">邀</view>
+        <text class="invite-banner__title">邀请好友加入</text>
+        <text class="invite-banner__sub">好友消费，你躺赚{{ rewardConfig?.referralRewardRate || '10' }}%积分奖励</text>
+        <text class="invite-banner__rule">无层级上限，永续收益</text>
+      </view>
 
-    <view class="invite-code-card">
-      <text class="card-label">我的邀请码</text>
-      <text class="invite-code">{{ inviteCode }}</text>
-      <view class="copy-btn" @click="copyCode">复制邀请码</view>
-    </view>
-
-    <view class="share-section">
-      <text class="section-title">分享链接</text>
-      <view class="share-url">{{ shareUrl }}</view>
-      <view class="share-btn" @click="shareInvite">分享给好友</view>
-    </view>
-
-    <view class="reward-rules">
-      <text class="section-title">邀请奖励规则</text>
-      <view class="rule-list">
-        <view class="rule-item">
-          <text class="rule-icon">邀</text>
-          <view class="rule-content">
-            <text class="rule-title">10% 无限级推荐奖励</text>
-            <text class="rule-desc">你推荐的好友在商城任意消费，你都将获得该笔积分的10%作为推荐奖励，实时到账，无层级上限</text>
-          </view>
+      <!-- 邀请码卡片 -->
+      <view class="code-card">
+        <text class="code-card__label">我的邀请码</text>
+        <text class="code-card__code">{{ inviteCode }}</text>
+        <view class="code-card__copy" @click="copyCode">
+          <text>复制邀请码</text>
         </view>
-        <view class="rule-item">
-          <text class="rule-icon">益</text>
-          <view class="rule-content">
-            <text class="rule-title">团队业绩计入小区理财</text>
-            <text class="rule-desc">好友申购理财项目的积分，会计入你的小区业绩，帮助你升级会员等级，获得更高每日分红</text>
-          </view>
+      </view>
+
+      <!-- 分享链接 -->
+      <view class="share-section">
+        <text class="section-head">分享链接</text>
+        <view class="share-url">{{ shareUrl }}</view>
+        <view class="share-btn" @click="shareInvite">
+          <text>分享给好友</text>
         </view>
-        <view class="rule-item">
-          <text class="rule-icon">礼</text>
-          <view class="rule-content">
-            <text class="rule-title">好友注册即得启动积分</text>
-            <text class="rule-desc">好友使用你的邀请码注册，将获得平台赠送的启动积分</text>
+      </view>
+
+      <!-- 奖励规则 -->
+      <view class="rules-section">
+        <text class="section-head">邀请奖励规则</text>
+        <view class="rule-list">
+          <view class="rule-card">
+            <view class="rule-card__icon">邀</view>
+            <view class="rule-card__body">
+              <text class="rule-card__title">10% 无限级推荐奖励</text>
+              <text class="rule-card__desc">你推荐的好友在商城任意消费，你都将获得该笔积分的 10% 作为推荐奖励，实时到账，无层级上限</text>
+            </view>
+          </view>
+          <view class="rule-card">
+            <view class="rule-card__icon">益</view>
+            <view class="rule-card__body">
+              <text class="rule-card__title">团队业绩计入小区理财</text>
+              <text class="rule-card__desc">好友申购理财项目的积分，会计入你的小区业绩，帮助你升级会员等级，获得更高每日分红</text>
+            </view>
+          </view>
+          <view class="rule-card">
+            <view class="rule-card__icon">礼</view>
+            <view class="rule-card__body">
+              <text class="rule-card__title">好友注册即得启动积分</text>
+              <text class="rule-card__desc">好友使用你的邀请码注册，将获得平台赠送的启动积分</text>
+            </view>
           </view>
         </view>
       </view>
-    </view>
 
-    <view class="safe-area-bottom"></view>
+      <view class="bottom-placeholder" :style="{ height: (100 + safeAreaBottom) + 'px' }" />
+    </scroll-view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { referralApi } from '@/utils/api'
-import { requireAuth } from '@/utils/auth'
+import { checkAuth } from '@/utils/auth'
 
 const statusBarHeight = ref(20)
+const safeAreaBottom = ref(0)
 const inviteCode = ref('')
 const shareUrl = ref('')
-const rewardConfig = ref<{ registerReward: string; referralRewardRate: string } | null>(null)
+const rewardConfig = ref<{ referralRewardRate?: string } | null>(null)
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
   statusBarHeight.value = sys.statusBarHeight || 20
-  if (!requireAuth()) return
-  loadData()
+  safeAreaBottom.value = sys.safeAreaInsets?.bottom || 0
+  if (checkAuth()) loadData()
 })
 
 async function loadData() {
@@ -78,18 +92,15 @@ async function loadData() {
       referralApi.getInviteCode(),
       referralApi.getRewardConfig(),
     ])
-    inviteCode.value = codeRes.inviteCode || ''
-    shareUrl.value = codeRes.inviteUrl || `https://jixiang.com/register?code=${inviteCode.value}`
+    inviteCode.value = codeRes?.inviteCode || ''
+    shareUrl.value = codeRes?.inviteUrl || `https://jixiang.com/register?code=${inviteCode.value}`
     rewardConfig.value = configRes
   } catch {
     inviteCode.value = ''
-    shareUrl.value = ''
   }
 }
 
-function goBack() {
-  uni.navigateBack()
-}
+function goBack() { uni.navigateBack() }
 
 function copyCode() {
   uni.setClipboardData({
@@ -112,165 +123,239 @@ function shareInvite() {
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
-@import '@/styles/page-shell.scss';
 
-.page-container { @include tab-page-shell; }
+.page-container {
+  min-height: 100vh;
+  @include page-bg;
+  display: flex;
+  flex-direction: column;
+}
 
-.page-header {
+.status-bar { width: 100%; }
+
+// ========== 导航栏 ==========
+.page-nav {
   display: flex;
   align-items: center;
-  gap: var(--spacing-base);
+  gap: 16rpx;
+  padding: 12rpx $spacing-base;
+  background: rgba(249, 249, 249, 0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1rpx solid rgba(20, 20, 20, 0.04);
 
-  .back {
-    font-size: 40rpx;
-    color: var(--text-primary);
+  &__back,
+  &__action {
+    width: 64rpx;
+    height: 64rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: 50%;
+    font-size: 28rpx;
+    color: $mineral-gray;
+    flex-shrink: 0;
   }
 
-  .page-title {
-    font-size: 36rpx;
+  &__title {
+    flex: 1;
+    font-size: 32rpx;
     font-weight: 700;
-    color: var(--text-primary);
+    color: $mineral-gray;
+    text-align: center;
   }
 }
 
-.invite-banner {
-  @include premium-surface($warm-yellow);
-  border-radius: $radius-lg;
-  padding: var(--spacing-xl);
-  text-align: center;
-  margin: var(--spacing-base) 0;
+// ========== 内容区 ==========
+.invite-body {
+  flex: 1;
+  padding: $spacing-base;
+}
 
-  .banner-title {
-    font-size: 40rpx;
-    font-weight: 700;
-    color: var(--text-primary);
-    display: block;
+// ========== Banner ==========
+.invite-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-xl $spacing-lg;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.60);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-gold;
+  margin-bottom: $spacing-base;
+
+  &__icon {
+    width: 100rpx;
+    height: 100rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $warm-yellow;
+    border: 2rpx solid $border-primary;
+    border-radius: 50%;
+    font-size: 36rpx;
+    font-weight: 800;
+    color: $accent-dark;
+    margin-bottom: $spacing-base;
   }
 
-  .banner-sub {
+  &__title {
+    font-size: 40rpx;
+    font-weight: 800;
+    color: $text-primary;
+    margin-bottom: 8rpx;
+  }
+
+  &__sub {
     font-size: 28rpx;
     color: $accent-dark;
-    display: block;
-    margin-top: 8rpx;
+    font-weight: 500;
+    margin-bottom: 4rpx;
   }
 
-  .banner-rule {
+  &__rule {
     font-size: 24rpx;
-    color: var(--text-muted);
-    display: block;
-    margin-top: 4rpx;
+    color: $text-muted;
   }
 }
 
-.invite-code-card {
-  @include premium-surface($bg-secondary);
+// ========== 邀请码卡片 ==========
+.code-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-xl $spacing-lg;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.60);
   border-radius: $radius-lg;
-  padding: var(--spacing-xl);
-  text-align: center;
+  box-shadow: $clay-shadow;
+  margin-bottom: $spacing-base;
 
-  .card-label {
+  &__label {
     font-size: 24rpx;
-    color: var(--text-muted);
+    color: $text-muted;
+    margin-bottom: 12rpx;
   }
 
-  .invite-code {
-    font-size: 56rpx;
-    font-weight: 700;
-    color: $navy;
-    letter-spacing: 4rpx;
-    display: block;
-    margin: var(--spacing-base) 0;
+  &__code {
+    font-family: $asset-balance-font;
+    font-size: 64rpx;
+    font-weight: 800;
+    color: $mineral-gray;
+    letter-spacing: 8rpx;
+    margin-bottom: $spacing-base;
   }
 
-  .copy-btn {
-    display: inline-block;
-    background: $accent-fire;
-    color: $text-inverse;
-    font-size: 26rpx;
-    font-weight: 600;
-    padding: 12rpx 48rpx;
-    border-radius: 50rpx;
+  &__copy {
+    height: 72rpx;
+    padding: 0 48rpx;
+    background: $accent-gradient;
+    border-radius: $radius-full;
+    box-shadow: $btn-gold-shadow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text {
+      font-size: 28rpx;
+      font-weight: 700;
+      color: #fff;
+    }
   }
 }
 
+// ========== 分享区 ==========
 .share-section {
-  margin: var(--spacing-lg) 0;
-
-  .section-title {
-    font-size: 28rpx;
-    color: var(--text-primary);
-    font-weight: 600;
-    display: block;
-    margin-bottom: var(--spacing-base);
-  }
+  margin-bottom: $spacing-base;
 
   .share-url {
-    background: var(--bg-secondary);
-    border-radius: $radius-sm;
-    padding: var(--spacing-base);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1rpx solid $border-light;
+    border-radius: $radius-md;
+    padding: $spacing-base;
     font-size: 22rpx;
-    color: var(--text-muted);
+    color: $text-muted;
     word-break: break-all;
-    margin-bottom: var(--spacing-base);
+    margin: $spacing-base 0;
   }
 
   .share-btn {
-    background: $accent-fire;
-    color: $text-inverse;
-    font-size: 28rpx;
-    font-weight: 600;
-    text-align: center;
-    padding: 16rpx;
-    border-radius: 50rpx;
+    height: 88rpx;
+    background: $mineral-gray;
+    border-radius: $radius-full;
+    box-shadow: $btn-brand-shadow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text {
+      font-size: 30rpx;
+      font-weight: 700;
+      color: $accent-light;
+    }
   }
 }
 
-.reward-rules {
-  .section-title {
+// ========== 规则区 ==========
+.section-head {
+  @include section-head;
+  margin-bottom: $spacing-base;
+}
+
+.rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-base;
+}
+
+.rule-card {
+  display: flex;
+  gap: $spacing-base;
+  padding: $spacing-base;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  border: 1rpx solid rgba(255, 255, 255, 0.60);
+  border-radius: $radius-lg;
+  box-shadow: $clay-shadow;
+
+  &__icon {
+    width: 72rpx;
+    height: 72rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $warm-yellow;
+    border: 1rpx solid $border-primary;
+    border-radius: 50%;
     font-size: 28rpx;
-    color: var(--text-primary);
-    font-weight: 600;
-    display: block;
-    margin-bottom: var(--spacing-base);
+    font-weight: 800;
+    color: $accent-dark;
+    flex-shrink: 0;
   }
 
-  .rule-list {
+  &__body {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-base);
+    gap: 6rpx;
   }
 
-  .rule-item {
-    display: flex;
-    gap: var(--spacing-base);
-    @include premium-surface($bg-secondary);
-    border-radius: $radius-lg;
-    padding: var(--spacing-base);
+  &__title {
+    font-size: 28rpx;
+    font-weight: 700;
+    color: $text-primary;
+  }
 
-    .rule-icon {
-      width: 56rpx; height: 56rpx; line-height: 56rpx; text-align: center;
-      font-size: 28rpx; font-weight: var(--weight-heavy); color: $navy;
-      background: $warm-yellow; border-radius: 50%; flex-shrink: 0;
-    }
-
-    .rule-content {
-      flex: 1;
-
-      .rule-title {
-        font-size: 28rpx;
-        font-weight: 600;
-        color: var(--text-primary);
-        display: block;
-      }
-
-      .rule-desc {
-        font-size: 24rpx;
-        color: var(--text-secondary);
-        display: block;
-        margin-top: 4rpx;
-        line-height: 1.6;
-      }
-    }
+  &__desc {
+    font-size: 24rpx;
+    color: $text-secondary;
+    line-height: 1.6;
   }
 }
+
+.bottom-placeholder { width: 100%; }
 </style>

@@ -117,7 +117,7 @@ async function doRedeem(h: any, early: boolean) {
 .page-container { @include tab-page-shell; }
 
 .page-header {
-  padding: var(--spacing-base) 0;
+  padding: $spacing-base 0;
   .page-title { @include page-title-text; }
 }
 
@@ -127,28 +127,28 @@ async function doRedeem(h: any, early: boolean) {
 
   .empty-icon {
     width: 120rpx; height: 120rpx; line-height: 120rpx; text-align: center;
-    font-size: 48rpx; font-weight: var(--weight-heavy); color: $navy;
+    font-size: 48rpx; font-weight: 700; color: $navy;
     background: $warm-yellow; border-radius: 50%;
     display: block; margin: 0 auto;
   }
 
   .empty-text {
     font-size: 32rpx;
-    color: var(--text-primary);
+    color: $text-primary;
     display: block;
-    margin-top: var(--spacing-base);
+    margin-top: $spacing-base;
   }
 
   .empty-sub {
     font-size: 26rpx;
-    color: var(--text-muted);
+    color: $text-muted;
     display: block;
     margin-top: 8rpx;
   }
 
   .go-invest {
     display: inline-block;
-    margin-top: var(--spacing-xl);
+    margin-top: $spacing-xl;
     background: $accent-fire;
     color: $text-inverse;
     padding: 16rpx 48rpx;
@@ -166,8 +166,8 @@ async function doRedeem(h: any, early: boolean) {
 .holding-card {
   @include premium-surface($bg-secondary);
   border-radius: $radius-lg;
-  padding: var(--spacing-base) var(--spacing-lg);
-  margin-bottom: var(--spacing-base);
+  padding: $spacing-base $spacing-lg;
+  margin-bottom: $spacing-base;
 
   .card-header {
     display: flex;
@@ -177,7 +177,7 @@ async function doRedeem(h: any, early: boolean) {
     .product-name {
       font-size: 30rpx;
       font-weight: 600;
-      color: var(--text-primary);
+      color: $text-primary;
     }
 
     .status-tag {
@@ -191,8 +191,8 @@ async function doRedeem(h: any, early: boolean) {
       }
 
       &.inactive {
-        background: var(--bg-secondary);
-        color: var(--text-muted);
+        background: $bg-secondary;
+        color: $text-muted;
       }
     }
   }
@@ -200,26 +200,26 @@ async function doRedeem(h: any, early: boolean) {
   .card-stats {
     display: flex;
     justify-content: space-around;
-    margin: var(--spacing-base) 0;
+    margin: $spacing-base 0;
 
     .stat {
       text-align: center;
 
       .stat-label {
         font-size: 22rpx;
-        color: var(--text-muted);
+        color: $text-muted;
         display: block;
       }
 
       .stat-val {
         font-size: 28rpx;
         font-weight: 600;
-        color: var(--text-primary);
+        color: $text-primary;
         display: block;
         margin-top: 4rpx;
 
         &.profit {
-          color: var(--profit);
+          color: $success;
         }
       }
     }
@@ -227,13 +227,13 @@ async function doRedeem(h: any, early: boolean) {
 
   .card-date {
     font-size: 22rpx;
-    color: var(--text-muted);
+    color: $text-muted;
   }
 
   .card-actions {
     display: flex;
-    gap: var(--spacing-base);
-    margin-top: var(--spacing-base);
+    gap: $spacing-base;
+    margin-top: $spacing-base;
 
     .redeem-btn, .early-btn {
       flex: 1;
@@ -250,8 +250,8 @@ async function doRedeem(h: any, early: boolean) {
     }
 
     .early-btn {
-      border: 1rpx solid var(--border-color);
-      color: var(--text-secondary);
+      border: 1rpx solid $border-light;
+      color: $text-secondary;
     }
   }
 }

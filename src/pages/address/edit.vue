@@ -145,22 +145,22 @@ async function doSubmit() {
 .page-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-base);
-  padding: var(--spacing-base) 0;
+  gap: $spacing-base;
+  padding: $spacing-base 0;
 
-  .back { font-size: 40rpx; color: var(--text-primary); }
-  .page-title { font-size: 36rpx; font-weight: 700; color: var(--text-primary); }
+  .back { font-size: 40rpx; color: $text-primary; }
+  .page-title { font-size: 36rpx; font-weight: 700; color: $text-primary; }
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: $spacing-lg;
 
   .form-item {
     .label {
       font-size: 26rpx;
-      color: var(--text-secondary);
+      color: $text-secondary;
       display: block;
       margin-bottom: 8rpx;
     }
@@ -168,9 +168,9 @@ async function doSubmit() {
     .input {
       @include premium-surface($bg-secondary);
       border-radius: $radius-sm;
-      padding: 20rpx var(--spacing-base);
+      padding: 20rpx $spacing-base;
       font-size: 30rpx;
-      color: var(--text-primary);
+      color: $text-primary;
       width: 100%;
       box-sizing: border-box;
     }
@@ -178,9 +178,9 @@ async function doSubmit() {
     .textarea {
       @include premium-surface($bg-secondary);
       border-radius: $radius-sm;
-      padding: 20rpx var(--spacing-base);
+      padding: 20rpx $spacing-base;
       font-size: 30rpx;
-      color: var(--text-primary);
+      color: $text-primary;
       width: 100%;
       box-sizing: border-box;
       min-height: 160rpx;
@@ -202,8 +202,8 @@ async function doSubmit() {
   font-size: 32rpx;
   font-weight: 700;
   text-align: center;
-  padding: var(--spacing-base);
+  padding: $spacing-base;
   border-radius: 50rpx;
-  margin: var(--spacing-xl) 0;
+  margin: $spacing-xl 0;
 }
 </style>

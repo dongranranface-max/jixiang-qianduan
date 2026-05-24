@@ -1,58 +1,97 @@
 <template>
   <view class="page-container">
-    <view class="safe-area-top" :style="{ height: statusBarHeight + 'px' }"></view>
-    <view class="page-header">
-      <text class="back" @click="goBack">&lt;</text>
-      <text class="page-title">绑定银行卡</text>
+    <view class="status-bar" :style="{ height: statusBarHeight + 'px' }" />
+
+    <view class="page-nav">
+      <view class="page-nav__back" @click="goBack"><text>←</text></view>
+      <text class="page-nav__title">绑定银行卡</text>
+      <view class="page-nav__action" />
     </view>
 
-    <view class="notice">
-      <text>绑定银行卡用于换购商城的资金结算，请务必填写真实信息</text>
-    </view>
+    <scroll-view scroll-y class="page-body">
+      <!-- 须知 -->
+      <view class="notice-strip">
+        <text class="notice-strip__icon">!</text>
+        <text class="notice-strip__text">绑定银行卡用于换购商城的资金结算，请务必填写真实信息</text>
+      </view>
 
-    <view class="form">
-      <view class="form-item">
-        <text class="label">持卡人姓名</text>
-        <input v-model="form.realName" class="input" placeholder="请输入持卡人姓名" />
-      </view>
-      <view class="form-item">
-        <text class="label">银行卡号</text>
-        <input v-model="form.bankCard" class="input" type="number" placeholder="请输入银行卡号" @input="formatCard" />
-      </view>
-      <view class="form-item">
-        <text class="label">开户行</text>
-        <input v-model="form.bankName" class="input" placeholder="如：中国工商银行北京分行" />
-      </view>
-      <view class="form-item">
-        <text class="label">预留手机号</text>
-        <input v-model="form.phone" class="input" type="number" placeholder="银行预留手机号" />
-      </view>
-    </view>
+      <!-- 表单 -->
+      <view class="form-section">
+        <view class="field-group">
+          <text class="field-group__label">持卡人姓名</text>
+          <input
+            v-model="form.realName"
+            class="field-group__input"
+            placeholder="请输入持卡人姓名"
+            placeholder-class="field-group__placeholder"
+          />
+        </view>
 
-    <view class="submit-btn" @click="doSubmit">确认绑定</view>
+        <view class="field-group">
+          <text class="field-group__label">银行卡号</text>
+          <input
+            v-model="form.bankCard"
+            class="field-group__input"
+            type="number"
+            placeholder="请输入银行卡号"
+            placeholder-class="field-group__placeholder"
+            maxlength="23"
+          />
+        </view>
 
-    <view v-if="hasCard" class="current-card">
-      <text class="card-label">当前绑定</text>
-      <view class="card-info">
-        <text>{{ maskCard(bankCard) }}</text>
-        <text class="bank-name">{{ bankName }}</text>
+        <view class="field-group">
+          <text class="field-group__label">开户行</text>
+          <input
+            v-model="form.bankName"
+            class="field-group__input"
+            placeholder="如：中国工商银行北京分行"
+            placeholder-class="field-group__placeholder"
+          />
+        </view>
+
+        <view class="field-group">
+          <text class="field-group__label">预留手机号</text>
+          <input
+            v-model="form.phone"
+            class="field-group__input"
+            type="number"
+            placeholder="银行预留手机号"
+            placeholder-class="field-group__placeholder"
+            maxlength="11"
+          />
+        </view>
       </view>
-    </view>
 
-    <view class="safe-area-bottom"></view>
+      <!-- 当前绑定 -->
+      <view v-if="hasCard" class="current-card">
+        <text class="current-card__label">当前绑定</text>
+        <view class="current-card__info">
+          <text class="current-card__num">{{ maskCard(bankCard) }}</text>
+          <text class="current-card__bank">{{ bankName }}</text>
+        </view>
+      </view>
+
+      <!-- 提交按钮 -->
+      <view class="submit-btn" :class="{ 'submit-btn--loading': loading }" @click="doSubmit">
+        <text class="submit-btn__text">{{ loading ? '绑定中...' : '确认绑定' }}</text>
+      </view>
+
+      <view class="bottom-placeholder" :style="{ height: (100 + safeAreaBottom) + 'px' }" />
+    </scroll-view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { userApi } from '@/utils/api'
-import { requireAuth } from '@/utils/auth'
+import { checkAuth } from '@/utils/auth'
 
 const statusBarHeight = ref(20)
+const safeAreaBottom = ref(0)
+const loading = ref(false)
 const hasCard = ref(false)
 const bankCard = ref('')
 const bankName = ref('')
-const loading = ref(false)
 
 const form = ref({
   realName: '',
@@ -64,45 +103,42 @@ const form = ref({
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
   statusBarHeight.value = sys.statusBarHeight || 20
-  if (!requireAuth()) return
-  loadCurrentCard()
+  safeAreaBottom.value = sys.safeAreaInsets?.bottom || 0
+  if (checkAuth()) loadCurrentCard()
 })
 
 async function loadCurrentCard() {
   try {
     const profile = await userApi.getProfile()
-    if (profile.bankCard) {
+    if (profile?.bankCard) {
       hasCard.value = true
       bankCard.value = profile.bankCard.bankCard || ''
       bankName.value = profile.bankCard.bankName || ''
     }
-  } catch { /* ignore */ }
+  } catch {}
 }
 
-function goBack() {
-  uni.navigateBack()
-}
+function goBack() { uni.navigateBack() }
 
-function formatCard() {
-  // 每4位空格
-}
-
-function maskCard(no: string) {
+function maskCard(no: string): string {
   if (!no || no.length < 8) return no
   return no.replace(/(\d{4})\d+(\d{4})/, '$1 **** **** $2')
 }
 
 async function doSubmit() {
+  if (loading.value) return
   if (!form.value.realName) return uni.showToast({ title: '请输入姓名', icon: 'none' })
-  if (!form.value.bankCard || form.value.bankCard.length < 16) return uni.showToast({ title: '请输入正确卡号', icon: 'none' })
+  if (!form.value.bankCard || form.value.bankCard.replace(/\s/g, '').length < 16) {
+    return uni.showToast({ title: '请输入正确卡号', icon: 'none' })
+  }
   if (!form.value.bankName) return uni.showToast({ title: '请输入开户行', icon: 'none' })
 
-  uni.showLoading()
   loading.value = true
+  uni.showLoading({ title: '' })
   try {
     await userApi.bindBankCard({
       bankName: form.value.bankName,
-      bankCard: form.value.bankCard,
+      bankCard: form.value.bankCard.replace(/\s/g, ''),
       realName: form.value.realName,
       phone: form.value.phone,
     })
@@ -111,104 +147,177 @@ async function doSubmit() {
   } catch {
     uni.showToast({ title: '绑定失败', icon: 'none' })
   } finally {
-    uni.hideLoading()
     loading.value = false
+    uni.hideLoading()
   }
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
-@import '@/styles/page-shell.scss';
 
-.page-container { @include tab-page-shell; }
-
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-base);
-  padding: var(--spacing-base) 0;
-
-  .back {
-    font-size: 40rpx;
-    color: var(--text-primary);
-  }
-
-  .page-title {
-    font-size: 36rpx;
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-}
-
-.notice {
-  background: rgba($danger, 0.08);
-  border: 1rpx solid rgba($danger, 0.25);
-  border-radius: $radius-sm;
-  padding: var(--spacing-sm) var(--spacing-base);
-  font-size: 24rpx;
-  color: var(--danger);
-  margin-bottom: var(--spacing-xl);
-}
-
-.form {
+.page-container {
+  min-height: 100vh;
+  @include page-bg;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+}
 
-  .form-item {
-    .label {
-      font-size: 26rpx;
-      color: var(--text-secondary);
-      display: block;
-      margin-bottom: 8rpx;
-    }
+.status-bar { width: 100%; }
 
-    .input {
-      @include premium-surface($bg-secondary);
-      border-radius: $radius-sm;
-      padding: 20rpx var(--spacing-base);
-      font-size: 30rpx;
-      color: var(--text-primary);
-    }
+// ========== 导航栏 ==========
+.page-nav {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx $spacing-base;
+  background: rgba(249, 249, 249, 0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1rpx solid rgba(20, 20, 20, 0.04);
+
+  &__back, &__action {
+    width: 64rpx; height: 64rpx;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(20, 20, 20, 0.06);
+    border-radius: 50%;
+    font-size: 28rpx; color: $mineral-gray; flex-shrink: 0;
+  }
+
+  &__title {
+    flex: 1; font-size: 32rpx; font-weight: 700;
+    color: $mineral-gray; text-align: center;
   }
 }
 
-.submit-btn {
-  background: $accent-fire;
-  color: $text-inverse;
-  font-size: 32rpx;
-  font-weight: 700;
-  text-align: center;
-  padding: var(--spacing-base);
-  border-radius: 50rpx;
-  margin: var(--spacing-xl) 0;
+// ========== 内容区 ==========
+.page-body {
+  flex: 1;
+  padding: $spacing-base;
 }
 
-.current-card {
-  @include premium-surface($bg-secondary);
-  border-radius: $radius-lg;
-  padding: var(--spacing-base) var(--spacing-lg);
+// ========== 须知 ==========
+.notice-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10rpx;
+  padding: $spacing-base;
+  background: rgba(192, 69, 74, 0.06);
+  border: 1rpx solid rgba(192, 69, 74, 0.15);
+  border-radius: $radius-md;
+  margin-bottom: $spacing-lg;
 
-  .card-label {
+  &__icon {
+    width: 32rpx; height: 32rpx;
+    display: flex; align-items: center; justify-content: center;
+    background: $danger;
+    border-radius: 50%;
+    font-size: 20rpx; font-weight: 800; color: #fff;
+    flex-shrink: 0;
+  }
+
+  &__text {
     font-size: 24rpx;
-    color: var(--text-muted);
+    color: $danger;
+    line-height: 1.6;
+  }
+}
+
+// ========== 表单 ==========
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-base;
+  margin-bottom: $spacing-lg;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+
+  &__label {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &__input {
+    height: 96rpx;
+    padding: 0 $spacing-base;
+    background: rgba(255, 255, 255, 0.90);
+    backdrop-filter: blur(12px);
+    border: 1rpx solid rgba(255, 255, 255, 0.60);
+    border-radius: $radius-md;
+    font-size: 30rpx;
+    color: $text-primary;
+    box-shadow: $clay-shadow;
+
+    &::placeholder { color: $text-muted; }
+  }
+
+  &__placeholder { color: $text-muted; }
+}
+
+// ========== 当前绑定 ==========
+.current-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1rpx solid rgba(255, 255, 255, 0.60);
+  border-radius: $radius-lg;
+  padding: $spacing-base $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  &__label {
+    font-size: 22rpx;
+    color: $text-muted;
     display: block;
     margin-bottom: 8rpx;
   }
 
-  .card-info {
+  &__info {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+  }
 
-    text {
-      font-size: 28rpx;
-      color: var(--text-primary);
-    }
+  &__num {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $text-primary;
+    font-variant-numeric: tabular-nums;
+  }
 
-    .bank-name {
-      color: var(--text-secondary);
-    }
+  &__bank {
+    font-size: 26rpx;
+    color: $text-secondary;
   }
 }
+
+// ========== 提交按钮 ==========
+.submit-btn {
+  height: 96rpx;
+  background: $accent-gradient;
+  border-radius: 48rpx;
+  box-shadow: $btn-gold-shadow;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+
+  &:active { transform: scale(0.98); }
+
+  &--loading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  &__text {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: #fff;
+  }
+}
+
+.bottom-placeholder { width: 100%; }
 </style>
