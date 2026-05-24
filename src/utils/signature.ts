@@ -7,7 +7,6 @@
 // --------------------------------------------
 //  常量配置
 // --------------------------------------------
-const SIGN_TIMESTAMP_TTL = 5 * 60 * 1000 // 签名有效期 5 分钟
 const SIGN_SECRET = 'JXCITY-SECRET-KEY' // 前端签名盐（与后端约定，非加密密钥）
 
 // --------------------------------------------
@@ -58,6 +57,18 @@ function simpleHash(str: string): string {
 //  签名 Header 生成器
 // --------------------------------------------
 
+/**
+ * 生成随机字符串作为 nonce
+ */
+function generateNonce(length = 16): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
 export interface SignHeaders {
   'X-Sign-Timestamp': string
   'X-Sign-Nonce': string
@@ -79,47 +90,6 @@ export function generateSignHeaders(payload: Record<string, unknown> = {}): Sign
     'X-Sign-Nonce': nonce,
     'X-Sign-Token': token,
   }
-}
-
-// --------------------------------------------
-//  防重放：nonce 管理
-// --------------------------------------------
-const usedNonces = new Set<string>()
-
-/**
- * 生成随机字符串作为 nonce
- */
-function generateNonce(length = 16): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let result = ''
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return result
-}
-
-/**
- * 校验 nonce 是否已使用（防重放攻击）
- * @returns true = 未使用，安全；false = 已使用，拒绝
- */
-export function checkNonce(nonce: string): boolean {
-  if (usedNonces.has(nonce)) return false
-  usedNonces.add(nonce)
-  // 清理过期的 nonce（保留最近 100 个）
-  if (usedNonces.size > 100) {
-    const arr = Array.from(usedNonces)
-    usedNonces.clear()
-    arr.slice(-50).forEach((n) => usedNonces.add(n))
-  }
-  return true
-}
-
-/**
- * 校验时间戳是否在有效期内
- */
-export function checkTimestamp(timestamp: number): boolean {
-  const now = Date.now()
-  return Math.abs(now - timestamp) < SIGN_TIMESTAMP_TTL
 }
 
 // --------------------------------------------
