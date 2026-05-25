@@ -1,6 +1,6 @@
 {
   "pages": [
-    { "path": "pages/index/index", "style": { "navigationStyle": "custom", "enablePullDownRefresh": true } },
+    { "path": "pages/index/index", "style": { "navigationStyle": "custom", "enablePullDownRefresh": true, "onReachBottomDistance": 300 } },
     { "path": "pages/catalog/index", "style": { "navigationStyle": "custom" } },
     { "path": "pages/cart/index", "style": { "navigationStyle": "custom" } },
     { "path": "pages/wealth/index", "style": { "navigationStyle": "custom" } },
@@ -41,7 +41,7 @@
   },
   "tabBar": {
     "color": "#BBBBBB",
-    "selectedColor": "#B89876",
+    "selectedColor": "#C4A57B",
     "backgroundColor": "rgba(255,255,255,0.01)",
     "borderStyle": "white",
     "list": [

@@ -1,6 +1,6 @@
 // ===========================================
 //  集享公社 · 轻奢金融主题
-//  象牙白底 · 深藏青 · 香槟金 · 克制留白
+//  象牙白底 · 深藏青 · 暖金 · 克制留白
 // ===========================================
 
 // SCSS Variables — 统一色彩 Token（去冗余）
@@ -16,10 +16,10 @@ $warm-yellow:  #EDE9E1;
 $warm-pink:    #F0EDE8;
 $warm-blue:    #ECEEF2;
 
-// 金色系（唯一来源）
-$accent:       #B89876;   // 主金
-$accent-light: #D4C4AE;   // 浅金
-$accent-dark:  #8E7459;   // 深金
+// 金色系（唯一来源，暖色调更亲和）
+$accent:       #C4A57B;   // 主金：提亮2%，更柔和
+$accent-light: #DFD0B5;   // 浅金：更淡雅
+$accent-dark:  #9B7E5E;   // 深金：保持层次
 
 // 藏青系（唯一来源）
 $mineral-gray:  #2F3542;   // 主藏青
@@ -34,11 +34,13 @@ $gold:           $accent;
 $gold-light:     $accent-light;
 
 // 语义色（标准色值）
-$success: #3D8B6E;   // 翠绿
-$warning: #D4850A;   // 橙黄
-$danger:  #C0454A;   // 正红
-$info:    $mineral-blue;
-$profit:  $accent-dark;
+$success:   #3D8B6E;   // 翠绿（已有）
+$warning:   #D4850A;   // 橙黄（已有）
+$highlight: #E9B35F;   // 活泼橙黄（新增：折扣/热销标签）
+$secondary: #7F9C89;   // 柔和绿松（新增：积分/成功提示）
+$danger:    #C0454A;   // 正红
+$info:      $mineral-blue;
+$profit:    $accent-dark;
 
 // 文字色
 $text-primary:   #141414;
@@ -58,10 +60,11 @@ $glass-bg-hover: #FAFAF8;
 $glass-border:   rgba(20, 20, 20, 0.06);
 
 // 阴影
-$clay-shadow:  0 12rpx 48rpx rgba(47, 53, 66, 0.06), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
-$shadow-glow:  0 16rpx 48rpx rgba(47, 53, 66, 0.08);
-$shadow-fire:   0 12rpx 40rpx rgba(184, 152, 118, 0.22);
-$shadow-gold:   0 12rpx 36rpx rgba(184, 152, 118, 0.18);
+$clay-shadow:   0 12rpx 48rpx rgba(47, 53, 66, 0.06), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+$shadow-hover:  0 20rpx 40rpx rgba(0, 0, 0, 0.08);   // 交互反馈悬浮阴影（新增）
+$shadow-glow:   0 16rpx 48rpx rgba(47, 53, 66, 0.08);
+$shadow-fire:   0 12rpx 40rpx rgba(196, 165, 123, 0.22);  // 暖金发光（更新色值）
+$shadow-gold:   0 0 20rpx rgba(196, 165, 123, 0.30);   // 选中态金色光晕（更新色值+强度）
 
 // 圆角
 $radius-sm:   12rpx;
@@ -89,7 +92,7 @@ $font-sans: 'Noto Sans SC', 'HarmonyOS Sans SC', 'PingFang SC',
             system-ui, sans-serif;
 
 $font-caption:     20rpx;   // 辅助/标签
-$font-body:        26rpx;    // 正文（24→26，拉开与caption的层级差距）
+$font-body:        28rpx;    // 正文（主流小程序标准 28-30rpx）
 $font-card-title:  28rpx;
 $font-page-title:  32rpx;
 $font-banner:      48rpx;

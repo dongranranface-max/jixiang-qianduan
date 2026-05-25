@@ -71,6 +71,7 @@
             class="cart-item__img"
             :src="item.product?.coverImage || item.coverImage"
             mode="aspectFill"
+            lazy-load
           />
 
           <!-- 商品信息 -->

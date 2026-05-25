@@ -76,7 +76,7 @@
             class="cat-card"
             @click="goCategoryProducts(cat)"
           >
-            <image class="cat-img" :src="cat.coverImage || '/static/logo.png'" mode="aspectFill" />
+            <image class="cat-img" :src="cat.coverImage || '/static/logo.png'" mode="aspectFill" lazy-load />
             <view class="cat-info">
               <text class="cat-name">{{ cat.name }}</text>
               <text class="cat-count">{{ cat.productCount || 0 }} 件商品</text>

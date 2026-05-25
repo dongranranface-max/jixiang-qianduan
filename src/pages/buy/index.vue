@@ -48,7 +48,7 @@
           @click="goExchange(item)"
         >
           <view class="product-card__cover">
-            <image class="cover-img" :src="item.coverImage || '/static/logo.png'" mode="aspectFill" />
+            <image class="cover-img" :src="item.coverImage || '/static/logo.png'" mode="aspectFill" lazy-load />
             <view class="cover-tag">
               <text>0元兑</text>
             </view>

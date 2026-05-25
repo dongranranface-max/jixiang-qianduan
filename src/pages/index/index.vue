@@ -122,10 +122,10 @@
         </view>
       </view>
 
-      <!-- 骨架屏 + loading 遮罩 -->
-      <view v-if="loading && products.length === 0" class="boutique-grid">
-        <view v-for="i in 4" :key="i" class="boutique-skeleton shimmer" />
-      </view>
+      <!-- 骨架屏（首次加载时显示） -->
+      <SkeletonProductGrid v-if="loading && products.length === 0" :count="4" />
+
+      <!-- 商品列表 -->
       <view v-else class="boutique-grid">
         <view
           v-for="p in products"
@@ -137,6 +137,7 @@
             class="boutique-img"
             :src="resolveProductCover(p)"
             mode="aspectFill"
+            lazy-load
           />
           <view class="boutique-info">
             <text class="boutique-name">{{ p.name }}</text>
@@ -151,11 +152,14 @@
         </view>
       </view>
 
-      <!-- Loading 遮罩层：骨架屏展示时覆盖整个区块 -->
-      <view v-if="loading && products.length === 0" class="loading-overlay" />
+      <!-- 触底加载状态 -->
+      <view v-if="loadMoreLoading" class="load-more-tip">
+        <text class="load-more-tip__text">加载中...</text>
+      </view>
+      <view v-else-if="!hasMore && products.length > 0" class="no-more-tip">
+        <text class="no-more-tip__text">— 没有更多了 —</text>
+      </view>
     </view>
-
-    <!-- 底部安全区 -->
     <view class="safe-area-bottom" :style="{ height: (100 + safeAreaBottom) + 'px' }" />
 
     <!-- 自定义毛玻璃 TabBar -->
@@ -165,18 +169,23 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onReachBottom } from '@dcloudio/uni-app'
 import { productApi, marketingApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import { resolveProductCover } from '@/utils/media'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
+import SkeletonProductGrid from '@/components/SkeletonProductGrid.vue'
 
 const statusBarHeight = ref(20)
 const safeAreaBottom = ref(0)
 const loggedIn = ref(checkAuth())
 const currentBanner = ref(0)
 const loading = ref(false)
+const loadMoreLoading = ref(false)
+const page = ref(1)
+const hasMore = ref(true)
+const PAGE_SIZE = 8
 
 interface Product {
   id: number | string
@@ -273,6 +282,11 @@ onShow(() => {
   if (loggedIn.value) assetStore.fetchBalance()
 })
 
+// 触底加载更多
+onReachBottom(() => {
+  loadProducts(false)
+})
+
 function startTicker() {
   tickerText.value = tickerQueue[0]
   tickerIndex = 0
@@ -282,15 +296,29 @@ function startTicker() {
   }, 4000)
 }
 
-async function loadProducts() {
-  loading.value = true
+async function loadProducts(reset = false) {
+  if (reset) {
+    page.value = 1
+    hasMore.value = true
+  }
+  if (!hasMore.value) return
+  if (loadMoreLoading.value) return
+  loadMoreLoading.value = true
   try {
-    const res = await productApi.getList({ type: 1, limit: 8, page: 1 })
-    products.value = (res.list || []).slice(0, 4)
+    const res = await productApi.getList({ type: 1, limit: PAGE_SIZE, page: page.value })
+    const list: Product[] = (res.list || []).slice(0, 4)
+    if (reset) {
+      products.value = list
+    } else {
+      products.value.push(...list)
+    }
+    hasMore.value = list.length === PAGE_SIZE
+    page.value++
   } catch {
-    products.value = []
+    if (reset) products.value = []
+    hasMore.value = false
   } finally {
-    loading.value = false
+    loadMoreLoading.value = false
   }
 }
 

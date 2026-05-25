@@ -25,6 +25,7 @@
             class="fav-card__img"
             :src="item.coverImage || '/static/logo.png'"
             mode="aspectFill"
+            lazy-load
           />
           <view class="fav-card__tag">
             <text>{{ getTypeName(item) }}</text>

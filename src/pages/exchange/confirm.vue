@@ -17,7 +17,7 @@
       <template v-else-if="product">
         <!-- 商品卡片 -->
         <view class="product-card">
-          <image class="product-card__cover" :src="product.coverImage || '/static/logo.png'" mode="aspectFill" />
+          <image class="product-card__cover" :src="product.coverImage || '/static/logo.png'" mode="aspectFill" lazy-load />
           <view class="product-card__info">
             <text class="product-card__name">{{ product.name }}</text>
             <view class="price-row">

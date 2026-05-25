@@ -57,7 +57,7 @@
             class="order-item"
             @click="goProduct(item)"
           >
-            <image class="order-item__img" :src="item.coverImage || '/static/logo.png'" mode="aspectFill" />
+            <image class="order-item__img" :src="item.coverImage || '/static/logo.png'" mode="aspectFill" lazy-load />
             <view class="order-item__info">
               <text class="order-item__name">{{ item.productName }}</text>
               <text class="order-item__spec">{{ item.specs || '默认规格' }} ×{{ item.quantity }}</text>

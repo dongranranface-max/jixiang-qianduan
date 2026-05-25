@@ -33,7 +33,7 @@
           @click="goDetail(item)"
         >
           <view class="product-card__cover">
-            <image class="cover-img" :src="item.coverImage || '/static/logo.png'" mode="aspectFill" />
+            <image class="cover-img" :src="item.coverImage || '/static/logo.png'" mode="aspectFill" lazy-load />
             <view class="cover-tag">
               <text>换购</text>
             </view>

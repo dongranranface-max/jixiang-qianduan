@@ -84,7 +84,7 @@
           <text class="detail-section__title">商品详情</text>
         </view>
         <view v-for="(img, i) in detailImages" :key="i" class="detail-img-wrap">
-          <image class="detail-img" :src="img" mode="widthFix" @error="handleDetailImgError(i, $event)" />
+          <image class="detail-img" :src="img" mode="widthFix" lazy-load @error="handleDetailImgError(i, $event)" />
         </view>
         <view v-if="product.detail" class="detail-text" v-html="product.detail" />
       </view>

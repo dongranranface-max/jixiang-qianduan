@@ -56,7 +56,8 @@
 // ============================================
 //  通用变量
 // ============================================
-$page-bg: radial-gradient(ellipse 80% 60% at 50% 0%, #F9F9F9 0%, #F0EDE8 100%);
+// 页面背景：降低对比度，长时间浏览不疲劳
+$page-bg: radial-gradient(ellipse 80% 60% at 50% 0%, #FCFAF7 0%, #F5F2EB 100%);
 
 // ============================================
 //  通用页面容器
@@ -256,5 +257,35 @@ $page-bg: radial-gradient(ellipse 80% 60% at 50% 0%, #F9F9F9 0%, #F0EDE8 100%);
     );
     background-size: 200% 100%;
     animation: shimmer-sweep 1.4s ease-in-out infinite;
+  }
+}
+
+// ============================================
+//  通用加载状态文字
+// ============================================
+
+.load-more-tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 0 16rpx;
+
+  &__text {
+    font-size: $font-caption;
+    color: $text-muted;
+    letter-spacing: 1rpx;
+  }
+}
+
+.no-more-tip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx 0 8rpx;
+
+  &__text {
+    font-size: $font-caption;
+    color: $text-muted;
+    letter-spacing: 1rpx;
   }
 }

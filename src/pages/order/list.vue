@@ -60,7 +60,7 @@
             class="order-item"
             @click="goDetail(order)"
           >
-            <image class="order-item__img" :src="item.coverImage || item.image" mode="aspectFill" />
+            <image class="order-item__img" :src="item.coverImage || item.image" mode="aspectFill" lazy-load />
             <view class="order-item__info">
               <text class="order-item__name">{{ item.productName || item.name }}</text>
               <text class="order-item__spec">{{ item.specs || item.skuInfo }} ×{{ item.quantity }}</text>
