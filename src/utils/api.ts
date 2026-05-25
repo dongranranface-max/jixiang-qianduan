@@ -301,8 +301,8 @@ export const productApi = {
   },
 
   // 商品详情
-  getDetail: (id: string) =>
-    request<any>({ url: `/products/${id}` }),
+  getDetail: <T = unknown>(id: string) =>
+    request<T>({ url: `/products/${id}` }),
 }
 
 // --------------------------------------------
@@ -382,7 +382,7 @@ export const orderApi = {
 // --------------------------------------------
 export const addressApi = {
   // 地址列表
-  list: () => request<any[]>({ url: '/address' }),
+  list: <T = unknown[]>() => request<T>({ url: '/address' }),
 
   // 新建地址
   create: (data: {
@@ -414,7 +414,9 @@ export const addressApi = {
     request<any>({ url: `/address/${id}/default`, method: 'POST' }),
 
   // 获取默认地址
-  getDefault: () => request<any>({ url: '/address/default' }),
+  getDefault: <T = unknown>() => request<T>({ url: '/address/default' }),
+
+  getDetail: <T = unknown>(id: string) => request<T>({ url: `/address/${id}` }),
 }
 
 // --------------------------------------------
@@ -648,11 +650,11 @@ export const ticketApi = {
   },
 
   // 工单详情
-  getDetail: (id: string) => request<any>({ url: `/tickets/${id}` }),
+  getDetail: <T = unknown>(id: string) => request<T>({ url: `/tickets/${id}` }),
 
   // 回复工单
-  reply: (id: string, data: { content: string; images?: string[] }) =>
-    request<any>({ url: `/tickets/${id}/reply`, method: 'POST', data }),
+  reply: <T = unknown>(id: string, data: { content: string; images?: string[] }) =>
+    request<T>({ url: `/tickets/${id}/reply`, method: 'POST', data }),
 
   // 确认解决
   confirm: (id: string) =>
