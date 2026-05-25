@@ -137,7 +137,6 @@
     <view class="safe-area-bottom" />
 
     <LuxuryTabbar />
-    <AssetStatusBar v-if="loggedIn" />
   </view>
 </template>
 
@@ -148,7 +147,6 @@ import { cartApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
-import AssetStatusBar from '@/components/AssetStatusBar.vue'
 
 const statusBarHeight = ref(20)
 const loggedIn = ref(checkAuth())

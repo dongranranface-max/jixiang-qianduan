@@ -141,9 +141,6 @@
 
     <!-- 自定义毛玻璃 TabBar -->
     <LuxuryTabbar />
-
-    <!-- 资产状态栏 -->
-    <AssetStatusBar v-if="loggedIn" />
   </view>
 </template>
 
@@ -154,7 +151,6 @@ import { productApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
-import AssetStatusBar from '@/components/AssetStatusBar.vue'
 
 const statusBarHeight = ref(20)
 const safeAreaBottom = ref(0)

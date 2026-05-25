@@ -103,7 +103,6 @@
     <view class="safe-area-bottom" :style="{ height: (100 + safeAreaBottom) + 'px' }" />
 
     <LuxuryTabbar />
-    <AssetStatusBar v-if="loggedIn" />
   </view>
 </template>
 
@@ -116,7 +115,6 @@ import { assetStore } from '@/store/asset'
 import { HOME_CATEGORY_FALLBACK, flattenCategories, normalizeCategoryTree } from '@/utils/category'
 import { DEFAULT_PRODUCT_COVER } from '@/utils/media'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
-import AssetStatusBar from '@/components/AssetStatusBar.vue'
 import HomeProductCard from '@/components/HomeProductCard.vue'
 
 const statusBarHeight = ref(20)
