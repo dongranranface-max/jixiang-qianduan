@@ -24,11 +24,8 @@
       </view>
     </view>
 
-    <!-- 加载中 -->
-    <view v-if="loading" class="loading-wrap">
-      <view class="loading-spinner" />
-      <text>加载中...</text>
-    </view>
+    <!-- 加载中骨架屏 -->
+    <ProductDetailSkeleton v-if="loading" />
 
     <template v-else-if="product.id">
       <!-- 商品信息 -->
@@ -166,6 +163,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { productApi, cartApi, favoriteApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
+import ProductDetailSkeleton from '@/components/ProductDetailSkeleton.vue'
 
 const DEFAULT_PRODUCT_COVER = '/static/logo.png'
 
