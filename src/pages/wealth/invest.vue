@@ -72,7 +72,10 @@
         </text>
       </view>
 
-      <view class="agreement">
+      <view class="agreement" @click="agreed = !agreed">
+        <view :class="['agreement__checkbox', { checked: agreed }]">
+          <text v-if="agreed" class="agreement__check">✓</text>
+        </view>
         <text>我已阅读并同意</text>
         <text class="link">《理财服务协议》</text>
       </view>
@@ -90,6 +93,12 @@
     </view>
 
     <view class="safe-area-bottom"></view>
+
+    <InvestmentRiskConfirm
+      :visible="showRiskConfirm"
+      @confirm="handleRiskConfirm"
+      @cancel="handleRiskCancel"
+    />
   </view>
 </template>
 
@@ -97,6 +106,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { financialApi, walletApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
+import InvestmentRiskConfirm from './components/InvestmentRiskConfirm.vue'
 
 const statusBarHeight = ref(20)
 interface FinancialProduct { id: string; name: string; type?: string; annualRate?: number; displayRate?: string; cycleDays?: number; minAmount?: string | number; maxAmount?: string | number; rateValue?: string; cycle?: number; [k: string]: unknown }
@@ -104,6 +114,8 @@ const product = ref<FinancialProduct | null>(null)
 const amount = ref('')
 const ecoPoints = ref(0)
 const loading = ref(false)
+const agreed = ref(false)
+const showRiskConfirm = ref(false)
 
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
@@ -165,19 +177,42 @@ const canSubmit = computed(() => {
 
 async function doSubscribe() {
   if (!canSubmit.value) return
-  uni.showLoading({ title: '提交中...' })
-  try {
-    await financialApi.subscribe({
-      productId: product.value.id,
-      amount: amount.value,
-    })
-    uni.showToast({ title: '申购成功', icon: 'success' })
-    setTimeout(() => uni.navigateBack(), 1500)
-  } catch (err: { message?: string }) {
-    uni.showToast({ title: err?.message || '申购失败', icon: 'none' })
-  } finally {
-    uni.hideLoading()
+  // 一生一次强制风险确认
+  const hasConfirmed = uni.getStorageSync('investment_risk_confirmed')
+  if (!hasConfirmed) {
+    showRiskConfirm.value = true
+    return
   }
+  executeSubscribe()
+}
+
+function executeSubscribe() {
+  uni.showLoading({ title: '提交中...' })
+  financialApi.subscribe({
+    productId: product.value.id,
+    amount: amount.value,
+  })
+    .then(() => {
+      uni.showToast({ title: '申购成功', icon: 'success' })
+      setTimeout(() => uni.navigateBack(), 1500)
+    })
+    .catch((err: { message?: string }) => {
+      uni.showToast({ title: err?.message || '申购失败', icon: 'none' })
+    })
+    .finally(() => {
+      uni.hideLoading()
+    })
+}
+
+function handleRiskConfirm() {
+  uni.setStorageSync('investment_risk_confirmed', '1')
+  showRiskConfirm.value = false
+  agreed.value = true
+  executeSubscribe()
+}
+
+function handleRiskCancel() {
+  showRiskConfirm.value = false
 }
 </script>
 
@@ -353,10 +388,39 @@ async function doSubscribe() {
   font-size: 24rpx;
   color: $text-muted;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  cursor: pointer;
 
   .link {
     color: $accent-dark;
   }
+}
+
+.agreement__checkbox {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 6rpx;
+  border: 2rpx solid rgba($accent-dark, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+
+  &.checked {
+    background: $accent-dark;
+    border-color: $accent-dark;
+  }
+}
+
+.agreement__check {
+  font-size: 18rpx;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .submit-btn {
