@@ -153,6 +153,9 @@ import { cartApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 const statusBarHeight = ref(20)
 const loggedIn = ref(checkAuth())
@@ -212,7 +215,7 @@ async function loadCart() {
     cartItems.value = (res || []).map((item: CartItem) => ({ ...item, selected: item.selected ?? false }))
   } catch (err: { message?: string }) {
     cartItems.value = []
-    uni.showToast({ title: err?.message || '加载购物车失败', icon: 'none' })
+    toast.error(err?.message || '加载购物车失败')
   } finally {
     loading.value = false
   }
@@ -226,7 +229,7 @@ async function changeQty(item: CartItem, delta: number) {
     await cartApi.updateQuantity(item.id, newQty)
     item.quantity = newQty
   } catch (err: { message?: string }) {
-    uni.showToast({ title: err?.message || '修改失败', icon: 'none' })
+    toast.error(err?.message || '修改失败')
   }
 }
 
@@ -235,7 +238,7 @@ async function toggleSelect(item: CartItem) {
     await cartApi.updateSelected(item.id, !item.selected)
     item.selected = !item.selected
   } catch (err: { message?: string }) {
-    uni.showToast({ title: err?.message || '选择失败', icon: 'none' })
+    toast.error(err?.message || '选择失败')
   }
 }
 
@@ -245,7 +248,7 @@ async function toggleSelectAll() {
     await cartApi.selectAll(!all)
     filteredItems.value.forEach((item: CartItem) => { item.selected = !all })
   } catch (err: { message?: string }) {
-    uni.showToast({ title: err?.message || '全选失败', icon: 'none' })
+    toast.error(err?.message || '全选失败')
   }
 }
 
@@ -260,7 +263,7 @@ async function removeItem(item: CartItem) {
         await cartApi.remove(item.id)
         cartItems.value = cartItems.value.filter((i: CartItem) => i.id !== item.id)
       } catch (err: { message?: string }) {
-        uni.showToast({ title: err?.message || '删除失败', icon: 'none' })
+        toast.error(err?.message || '删除失败')
       }
     },
   })
@@ -278,7 +281,7 @@ async function removeSelected() {
         await cartApi.removeSelected()
         await loadCart()
       } catch (err: { message?: string }) {
-        uni.showToast({ title: err?.message || '删除失败', icon: 'none' })
+        toast.error(err?.message || '删除失败')
       }
     },
   })
@@ -303,11 +306,11 @@ function goSettle() {
     const requiredCash = totalCash.value
     const { ecoPoints = 0, balance = 0 } = assetStore as { ecoPoints?: number; balance?: number }
     if (ecoPoints < requiredPoints) {
-      uni.showToast({ title: '积分不足，无法换购', icon: 'none' })
+      toast.warning('积分不足，无法换购')
       return
     }
     if (balance < requiredCash) {
-      uni.showToast({ title: '余额不足，无法换购', icon: 'none' })
+      toast.warning('余额不足，无法换购')
       return
     }
   }

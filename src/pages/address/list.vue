@@ -58,6 +58,9 @@
 import { ref, onMounted } from 'vue'
 import { addressApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 const statusBarHeight = ref(20)
 const safeAreaBottom = ref(0)
@@ -79,7 +82,7 @@ async function loadData() {
     const list = await addressApi.list()
     addresses.value = list || []
   } catch (err: { message?: string }) {
-    uni.showToast({ title: err?.message || '加载失败', icon: 'none' })
+    toast.error(err?.message || '加载失败')
   } finally {
     loading.value = false
   }
@@ -99,10 +102,10 @@ async function setDefault(addr: Address) {
   if (addr.isDefault === 1) return
   try {
     await addressApi.setDefault(addr.id)
-    uni.showToast({ title: '设置成功', icon: 'success' })
+    toast.success('设置成功')
     loadData()
   } catch (err: { message?: string }) {
-    uni.showToast({ title: err?.message || '设置失败', icon: 'none' })
+    toast.error(err?.message || '设置失败')
   }
 }
 
@@ -114,10 +117,10 @@ function deleteAddr(addr: Address) {
       if (!res.confirm) return
       try {
         await addressApi.delete(addr.id)
-        uni.showToast({ title: '已删除', icon: 'success' })
+        toast.success('已删除')
         loadData()
       } catch (err: { message?: string }) {
-        uni.showToast({ title: err?.message || '删除失败', icon: 'none' })
+        toast.error(err?.message || '删除失败')
       }
     },
   })

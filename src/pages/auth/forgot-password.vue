@@ -223,6 +223,9 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import { authApi } from '@/utils/api'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 const step = ref(1)
 const submitting = ref(false)
@@ -273,12 +276,12 @@ function goLogin() {
 async function sendCode() {
   if (countdown.value > 0 || sending.value) return
   if (!/^1\d{10}$/.test(form.value.phone)) {
-    return uni.showToast({ title: '请输入正确手机号', icon: 'none' })
+    return toast.warning('请输入正确手机号')
   }
   sending.value = true
   try {
     await authApi.sendResetSmsCode(form.value.phone)
-    uni.showToast({ title: '验证码已发送', icon: 'success' })
+    toast.success('验证码已发送')
     countdown.value = 60
     countdownTimer = setInterval(() => {
       countdown.value -= 1
@@ -289,14 +292,14 @@ async function sendCode() {
     }, 1000)
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : '发送失败'
-    uni.showToast({ title: msg, icon: 'none' })
+    toast.error(msg)
   } finally {
     sending.value = false
   }
 }
 
 function goStep2() {
-  if (!canGoStep2.value) return uni.showToast({ title: '请完成手机号与验证码', icon: 'none' })
+  if (!canGoStep2.value) return toast.warning('请完成手机号与验证码')
   step.value = 2
 }
 
@@ -314,17 +317,17 @@ async function doReset() {
   if (submitting.value || !canSubmit.value) return
   confirmDirty.value = true
   if (form.value.confirm !== form.value.password) {
-    return uni.showToast({ title: '两次密码不一致', icon: 'none' })
+    return toast.warning('两次密码不一致')
   }
   submitting.value = true
   uni.showLoading({ title: '重置中...', mask: true })
   try {
     await authApi.resetPassword(form.value.phone, form.value.code.trim(), form.value.password)
-    uni.showToast({ title: '密码已重置', icon: 'success' })
+    toast.success('密码已重置')
     setTimeout(() => uni.redirectTo({ url: '/pages/auth/login' }), 1200)
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : '重置失败'
-    uni.showToast({ title: msg, icon: 'none' })
+    toast.error(msg)
   } finally {
     submitting.value = false
     uni.hideLoading()

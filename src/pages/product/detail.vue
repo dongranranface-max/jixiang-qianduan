@@ -164,6 +164,9 @@ import { productApi, cartApi, favoriteApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import ProductDetailSkeleton from '@/components/ProductDetailSkeleton.vue'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 const DEFAULT_PRODUCT_COVER = '/static/logo.png'
 
@@ -252,7 +255,7 @@ function closeSkuSheet() { skuSheetVisible.value = false }
 
 function confirmSku() {
   if (!selectedSkuId.value) {
-    uni.showToast({ title: '请选择完整规格', icon: 'none' })
+    toast.warning('请选择完整规格')
     return
   }
   skuSheetVisible.value = false
@@ -301,7 +304,7 @@ async function loadProduct(id: number) {
     isFavorite.value = res.isFavorite || false
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '加载失败'
-    uni.showToast({ title: message, icon: 'none' })
+    toast.error(message)
   } finally {
     loading.value = false
   }
@@ -321,15 +324,15 @@ async function toggleFavorite() {
     if (checkRes?.favorited) {
       await favoriteApi.remove(String(productId.value))
       isFavorite.value = false
-      uni.showToast({ title: '已取消', icon: 'success' })
+      toast.success('已取消')
     } else {
       await favoriteApi.add(String(productId.value))
       isFavorite.value = true
-      uni.showToast({ title: '已收藏', icon: 'success' })
+      toast.success('已收藏')
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '操作失败'
-    uni.showToast({ title: message, icon: 'none' })
+    toast.error(message)
   }
 }
 
@@ -342,10 +345,10 @@ async function addToCart() {
     await cartApi.add({ productId: String(productId.value), quantity: 1, skuId: selectedSkuId.value ?? undefined })
     const countRes = await cartApi.count()
     cartCount.value = countRes?.count ?? 0
-    uni.showToast({ title: '已加入购物车', icon: 'success' })
+    toast.success('已加入购物车')
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : '添加失败'
-    uni.showToast({ title: message, icon: 'none' })
+    toast.error(message)
   }
 }
 

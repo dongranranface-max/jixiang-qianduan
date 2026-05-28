@@ -383,6 +383,9 @@ import { onShow } from '@dcloudio/uni-app'
 import { orderApi, addressApi, marketingApi, walletApi, productApi, cartApi, userApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 // ===========================================
 //  Type Definitions
@@ -769,13 +772,13 @@ async function handleSubmit() {
 
   // 地址校验
   if (!address.value) {
-    uni.showToast({ title: '请选择收货地址', icon: 'none' })
+    toast.warning('请选择收货地址')
     return
   }
 
   // 换购订单银行卡校验
   if (mode.value === 'exchange' && !hasBankCard.value) {
-    uni.showToast({ title: '请先绑定银行卡', icon: 'none' })
+    toast.warning('请先绑定银行卡')
     return
   }
 
@@ -831,7 +834,7 @@ async function handleSubmit() {
     uni.removeStorageSync('cartGoodsList')
     uni.removeStorageSync('selectedAddress')
 
-    uni.showToast({ title: '下单成功', icon: 'success' })
+    toast.success('下单成功')
     setTimeout(() => {
       uni.redirectTo({ url: '/pages/order/list?tab=1' })
     }, 1500)
@@ -850,10 +853,10 @@ async function handleSubmit() {
       }
       setTimeout(() => errorMsg.value = '', 4000)
     } else if (code === 401) {
-      uni.showToast({ title: '请重新登录', icon: 'none' })
+      toast.error('请重新登录')
       setTimeout(() => uni.navigateTo({ url: '/pages/auth/login' }), 1200)
     } else {
-      uni.showToast({ title: msg, icon: 'none' })
+      toast.error(msg)
     }
   } finally {
     submitting.value = false

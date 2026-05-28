@@ -82,6 +82,9 @@ import { ref, computed, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { addressApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 const statusBarHeight = ref(20)
 const safeAreaBottom = ref(0)
@@ -127,7 +130,7 @@ async function loadAddress() {
     }
     if (addr.province) region.value = [addr.province, addr.city, addr.district]
   } catch {
-    uni.showToast({ title: '加载失败', icon: 'none' })
+    toast.error('加载失败')
   }
 }
 
@@ -143,10 +146,10 @@ function goBack() { uni.navigateBack() }
 
 async function doSubmit() {
   if (loading.value) return
-  if (!form.value.consignee.trim()) return uni.showToast({ title: '请输入收货人', icon: 'none' })
-  if (!form.value.phone.trim() || form.value.phone.length < 11) return uni.showToast({ title: '请输入正确手机号', icon: 'none' })
-  if (!form.value.province) return uni.showToast({ title: '请选择所在地区', icon: 'none' })
-  if (!form.value.detail.trim()) return uni.showToast({ title: '请输入详细地址', icon: 'none' })
+  if (!form.value.consignee.trim()) return toast.warning('请输入收货人')
+  if (!form.value.phone.trim() || form.value.phone.length < 11) return toast.warning('请输入正确手机号')
+  if (!form.value.province) return toast.warning('请选择所在地区')
+  if (!form.value.detail.trim()) return toast.warning('请输入详细地址')
 
   loading.value = true
   try {
@@ -155,10 +158,10 @@ async function doSubmit() {
     } else {
       await addressApi.create(form.value)
     }
-    uni.showToast({ title: '保存成功', icon: 'success' })
+    toast.success('保存成功')
     setTimeout(() => uni.navigateBack(), 800)
   } catch (err: { message?: string }) {
-    uni.showToast({ title: err?.message || '保存失败', icon: 'none' })
+    toast.error(err?.message || '保存失败')
   } finally {
     loading.value = false
   }

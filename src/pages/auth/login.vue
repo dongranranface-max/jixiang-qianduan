@@ -143,6 +143,9 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { authApi } from '@/utils/api'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 interface UniInputEvent {
   detail?: {
@@ -192,16 +195,16 @@ function goForgot() {
 }
 
 function thirdPartyLogin(_type: 'wechat' | 'alipay' | 'apple') {
-  uni.showToast({ title: '暂未开放', icon: 'none' })
+  toast.info('暂未开放')
 }
 
 async function doLogin() {
   if (submitting.value) return
   if (!form.value.phone || form.value.phone.length !== 11) {
-    return uni.showToast({ title: '请输入11位手机号', icon: 'none' })
+    return toast.warning('请输入11位手机号')
   }
   if (!form.value.password || form.value.password.length < 6) {
-    return uni.showToast({ title: '密码至少6位', icon: 'none' })
+    return toast.warning('密码至少6位')
   }
 
   submitting.value = true
@@ -210,11 +213,11 @@ async function doLogin() {
     await authApi.login(form.value.phone, form.value.password)
     const { assetStore } = await import('@/store/asset')
     await assetStore.fetchBalance()
-    uni.showToast({ title: '登录成功', icon: 'success' })
+    toast.success('登录成功')
     setTimeout(() => uni.switchTab({ url: '/pages/index/index' }), 1200)
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : '登录失败'
-    uni.showToast({ title: msg, icon: 'none' })
+    toast.error(msg)
   } finally {
     submitting.value = false
     uni.hideLoading()

@@ -121,6 +121,9 @@ import { onShow } from '@dcloudio/uni-app'
 import { orderApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 const statusBarHeight = ref(20)
 const loggedIn = ref(checkAuth())
@@ -213,10 +216,10 @@ async function cancelOrder(order: Order) {
       if (!res.confirm) return
       try {
         await orderApi.cancel(order.orderNo)
-        uni.showToast({ title: '已取消', icon: 'success' })
+        toast.success('已取消')
         loadOrders(true)
       } catch (err: { message?: string }) {
-        uni.showToast({ title: err?.message || '取消失败', icon: 'none' })
+        toast.error(err?.message || '取消失败')
       }
     },
   })
@@ -225,10 +228,10 @@ async function cancelOrder(order: Order) {
 async function payOrder(order: Order) {
   try {
     await orderApi.pay(order.orderNo)
-    uni.showToast({ title: '付款成功', icon: 'success' })
+    toast.success('付款成功')
     loadOrders(true)
   } catch (err: { message?: string }) {
-    uni.showToast({ title: err?.message || '付款失败', icon: 'none' })
+    toast.error(err?.message || '付款失败')
   }
 }
 
@@ -240,10 +243,10 @@ async function confirmReceive(order: Order) {
       if (!res.confirm) return
       try {
         await orderApi.confirm(order.orderNo)
-        uni.showToast({ title: '已确认收货', icon: 'success' })
+        toast.success('已确认收货')
         loadOrders(true)
       } catch (err: { message?: string }) {
-        uni.showToast({ title: err?.message || '操作失败', icon: 'none' })
+        toast.error(err?.message || '操作失败')
       }
     },
   })

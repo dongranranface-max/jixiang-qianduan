@@ -3,6 +3,7 @@ import { onLaunch, onShow } from '@dcloudio/uni-app'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import NetworkBanner from '@/components/NetworkBanner.vue'
+import Toast from '@/components/Toast/Toast.vue'
 
 onLaunch(() => {
   if (checkAuth()) assetStore.fetchBalance()
@@ -15,6 +16,7 @@ onShow(() => {
 
 <template>
   <NetworkBanner />
+  <Toast />
   <RouterView />
 </template>
 

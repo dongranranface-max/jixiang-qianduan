@@ -151,6 +151,9 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import { authApi } from '@/utils/api'
+import { useToast } from '@/composables/useToast'
+
+const toast = useToast()
 
 const submitting = ref(false)
 const sending = ref(false)
@@ -201,12 +204,12 @@ function goLogin() {
 async function sendCode() {
   if (countdown.value > 0 || sending.value) return
   if (!/^1\d{10}$/.test(form.value.phone)) {
-    return uni.showToast({ title: '请输入正确手机号', icon: 'none' })
+    return toast.warning('请输入正确手机号')
   }
   sending.value = true
   try {
     await authApi.sendResetSmsCode(form.value.phone)
-    uni.showToast({ title: '验证码已发送', icon: 'success' })
+    toast.success('验证码已发送')
     countdown.value = 60
     countdownTimer = setInterval(() => {
       countdown.value -= 1
@@ -217,7 +220,7 @@ async function sendCode() {
     }, 1000)
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : '发送失败'
-    uni.showToast({ title: msg, icon: 'none' })
+    toast.error(msg)
   } finally {
     sending.value = false
   }
@@ -226,16 +229,16 @@ async function sendCode() {
 async function doRegister() {
   if (submitting.value) return
   if (!/^1\d{10}$/.test(form.value.phone)) {
-    return uni.showToast({ title: '请输入手机号', icon: 'none' })
+    return toast.warning('请输入手机号')
   }
   if (!/^\d{6}$/.test(form.value.code)) {
-    return uni.showToast({ title: '请输入6位验证码', icon: 'none' })
+    return toast.warning('请输入6位验证码')
   }
   if (form.value.password.length < 6) {
-    return uni.showToast({ title: '密码至少6位', icon: 'none' })
+    return toast.warning('密码至少6位')
   }
   if (!agreed.value) {
-    return uni.showToast({ title: '请先阅读并同意用户协议', icon: 'none' })
+    return toast.warning('请先阅读并同意用户协议')
   }
 
   submitting.value = true
@@ -247,11 +250,11 @@ async function doRegister() {
       form.value.inviteCode || undefined,
       form.value.code
     )
-    uni.showToast({ title: '注册成功', icon: 'success' })
+    toast.success('注册成功')
     setTimeout(() => uni.redirectTo({ url: '/pages/auth/login' }), 1200)
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : '注册失败'
-    uni.showToast({ title: msg, icon: 'none' })
+    toast.error(msg)
   } finally {
     submitting.value = false
     uni.hideLoading()
