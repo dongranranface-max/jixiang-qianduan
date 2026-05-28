@@ -31,6 +31,25 @@
         <view class="asset-item"><text class="asset-value gold">¥{{ balanceDisplay }}</text><text class="asset-label">账户余额</text></view>
       </view>
       <view v-if="!loggedIn" class="asset-strip asset-strip--guest"><text class="asset-strip__guest-text">登录后查看资产详情</text></view>
+
+      <!-- 团队统计 -->
+      <view v-if="loggedIn" class="team-stats" @click.stop="goTeam">
+        <view class="team-stat-item">
+          <text class="team-stat-value">{{ teamInfo.directCount ?? '--' }}</text>
+          <text class="team-stat-label">直推人数</text>
+        </view>
+        <view class="team-stat-divider" />
+        <view class="team-stat-item">
+          <text class="team-stat-value">{{ teamInfo.teamSize ?? '--' }}</text>
+          <text class="team-stat-label">团队总人数</text>
+        </view>
+        <view class="team-stat-divider" />
+        <view class="team-stat-item">
+          <text class="team-stat-value accent">{{ teamInfo.teamPerformance ?? '--' }}</text>
+          <text class="team-stat-label">小区业绩</text>
+        </view>
+        <view class="team-stat-arrow">›</view>
+      </view>
     </view>
 
     <!-- 分红 Banner -->
@@ -104,7 +123,7 @@ import { onShow } from '@dcloudio/uni-app'
 import { checkAuth, clearAuth } from '@/utils/auth'
 import { resolveAvatar } from '@/utils/media'
 import { assetStore } from '@/store/asset'
-import { userApi, type UserProfile } from '@/utils/api'
+import { userApi, type UserProfile, type UserTeam } from '@/utils/api'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
 
 const DEFAULT_AVATAR = '/static/images/default-avatar.png'
@@ -113,6 +132,7 @@ const safeAreaBottom = ref(0)
 const loggedIn = ref(checkAuth())
 const userInfo = ref<Partial<UserProfile>>({})
 const avatarSrc = ref('')
+const teamInfo = ref<Partial<UserTeam>>({})
 
 const ecoPointsDisplay = computed(() => assetStore.ecoPointsDisplay)
 const consumerPointsDisplay = computed(() => assetStore.consumerPointsDisplay)
@@ -134,6 +154,7 @@ const orderTabs = [
 const toolItems = [
   { id: 'signin', label: '每日签到', icon: '签', bg: 'rgba(184,152,118,0.12)', action: () => goSignIn() },
   { id: 'address', label: '收货地址', icon: '址', bg: 'rgba(65,75,94,0.08)', action: () => goAddress() },
+  { id: 'team', label: '我的团队', icon: '团', bg: 'rgba(184,152,118,0.12)', action: () => goTeam() },
   { id: 'exchange', label: '积分兑换', icon: '兑', bg: 'rgba(142,116,89,0.10)', action: () => goExchange() },
   { id: 'wealth', label: '我的理财', icon: '财', bg: 'rgba(184,152,118,0.12)', action: () => goWealth() },
   { id: 'help', label: '帮助中心', icon: '帮', bg: 'rgba(65,75,94,0.08)', action: () => goHelp() },
@@ -150,7 +171,10 @@ onMounted(() => {
 onShow(() => {
   loggedIn.value = checkAuth()
   assetStore.fetchBalance()
-  if (loggedIn.value) loadUserInfo()
+  if (loggedIn.value) {
+    loadUserInfo()
+    loadTeamInfo()
+  }
 })
 
 async function loadUserInfo() {
@@ -162,10 +186,19 @@ async function loadUserInfo() {
   } catch {}
 }
 
+async function loadTeamInfo() {
+  if (!checkAuth()) return
+  try {
+    const res = await userApi.getTeam()
+    teamInfo.value = res || {}
+  } catch {}
+}
+
 function onAvatarError() { avatarSrc.value = DEFAULT_AVATAR }
 
 function goProfile() { if (!checkAuth()) return; uni.navigateTo({ url: '/pages/user/profile' }) }
 function goInvite() { if (!checkAuth()) return; uni.navigateTo({ url: '/pages/user/invite' }) }
+function goTeam() { if (!checkAuth()) return; uni.navigateTo({ url: '/pages/user/team' }) }
 function goSignIn() { if (!checkAuth()) return; uni.navigateTo({ url: '/pages/user/sign-in' }) }
 function goOrderList(key = '') { if (!checkAuth()) return; const url = key ? `/pages/order/list?tab=${key}` : '/pages/order/list'; uni.navigateTo({ url }) }
 function goAddress() { if (!checkAuth()) return; uni.navigateTo({ url: '/pages/address/list' }) }
@@ -176,7 +209,7 @@ function goAbout() { uni.showToast({ title: '关于我们开发中', icon: 'none
 
 function logout() {
   uni.showModal({ title: '提示', content: '确定退出登录？', success: (res) => {
-    if (res.confirm) { clearAuth(); userInfo.value = {}; loggedIn.value = false; avatarSrc.value = ''; uni.showToast({ title: '已退出', icon: 'none' }) }
+    if (res.confirm) { clearAuth(); userInfo.value = {}; teamInfo.value = {}; loggedIn.value = false; avatarSrc.value = ''; uni.showToast({ title: '已退出', icon: 'none' }) }
   }})
 }
 </script>
@@ -229,11 +262,28 @@ $gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx; $gap-base: 16rpx; $g
 .asset-strip {
   position: relative; z-index: 1;
   display: flex; align-items: center; justify-content: space-around;
-  padding: 16rpx $gap-24 $gap-24; border-top: 1rpx solid rgba(255,255,255,0.08); box-sizing: border-box;
+  padding: 16rpx $gap-24 $gap-24; border-top: 1rpx solid rgba(47,53,66,0.08); box-sizing: border-box;
   .asset-item { text-align: center; .asset-value { display: block; font-family: $font-sans; font-size: 32rpx; font-weight: 700; color: $text-primary; font-variant-numeric: tabular-nums; &.accent { color: $accent-dark; } &.gold { color: $accent-dark; } } .asset-label { display: block; font-size: 20rpx; color: $text-muted; margin-top: 4rpx; } }
   .asset-divider { width: 1rpx; height: 40rpx; background: rgba(47,53,66,0.08); }
   &--guest { justify-content: center; .asset-strip__guest-text { font-size: 26rpx; color: $text-muted; font-weight: 500; } }
 }
+
+// 团队统计
+.team-stats {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20rpx $gap-24 $gap-24; border-top: 1rpx solid rgba(47,53,66,0.06); box-sizing: border-box;
+}
+
+.team-stat-item {
+  flex: 1; text-align: center;
+  .team-stat-value { display: block; font-family: $font-sans; font-size: 36rpx; font-weight: 700; color: $text-primary; font-variant-numeric: tabular-nums; &.accent { color: $accent-dark; } }
+  .team-stat-label { display: block; font-size: 20rpx; color: $text-muted; margin-top: 4rpx; }
+}
+
+.team-stat-divider { width: 1rpx; height: 48rpx; background: rgba(47,53,66,0.08); }
+
+.team-stat-arrow { font-size: 36rpx; color: $text-muted; flex-shrink: 0; padding-left: 8rpx; }
 
 // 分红 Banner
 .dividend-banner {

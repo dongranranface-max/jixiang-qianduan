@@ -98,10 +98,10 @@
             </view>
           </view>
 
-          <!-- 邀请码（弱化）-->
-          <view class="field-group field-group--muted">
-            <view class="field-line field-line--dashed" :class="{ 'is-focused': focusState.invite, 'has-value': form.inviteCode }">
-              <span class="field-line__fl field-line__fl--muted">邀请码 <text class="field-line__opt">(选填)</text></span>
+          <!-- 邀请码 -->
+          <view class="field-group">
+            <view class="field-line" :class="{ 'is-focused': focusState.invite, 'has-value': form.inviteCode }">
+              <span class="field-line__fl">邀请码 <text class="field-line__req">*</text></span>
               <input
                 class="field-line__input"
                 v-model="form.inviteCode"
@@ -179,7 +179,8 @@ const form = ref({
 const canSubmit = computed(() =>
   form.value.phone.length === 11 &&
   form.value.code.length === 6 &&
-  form.value.password.length >= 6
+  form.value.password.length >= 6 &&
+  form.value.inviteCode.length > 0
 )
 
 function onFocus(field: 'phone' | 'code' | 'pwd' | 'invite') { focusState[field] = true }
@@ -236,6 +237,9 @@ async function doRegister() {
   }
   if (form.value.password.length < 6) {
     return toast.warning('密码至少6位')
+  }
+  if (form.value.inviteCode.trim().length === 0) {
+    return toast.warning('请填写邀请码')
   }
   if (!agreed.value) {
     return toast.warning('请先阅读并同意用户协议')
@@ -487,6 +491,13 @@ async function doRegister() {
     font-size: 18rpx;
     font-weight: 400;
     color: #888888;
+  }
+
+  &__req {
+    font-size: 20rpx;
+    font-weight: 700;
+    color: $danger;
+    margin-left: 2rpx;
   }
 
   &__input {

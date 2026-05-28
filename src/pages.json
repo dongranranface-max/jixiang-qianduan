@@ -28,6 +28,7 @@
     { "path": "pages/user/service-create", "style": { "navigationStyle": "custom" } },
     { "path": "pages/user/service-detail", "style": { "navigationStyle": "custom" } },
     { "path": "pages/user/settings", "style": { "navigationStyle": "custom" } },
+    { "path": "pages/user/team", "style": { "navigationStyle": "custom" } },
     { "path": "pages/coupon/list", "style": { "navigationStyle": "custom" } },
     { "path": "pages/address/list", "style": { "navigationStyle": "custom" } },
     { "path": "pages/address/edit", "style": { "navigationStyle": "custom" } }
