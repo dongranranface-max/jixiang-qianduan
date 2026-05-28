@@ -2,6 +2,7 @@
 import { onLaunch, onShow } from '@dcloudio/uni-app'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
+import NetworkBanner from '@/components/NetworkBanner.vue'
 
 onLaunch(() => {
   if (checkAuth()) assetStore.fetchBalance()
@@ -11,6 +12,11 @@ onShow(() => {
   if (checkAuth()) assetStore.fetchBalance()
 })
 </script>
+
+<template>
+  <NetworkBanner />
+  <RouterView />
+</template>
 
 <style lang="scss">
 @import './styles/theme.scss';
