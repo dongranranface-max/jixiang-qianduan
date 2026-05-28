@@ -279,7 +279,7 @@ function nextTick(fn: () => void) { setTimeout(fn, 0) }
 
   &__text {
     font-size: 26rpx;
-    color: #A88A5C;
+    color: $auth-gold-light;
     font-weight: 600;
     letter-spacing: 1rpx;
     line-height: 1;

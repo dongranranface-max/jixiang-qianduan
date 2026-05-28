@@ -357,7 +357,7 @@ async function doReset() {
 
   &__fill {
     height: 100%;
-    background: linear-gradient(90deg, $auth-gold 0%, #C4A870 100%);
+    background: linear-gradient(90deg, $auth-gold 0%, -gold 100%);
     border-radius: 0 2rpx 2rpx 0;
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -438,7 +438,7 @@ async function doReset() {
 
   &__text {
     font-size: 26rpx;
-    color: #A88A5C;
+    color: $auth-gold-light;
     font-weight: 500;
     letter-spacing: 1rpx;
     line-height: 1;

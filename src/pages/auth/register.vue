@@ -347,7 +347,7 @@ async function doRegister() {
 
   &__text {
     font-size: 26rpx;
-    color: #A88A5C;
+    color: $auth-gold-light;
     font-weight: 500;
     letter-spacing: 1rpx;
     line-height: 1;
