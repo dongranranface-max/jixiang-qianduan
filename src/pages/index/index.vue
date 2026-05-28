@@ -1,18 +1,13 @@
 <template>
   <view class="page">
 
-    <!-- ==================== 1. 头部导航 ==================== -->
+    <!-- 1. 头部导航 -->
     <header class="header">
       <view class="header__inner">
-        <!-- 左侧：Logo + 品牌 -->
         <view class="header__brand">
-          <view class="header__logo">
-            <text class="header__logo-text">集</text>
-          </view>
+          <view class="header__logo"><text class="header__logo-text">集</text></view>
           <text class="header__brand-name">集享公社</text>
         </view>
-
-        <!-- 右侧：搜索入口 -->
         <view class="header__search" @click="goSearch">
           <text class="header__search-icon">⌕</text>
           <text class="header__search-text">搜索商品/服务</text>
@@ -20,22 +15,13 @@
       </view>
     </header>
 
-    <!-- ==================== 2. Banner 轮播 ==================== -->
-    <BannerCarousel
-      :banners="banners"
-      height="320rpx"
-      @click="onBannerClick"
-    />
+    <!-- 2. Banner 轮播 -->
+    <BannerCarousel :banners="banners" height="320rpx" @click="onBannerClick" />
 
-    <!-- ==================== 3. 四大功能图标（集/购/换/兑） ==================== -->
+    <!-- 3. 四大功能图标 -->
     <section class="section func-grid-section">
       <view class="func-grid">
-        <view
-          v-for="item in funcModules"
-          :key="item.id"
-          class="func-item"
-          @click="onFuncClick(item)"
-        >
+        <view v-for="item in funcModules" :key="item.id" class="func-item" @click="onFuncClick(item)">
           <view class="func-item__icon-wrap" :style="{ background: item.bg }">
             <text class="func-item__icon">{{ item.icon }}</text>
           </view>
@@ -45,30 +31,20 @@
       </view>
     </section>
 
-    <!-- ==================== 4. 热门分类 ==================== -->
+    <!-- 4. 热门分类 -->
     <section class="section">
-      <!-- 标题 -->
       <view class="section__head">
         <text class="section__title">热门分类</text>
         <text class="section__more" @click="goCatalog">查看全部 ›</text>
       </view>
-
-      <!-- 骨架屏 -->
       <view v-if="categories.length === 0" class="category-skeleton">
         <view v-for="i in 8" :key="i" class="category-skeleton__item">
           <view class="category-skeleton__icon" />
           <view class="category-skeleton__name" />
         </view>
       </view>
-
-      <!-- 分类网格 -->
       <view v-else class="category-grid">
-        <view
-          v-for="cat in categories"
-          :key="cat.id"
-          class="category-card"
-          @click="goCategory(cat)"
-        >
+        <view v-for="cat in categories" :key="cat.id" class="category-card" @click="goCategory(cat)">
           <view class="category-card__icon-wrap" :style="{ background: cat.bg }">
             <text class="category-card__icon">{{ cat.icon }}</text>
           </view>
@@ -77,15 +53,12 @@
       </view>
     </section>
 
-    <!-- ==================== 5. 精品推荐 ==================== -->
+    <!-- 5. 精品推荐 -->
     <section class="section">
-      <!-- 标题 -->
       <view class="section__head">
         <text class="section__title">精品推荐</text>
         <text class="section__more" @click="goCatalog">查看全部 ›</text>
       </view>
-
-      <!-- 骨架屏 -->
       <view v-if="loading && products.length === 0" class="product-skeleton">
         <view v-for="i in 6" :key="i" class="product-skeleton__item">
           <view class="product-skeleton__img" />
@@ -93,27 +66,13 @@
           <view class="product-skeleton__price" />
         </view>
       </view>
-
-      <!-- 商品网格 -->
       <view v-else class="product-grid">
-        <view
-          v-for="p in products"
-          :key="p.id"
-          class="product-card"
-          @click="goProduct(p)"
-        >
+        <view v-for="p in products" :key="p.id" class="product-card" @click="goProduct(p)">
           <view class="product-card__img-wrap">
-            <image
-              class="product-card__img"
-              :src="resolveCover(p)"
-              mode="aspectFill"
-              lazy-load
-            />
-            <!-- 类型角标 -->
+            <image class="product-card__img" :src="resolveCover(p)" mode="aspectFill" lazy-load />
             <view class="product-card__badge" :class="`product-card__badge--${p.type || 1}`">
               <text>{{ typeLabel(p.type) }}</text>
             </view>
-            <!-- 销量 -->
             <view v-if="p.salesCount" class="product-card__sales">
               <text>已售 {{ p.salesCount }}</text>
             </view>
@@ -127,26 +86,19 @@
           </view>
         </view>
       </view>
-
-      <!-- 触底加载 -->
-      <view v-if="loadMoreLoading" class="load-tip">
-        <text>加载中...</text>
-      </view>
-      <view v-else-if="!hasMore && products.length > 0" class="load-tip load-tip--end">
-        <text>— 没有更多了 —</text>
-      </view>
+      <view v-if="loadMoreLoading" class="load-tip"><text>加载中...</text></view>
+      <view v-else-if="!hasMore && products.length > 0" class="load-tip load-tip--end"><text>— 没有更多了 —</text></view>
     </section>
 
-    <!-- ==================== 6. 底部安全区 ==================== -->
+    <!-- 6. 底部安全区 -->
     <view class="safe-bottom" :style="{ height: (120 + safeAreaBottom) + 'px' }" />
 
-    <!-- 自定义 TabBar -->
     <LuxuryTabbar />
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { onShow, onReachBottom } from '@dcloudio/uni-app'
 import { productApi, marketingApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
@@ -155,7 +107,6 @@ import { resolveProductCover } from '@/utils/media'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
 import BannerCarousel from '@/components/BannerCarousel.vue'
 
-// ========== 状态 ==========
 const safeAreaBottom = ref(0)
 const loggedIn = ref(false)
 const loading = ref(false)
@@ -164,15 +115,17 @@ const page = ref(1)
 const hasMore = ref(true)
 const PAGE_SIZE = 6
 
-// ========== 数据 ==========
 const banners = ref<Array<{ id: number; image: string; link?: string }>>([])
+
 const funcModules = [
-  { id: 'ji',   label: '集',    sub: '积分聚合', icon: '集', bg: 'rgba(196,165,123,0.12)', action: '/pages/catalog/index?type=0' },
-  { id: 'gou',  label: '购',    sub: '消费返积分', icon: '购', bg: 'rgba(61,139,110,0.10)', action: '/pages/catalog/index?type=1' },
-  { id: 'huan', label: '换',    sub: '积分抵现', icon: '换', bg: 'rgba(65,75,94,0.10)', action: '/pages/catalog/index?type=2' },
-  { id: 'dui',  label: '兑',    sub: '积分兑换', icon: '兑', bg: 'rgba(142,116,89,0.10)', action: '/pages/catalog/index?type=3' },
+  { id: 'ji',   label: '集', sub: '积分聚合',   icon: '集', bg: 'rgba(196,165,123,0.12)', action: '/pages/catalog/index?type=0' },
+  { id: 'gou',  label: '购', sub: '消费返积分', icon: '购', bg: 'rgba(61,139,110,0.10)',  action: '/pages/catalog/index?type=1' },
+  { id: 'huan', label: '换', sub: '积分抵现',   icon: '换', bg: 'rgba(65,75,94,0.10)',   action: '/pages/catalog/index?type=2' },
+  { id: 'dui',  label: '兑', sub: '积分兑换',   icon: '兑', bg: 'rgba(142,116,89,0.10)', action: '/pages/catalog/index?type=3' },
 ]
+
 const categories = ref<Array<{ id: number; name: string; icon: string; bg: string }>>([])
+
 const products = ref<Array<{
   id: number
   name: string
@@ -184,16 +137,17 @@ const products = ref<Array<{
   image?: string
 }>>([])
 
-// ========== 工具函数 ==========
 function typeLabel(type?: number) {
-  return type === 1 ? '购' : type === 2 ? '换' : type === 3 ? '兑' : '集'
+  if (type === 1) return '购'
+  if (type === 2) return '换'
+  if (type === 3) return '兑'
+  return '集'
 }
 
 function resolveCover(p: { coverImage?: string; image?: string }) {
   return resolveProductCover(p as any)
 }
 
-// ========== 生命周期 ==========
 onMounted(() => {
   const sys = uni.getSystemInfoSync()
   safeAreaBottom.value = sys.safeAreaInsets?.bottom || 0
@@ -204,60 +158,31 @@ onMounted(() => {
 
 onShow(() => {
   loggedIn.value = checkAuth()
-  if (loggedIn.value) {
-    assetStore.fetchBalance()
-  }
+  if (loggedIn.value) assetStore.fetchBalance()
 })
 
-onUnmounted(() => {})
+onReachBottom(() => { loadProducts(false) })
 
-// 触底加载
-onReachBottom(() => {
-  loadProducts(false)
-})
-
-// ========== 数据加载 ==========
 async function loadBanners() {
   try {
     const res = await marketingApi.getBanners()
-    banners.value = (res || []).map((b: any) => ({
-      id: b.id,
-      image: b.image || '',
-      link: b.link || '',
-    }))
-  } catch {
-    banners.value = []
-  }
+    banners.value = (res || []).map((b: any) => ({ id: b.id, image: b.image || '', link: b.link || '' }))
+  } catch { banners.value = [] }
 }
 
 async function loadCategories() {
   try {
     const res = await productApi.getCategories()
-    const bgPalettes = [
-      'rgba(184,152,118,0.12)',
-      'rgba(65,75,94,0.08)',
-      'rgba(142,116,89,0.10)',
-      'rgba(65,75,94,0.08)',
-    ]
+    const bgPalettes = ['rgba(184,152,118,0.12)', 'rgba(65,75,94,0.08)', 'rgba(142,116,89,0.10)', 'rgba(65,75,94,0.08)']
     categories.value = (res || []).slice(0, 8).map((cat: any, idx: number) => ({
-      id: cat.id,
-      name: cat.name,
-      icon: cat.icon || '📦',
-      bg: bgPalettes[idx % bgPalettes.length],
+      id: cat.id, name: cat.name, icon: cat.icon || '📦', bg: bgPalettes[idx % bgPalettes.length],
     }))
-  } catch {
-    categories.value = []
-  }
+  } catch { categories.value = [] }
 }
 
 async function loadProducts(reset = true) {
-  if (reset) {
-    page.value = 1
-    hasMore.value = true
-    loading.value = true
-  }
+  if (reset) { page.value = 1; hasMore.value = true; loading.value = true }
   if (!hasMore.value || loadMoreLoading.value) return
-
   loadMoreLoading.value = true
   try {
     const res = await productApi.getList({ type: 1, limit: PAGE_SIZE, page: page.value })
@@ -269,50 +194,20 @@ async function loadProducts(reset = true) {
   } catch {
     if (reset) products.value = []
     hasMore.value = false
-  } finally {
-    loading.value = false
-    loadMoreLoading.value = false
-  }
+  } finally { loading.value = false; loadMoreLoading.value = false }
 }
 
-// ========== 路由跳转 ==========
-function goSearch() {
-  uni.navigateTo({ url: '/pages/search/index' })
-}
-
-function onBannerClick(item: { link?: string }) {
-  if (item.link) {
-    uni.navigateTo({ url: item.link })
-  }
-}
-
-function onFuncClick(item: { action?: string }) {
-  if (item.action) {
-    uni.navigateTo({ url: item.action })
-  }
-}
-
-function goCatalog() {
-  uni.switchTab({ url: '/pages/catalog/index' })
-}
-
-function goCategory(cat: { id: number }) {
-  if (cat.id) {
-    uni.navigateTo({ url: `/pages/catalog/index?categoryId=${cat.id}` })
-  }
-}
-
-function goProduct(p: { id: number; type?: number }) {
-  if (p.id) {
-    uni.navigateTo({ url: `/pages/product/detail?id=${p.id}&type=${p.type || 1}` })
-  }
-}
+function goSearch() { uni.navigateTo({ url: '/pages/search/index' }) }
+function onBannerClick(item: { link?: string }) { if (item.link) uni.navigateTo({ url: item.link }) }
+function onFuncClick(item: { action?: string }) { if (item.action) uni.navigateTo({ url: item.action }) }
+function goCatalog() { uni.switchTab({ url: '/pages/catalog/index' }) }
+function goCategory(cat: { id: number }) { if (cat.id) uni.navigateTo({ url: `/pages/catalog/index?categoryId=${cat.id}` }) }
+function goProduct(p: { id: number; type?: number }) { if (p.id) uni.navigateTo({ url: `/pages/product/detail?id=${p.id}&type=${p.type || 1}` }) }
 </script>
 
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
 
-// ========== 全局重置 ==========
 .page {
   min-height: 100vh;
   background: $bg-primary;
@@ -320,422 +215,147 @@ function goProduct(p: { id: number; type?: number }) {
   box-sizing: border-box;
 }
 
-// ========== 间距系统（4/8/16/24px） ==========
-$gap-4:  4rpx;
-$gap-8:  8rpx;
-$gap-16: 16rpx;
-$gap-24: 24rpx;
+$gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx;
 
-// ========== 1. 头部导航 ==========
+// 头部导航
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: 120rpx;
+  position: sticky; top: 0; z-index: 100; height: 120rpx;
   padding-top: env(safe-area-inset-top);
   background: rgba(30, 36, 51, 0.97);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
 }
 
 .header__inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  padding: 0 $gap-16;
-  box-sizing: border-box;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 100%; padding: 0 $gap-16; box-sizing: border-box;
 }
 
-// 左侧：Logo + 品牌
-.header__brand {
-  display: flex;
-  align-items: center;
-  gap: $gap-8;
-}
+.header__brand { display: flex; align-items: center; gap: $gap-8; }
 
 .header__logo {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 16rpx;
+  width: 64rpx; height: 64rpx; border-radius: 16rpx;
   background: linear-gradient(145deg, $accent 0%, $accent-dark 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
-.header__logo-text {
-  font-size: 32rpx;
-  font-weight: 900;
-  color: #fff;
-}
+.header__logo-text { font-size: 32rpx; font-weight: 900; color: #fff; }
+.header__brand-name { font-size: 34rpx; font-weight: 700; color: #fff; letter-spacing: 2rpx; }
 
-.header__brand-name {
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 2rpx;
-}
-
-// 右侧：搜索入口
 .header__search {
-  display: flex;
-  align-items: center;
-  gap: $gap-8;
-  height: 72rpx;
-  padding: 0 $gap-16;
+  display: flex; align-items: center; gap: $gap-8; height: 72rpx; padding: 0 $gap-16;
   background: rgba(255, 255, 255, 0.08);
-  border: 1rpx solid rgba(255, 255, 255, 0.12);
-  border-radius: 36rpx;
-  box-sizing: border-box;
-  cursor: pointer;
-  &:active {
-    background: rgba(255, 255, 255, 0.12);
-  }
+  border: 1rpx solid rgba(255, 255, 255, 0.12); border-radius: 36rpx; box-sizing: border-box;
+  cursor: pointer; &:active { background: rgba(255, 255, 255, 0.12); }
 }
 
-.header__search-icon {
-  font-size: 28rpx;
-  color: rgba(255, 255, 255, 0.5);
-}
+.header__search-icon { font-size: 28rpx; color: rgba(255, 255, 255, 0.5); }
+.header__search-text { font-size: 26rpx; color: rgba(255, 255, 255, 0.45); white-space: nowrap; }
 
-.header__search-text {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.45);
-  white-space: nowrap;
-}
-
-// ========== 通用区块 ==========
-.section {
-  padding: $gap-24 $gap-16;
-}
+// 通用区块
+.section { padding: $gap-24 $gap-16; }
 
 .section__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: $gap-16;
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: $gap-16;
 }
 
-.section__title {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: $mineral-gray;
-  letter-spacing: 0.5rpx;
-}
+.section__title { font-size: 32rpx; font-weight: 700; color: $mineral-gray; letter-spacing: 0.5rpx; }
+.section__more { font-size: 26rpx; color: $text-muted; &:active { opacity: 0.6; } }
 
-.section__more {
-  font-size: 26rpx;
-  color: $text-muted;
-  &:active { opacity: 0.6; }
-}
+// 四大功能图标
+.func-grid-section { padding-top: $gap-16; padding-bottom: $gap-8; }
 
-// ========== 3. 四大功能图标（Grid 4列） ==========
-.func-grid-section {
-  padding-top: $gap-16;
-  padding-bottom: $gap-8;
-}
-
-.func-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $gap-16;
-}
+.func-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: $gap-16; }
 
 .func-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $gap-8;
-  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: $gap-8; cursor: pointer;
   &:active { opacity: 0.7; }
 }
 
 .func-item__icon-wrap {
-  width: 112rpx;
-  height: 112rpx;
-  border-radius: 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: $clay-shadow;
-  border: 1rpx solid rgba(255, 255, 255, 0.7);
-  box-sizing: border-box;
+  width: 112rpx; height: 112rpx; border-radius: 28rpx;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: $clay-shadow; border: 1rpx solid rgba(255, 255, 255, 0.7); box-sizing: border-box;
 }
 
-.func-item__icon {
-  font-size: 40rpx;
-  font-weight: 800;
-  color: $accent-dark;
-}
+.func-item__icon { font-size: 40rpx; font-weight: 800; color: $accent-dark; }
+.func-item__label { font-size: 30rpx; font-weight: 700; color: $mineral-gray; line-height: 1; }
+.func-item__sub { font-size: 20rpx; color: $text-muted; line-height: 1; }
 
-.func-item__label {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: $mineral-gray;
-  line-height: 1;
-}
+// 热门分类
+.category-skeleton { display: grid; grid-template-columns: repeat(4, 1fr); gap: $gap-16; }
+.category-skeleton__item { display: flex; flex-direction: column; align-items: center; gap: $gap-8; }
+.category-skeleton__icon { width: 96rpx; height: 96rpx; border-radius: 24rpx; background: $bg-tertiary; animation: shim 1.4s ease-in-out infinite; }
+.category-skeleton__name { width: 60rpx; height: 22rpx; border-radius: 6rpx; background: $bg-tertiary; animation: shim 1.4s ease-in-out infinite; }
 
-.func-item__sub {
-  font-size: 20rpx;
-  color: $text-muted;
-  line-height: 1;
-}
-
-// ========== 4. 热门分类（Grid 4列） ==========
-.category-skeleton {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $gap-16;
-}
-
-.category-skeleton__item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $gap-8;
-}
-
-.category-skeleton__icon {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 24rpx;
-  background: $bg-tertiary;
-  animation: shim 1.4s ease-in-out infinite;
-}
-
-.category-skeleton__name {
-  width: 60rpx;
-  height: 22rpx;
-  border-radius: 6rpx;
-  background: $bg-tertiary;
-  animation: shim 1.4s ease-in-out infinite;
-}
-
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $gap-16;
-}
+.category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: $gap-16; }
 
 .category-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $gap-8;
-  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: $gap-8; cursor: pointer;
   &:active { opacity: 0.7; }
 }
 
 .category-card__icon-wrap {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: $clay-shadow;
-  border: 1rpx solid rgba(255, 255, 255, 0.7);
-  box-sizing: border-box;
+  width: 96rpx; height: 96rpx; border-radius: 24rpx;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: $clay-shadow; border: 1rpx solid rgba(255, 255, 255, 0.7); box-sizing: border-box;
 }
 
-.category-card__icon {
-  font-size: 36rpx;
-}
+.category-card__icon { font-size: 36rpx; }
 
 .category-card__name {
-  font-size: 24rpx;
-  font-weight: 500;
-  color: $text-secondary;
-  text-align: center;
-  line-height: 1.2;
-  max-width: 120rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 24rpx; font-weight: 500; color: $text-secondary;
+  text-align: center; line-height: 1.2; max-width: 120rpx;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
-// ========== 5. 精品推荐（Grid 2列） ==========
-.product-skeleton {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: $gap-16;
-}
+// 精品推荐
+.product-skeleton { display: grid; grid-template-columns: repeat(2, 1fr); gap: $gap-16; }
+.product-skeleton__item { display: flex; flex-direction: column; gap: $gap-8; }
+.product-skeleton__img { width: 100%; aspect-ratio: 1 / 1; border-radius: 16rpx; background: $bg-tertiary; animation: shim 1.4s ease-in-out infinite; }
+.product-skeleton__title { width: 100%; height: 32rpx; border-radius: 8rpx; background: $bg-tertiary; animation: shim 1.4s ease-in-out infinite; }
+.product-skeleton__price { width: 50%; height: 28rpx; border-radius: 8rpx; background: $bg-tertiary; animation: shim 1.4s ease-in-out infinite; }
 
-.product-skeleton__item {
-  display: flex;
-  flex-direction: column;
-  gap: $gap-8;
-}
-
-.product-skeleton__img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 16rpx;
-  background: $bg-tertiary;
-  animation: shim 1.4s ease-in-out infinite;
-}
-
-.product-skeleton__title {
-  width: 100%;
-  height: 32rpx;
-  border-radius: 8rpx;
-  background: $bg-tertiary;
-  animation: shim 1.4s ease-in-out infinite;
-}
-
-.product-skeleton__price {
-  width: 50%;
-  height: 28rpx;
-  border-radius: 8rpx;
-  background: $bg-tertiary;
-  animation: shim 1.4s ease-in-out infinite;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: $gap-16;
-}
+.product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: $gap-16; }
 
 .product-card {
-  border-radius: 16rpx;
-  overflow: hidden;
-  background: $bg-secondary;
-  border: 1rpx solid $border-light;
-  box-shadow: $clay-shadow;
-  box-sizing: border-box;
-  cursor: pointer;
+  border-radius: 16rpx; overflow: hidden; background: $bg-secondary;
+  border: 1rpx solid $border-light; box-shadow: $clay-shadow; box-sizing: border-box; cursor: pointer;
   &:active { transform: scale(0.98); }
 }
 
-.product-card__img-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-}
-
-.product-card__img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  background: $bg-tertiary;
-}
+.product-card__img-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; }
+.product-card__img { width: 100%; height: 100%; display: block; background: $bg-tertiary; }
 
 .product-card__badge {
-  position: absolute;
-  top: 12rpx;
-  left: 12rpx;
-  min-width: 44rpx;
-  height: 44rpx;
-  padding: 0 12rpx;
-  border-radius: 22rpx;
-  font-size: 22rpx;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-
-  &--1 {
-    background: $warm-yellow;
-    color: $accent-dark;
-    border: 1rpx solid $border-primary;
-  }
-  &--2 {
-    background: rgba(47, 53, 66, 0.88);
-    color: $accent-light;
-    border: 1rpx solid rgba(47, 53, 66, 0.3);
-  }
-  &--3 {
-    background: $mineral-gray;
-    color: $accent-light;
-    border: 1rpx solid rgba(47, 53, 66, 0.3);
-  }
-  &--0 {
-    background: rgba(196, 165, 123, 0.15);
-    color: $accent-dark;
-    border: 1rpx solid $border-primary;
-  }
+  position: absolute; top: 12rpx; left: 12rpx; min-width: 44rpx; height: 44rpx; padding: 0 12rpx;
+  border-radius: 22rpx; font-size: 22rpx; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  &--1 { background: $warm-yellow; color: $accent-dark; border: 1rpx solid $border-primary; }
+  &--2 { background: rgba(47, 53, 66, 0.88); color: $accent-light; border: 1rpx solid rgba(47, 53, 66, 0.3); }
+  &--3 { background: $mineral-gray; color: $accent-light; border: 1rpx solid rgba(47, 53, 66, 0.3); }
+  &--0 { background: rgba(196, 165, 123, 0.15); color: $accent-dark; border: 1rpx solid $border-primary; }
 }
 
 .product-card__sales {
-  position: absolute;
-  bottom: 12rpx;
-  left: 12rpx;
-  padding: 4rpx 12rpx;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  border-radius: 20rpx;
-  font-size: 18rpx;
-  color: rgba(255, 255, 255, 0.85);
-  box-sizing: border-box;
+  position: absolute; bottom: 12rpx; left: 12rpx; padding: 4rpx 12rpx;
+  background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); border-radius: 20rpx;
+  font-size: 18rpx; color: rgba(255, 255, 255, 0.85); box-sizing: border-box;
 }
 
-.product-card__info {
-  padding: 16rpx;
-}
+.product-card__info { padding: 16rpx; }
 
 .product-card__name {
-  display: block;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: $text-primary;
-  line-height: 1.4;
-  margin-bottom: $gap-8;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  font-size: 28rpx; font-weight: 600; color: $text-primary; line-height: 1.4; margin-bottom: $gap-8;
 }
 
-.product-card__price-row {
-  display: flex;
-  align-items: baseline;
-  gap: $gap-8;
-}
+.product-card__price-row { display: flex; align-items: baseline; gap: $gap-8; }
+.product-card__cash { font-family: $font-sans; font-size: 30rpx; font-weight: 700; color: $mineral-gray; font-variant-numeric: tabular-nums; }
+.product-card__points { font-size: 22rpx; font-weight: 600; color: $accent-dark; }
 
-.product-card__cash {
-  font-family: $font-sans;
-  font-size: 30rpx;
-  font-weight: 700;
-  color: $mineral-gray;
-  font-variant-numeric: tabular-nums;
-}
+// 加载状态
+.load-tip { display: flex; align-items: center; justify-content: center; padding: 32rpx 0; text { font-size: 26rpx; color: $text-muted; } &--end text { color: $text-muted; } }
+.safe-bottom { width: 100%; }
 
-.product-card__points {
-  font-size: 22rpx;
-  font-weight: 600;
-  color: $accent-dark;
-}
-
-// ========== 加载状态 ==========
-.load-tip {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 32rpx 0;
-
-  text {
-    font-size: 26rpx;
-    color: $text-muted;
-  }
-
-  &--end text {
-    color: $text-muted;
-  }
-}
-
-.safe-bottom {
-  width: 100%;
-}
-
-// ========== 动画 ==========
-@keyframes shim {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.7; }
-}
+@keyframes shim { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.7; } }
 </style>
