@@ -357,7 +357,7 @@ async function doReset() {
 
   &__fill {
     height: 100%;
-    background: linear-gradient(90deg, #D4B483 0%, #C4A870 100%);
+    background: linear-gradient(90deg, $auth-gold 0%, #C4A870 100%);
     border-radius: 0 2rpx 2rpx 0;
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
@@ -401,7 +401,7 @@ async function doReset() {
   }
   &__slogan {
     font-size: 18rpx;
-    color: #D4B483;
+    color: $auth-gold;
     font-weight: 400;
     letter-spacing: 0.5rpx;
     line-height: 1;
@@ -500,7 +500,7 @@ async function doReset() {
 }
 
 .phone-marked {
-  color: #D4B483;
+  color: $auth-gold;
   font-weight: 600;
 }
 
@@ -556,10 +556,10 @@ async function doReset() {
   &.is-active {
     .step-item__dot {
       background: rgba(212, 180, 131, 0.10);
-      border-color: #D4B483;
+      border-color: $auth-gold;
       box-shadow: 0 0 0 5rpx rgba(212, 180, 131, 0.12);
     }
-    .step-item__num { color: #D4B483; }
+    .step-item__num { color: $auth-gold; }
     .step-item__label { color: $mineral-gray; font-weight: 500; }
   }
 
@@ -580,7 +580,7 @@ async function doReset() {
   border-radius: 2rpx;
   transition: background 0.4s ease;
 
-  &.is-active { background: #D4B483; }
+  &.is-active { background: $auth-gold; }
   &.is-done { background: $success; }
 }
 
@@ -611,7 +611,7 @@ async function doReset() {
   overflow: visible;
   transition: border-color 0.25s ease;
 
-  &.is-focused { border-bottom-color: #D4B483; }
+  &.is-focused { border-bottom-color: $auth-gold; }
 
   &--with-code { padding-right: 156rpx; }
   &--with-eye { padding-right: 72rpx; }
@@ -632,7 +632,7 @@ async function doReset() {
   &.has-value &__fl,
   &.is-focused &__fl {
     font-size: 18rpx;
-    color: #D4B483;
+    color: $auth-gold;
     font-weight: 600;
     letter-spacing: 0.5rpx;
     transform: translateY(-40rpx) scale(0.85);
@@ -674,7 +674,7 @@ async function doReset() {
 
     text {
       font-size: 24rpx;
-      color: #D4B483;
+      color: $auth-gold;
       font-weight: 600;
       letter-spacing: 0.3rpx;
       line-height: 1;
@@ -706,7 +706,7 @@ async function doReset() {
     flex-shrink: 0;
     transition: color 0.2s ease;
 
-    &:active { color: #D4B483; }
+    &:active { color: $auth-gold; }
   }
 }
 

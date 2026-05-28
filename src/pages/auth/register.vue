@@ -310,7 +310,7 @@ async function doRegister() {
   }
   &__slogan {
     font-size: 18rpx;
-    color: #D4B483;
+    color: $auth-gold;
     font-weight: 400;
     letter-spacing: 0.5rpx;
     line-height: 1;
@@ -446,7 +446,7 @@ async function doRegister() {
   overflow: visible;
   transition: border-color 0.25s ease;
 
-  &.is-focused { border-bottom-color: #D4B483; }
+  &.is-focused { border-bottom-color: $auth-gold; }
 
   &--with-code { padding-right: 156rpx; }
   &--with-eye { padding-right: 72rpx; }
@@ -472,7 +472,7 @@ async function doRegister() {
   &.has-value &__fl,
   &.is-focused &__fl {
     font-size: 18rpx;
-    color: #D4B483;
+    color: $auth-gold;
     font-weight: 600;
     letter-spacing: 0.5rpx;
     transform: translateY(-40rpx) scale(0.85);
@@ -522,7 +522,7 @@ async function doRegister() {
 
     text {
       font-size: 24rpx;
-      color: #D4B483;
+      color: $auth-gold;
       font-weight: 600;
       letter-spacing: 0.3rpx;
       line-height: 1;
@@ -554,7 +554,7 @@ async function doRegister() {
     flex-shrink: 0;
     transition: color 0.2s ease;
 
-    &:active { color: #D4B483; }
+    &:active { color: $auth-gold; }
   }
 }
 
@@ -581,13 +581,13 @@ async function doRegister() {
 
   &.is-checked {
     background: rgba(212, 180, 131, 0.12);
-    border-color: #D4B483;
+    border-color: $auth-gold;
     box-shadow: 0 0 0 3rpx rgba(212, 180, 131, 0.10);
   }
 
   &__icon {
     font-size: 22rpx;
-    color: #D4B483;
+    color: $auth-gold;
     font-weight: 700;
     line-height: 1;
   }
@@ -600,7 +600,7 @@ async function doRegister() {
 }
 
 .terms-link {
-  color: #D4B483;
+  color: $auth-gold;
   font-weight: 500;
 }
 
