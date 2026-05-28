@@ -25,7 +25,7 @@
             <view class="mini-bar">
               <view class="mini-fill" :style="{ width: vipProgress + '%' }" />
             </view>
-            <text class="vip-label">V{{ Math.min((userInfo.level || 1) + 1, 9) }}</text>
+            <text class="vip-label">V{{ Math.min((userInfo.level || 1) + 1, 8) }}</text>
           </view>
         </view>
         <view class="invite-btn" @click.stop="$emit('invite')">
@@ -69,10 +69,10 @@
       </view>
     </view>
 
-    <!-- 9级能量球展示 -->
+    <!-- 8级能量球展示（v5.2修正：V1-V8） -->
     <view class="energy-orbs">
       <view
-        v-for="i in 9"
+        v-for="i in 8"
         :key="i"
         class="energy-orb"
         :class="['orb-' + i, { active: (userInfo.level || 1) >= i }, 'v' + Math.ceil(i / 3)]"
@@ -83,7 +83,7 @@
 
     <!-- VIP 进度信息 -->
     <view class="vip-progress-row">
-      <text class="progress-label">距离 V{{ Math.min((userInfo.level || 1) + 1, 9) }} 还差</text>
+      <text class="progress-label">距离 V{{ Math.min((userInfo.level || 1) + 1, 8) }} 还差</text>
       <text class="progress-value">{{ remainingPerformance }}业绩</text>
     </view>
     <view class="progress-bar">
@@ -93,7 +93,7 @@
       <text class="perk-tag" v-if="userInfo.level >= 3">③ 每日分红</text>
       <text class="perk-tag" v-if="userInfo.level >= 5">⑤ 专属客服</text>
       <text class="perk-tag" v-if="userInfo.level >= 7">⑦ 优先发货</text>
-      <text class="perk-tag" v-if="userInfo.level >= 9">⑨ 最高权益</text>
+      <text class="perk-tag" v-if="userInfo.level >= 8">⑧ 最高权益</text>
     </view>
   </view>
 </template>
@@ -433,8 +433,7 @@ const shortId = computed(() => {
   &.v5 .orb-label,
   &.v6 .orb-label { color: $navy-light; }
   &.v7 .orb-label,
-  &.v8 .orb-label,
-  &.v9 .orb-label { color: $navy-light; }
+  &.v8 .orb-label { color: $navy-light; }
 
   .orb-label {
     font-size: 18rpx;

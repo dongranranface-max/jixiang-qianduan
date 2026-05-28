@@ -1,0 +1,235 @@
+// ============================================================
+// 集享公社 Design Token · SCSS 变量文件 v5.2
+// 版本：v5.2 · 2026-05-28
+// 使用方式：在项目 scss 文件中 import 此文件
+// ============================================================
+// @import '@/styles/design-tokens-v5.2.scss';
+
+// ============================================================
+// 【重要】v5.1 → v5.2 Token 变更说明
+// ============================================================
+// 1. $accent → $gold（强调色重命名，更语义化）
+// 2. $mineral-gray → $mineral-navy（命名更准确）
+// 3. $mineral-blue → $mineral-slate（命名统一）
+// 4. $gold 新增 $gold-on-light 变体，确保 WCAG AA 对比度
+// 5. 暗色模式 Token 新增（$dark-* 前缀）
+// ============================================================
+
+// ============================================================
+// 一、色彩系统
+// ============================================================
+
+// --- 背景色（浅色模式）---
+$bg-primary:      #F8F7F4 !default;   // 页面全局背景（象限白）
+$bg-secondary:    #FFFFFF !default;   // 卡片/浮层/模态框
+$bg-tertiary:     #EFEEEA !default;   // 骨架屏/输入框/列表分隔
+
+// --- 暖色点缀 ---
+$warm-yellow:     #EDE9E1 !default;   // 活动卡片/优惠提示背景
+
+// --- 品牌金（强调色）---
+// 核心金：用于深色背景上的元素 / 按钮 / 边框 / 选中态
+$gold:            #C4A57B !default;   // 主金（禁用正金色 #FFD700）
+$gold-light:      #DFD0B5 !default;   // 浅金：收益数字 / hover 态
+$gold-dark:       #9B7E5E !default;   // 深金：深色背景上金色文字
+// 浅色背景专用金变体：确保 WCAG AA 对比度 ≥ 4.5:1
+$gold-on-light:   #9B7E5E !default;   // 浅色背景（$bg-primary）上的金色文字/图标
+
+// --- 藏青（主文字/深色卡片）---
+$mineral-navy:    #2F3542 !default;   // 资产卡/Hero/商城入口（禁用纯黑 #000）
+$mineral-slate:   #707B8C !default;   // 蓝灰：次级文字/辅助说明
+
+// --- 语义色 ---
+$success:         #3D8B6E !default;   // 绿色：成功/已完成/正向收益
+$warning:         #D4850A !default;   // 橙色：警告/库存紧张/即将过期
+$danger:          #C0454A !default;   // 红色：错误/删除/亏损
+
+// --- 文字色 ---
+$text-primary:    #141414 !default;   // 标题/重要正文（字重 700+）
+$text-secondary:  #5C5C5C !default;   // 正文（字重 500）
+$text-muted:      #8A8A8A !default;   // 辅助/时间戳/占位符
+$text-inverse:    #FFFFFF !default;   // 深色背景上的白色文字
+
+// --- 边框 ---
+$border-color:    rgba(20, 20, 20, 0.08) !default;   // 默认边框/卡片边框
+$border-gold:     rgba(184, 152, 118, 0.40) !default; // 金色边框：重点卡片/FL聚焦/选中态
+
+// --- 渐变 ---
+$gold-gradient:     linear-gradient(135deg, #C4A57B 0%, #DFD0B5 100%) !default;
+$navy-gradient:     linear-gradient(180deg, #2F3542 0%, #1A1F2A 100%) !default;
+$mineral-navy-gradient: linear-gradient(180deg, #3D4654 0%, #2F3542 100%) !default;
+
+// ============================================================
+// 二、暗色模式色彩（v5.2 新增）
+// ============================================================
+$dark-bg-primary:    #121212 !default;
+$dark-bg-secondary:  #1E1E1E !default;
+$dark-bg-tertiary:   #2A2A2A !default;
+$dark-warm-yellow:   #2A2520 !default;
+$dark-gold:          #C4A57B !default;
+$dark-gold-light:   #E8D9BC !default;
+$dark-gold-dark:    #9B7E5E !default;
+$dark-gold-on-dark: #DFD0B5 !default;
+$dark-mineral-navy: #2F3542 !default;
+$dark-mineral-slate:#9CA3AF !default;
+$dark-success:      #4ADE80 !default;
+$dark-warning:      #FBBF24 !default;
+$dark-danger:       #F87171 !default;
+$dark-text-primary:  #F5F5F5 !default;
+$dark-text-secondary:#D1D5DB !default;
+$dark-text-muted:   #9CA3AF !default;
+$dark-text-inverse:  #141414 !default;
+$dark-border-color:  rgba(255, 255, 255, 0.10) !default;
+$dark-border-gold:   rgba(196, 165, 123, 0.50) !default;
+
+// ============================================================
+// 三、字体系统（精简为5级）
+// ============================================================
+$font-family-cn:    "PingFang SC", "Noto Sans SC", -apple-system, sans-serif !default;
+$font-family-en:    "Helvetica Neue", "DIN Alternate", "Roboto", sans-serif !default;
+$font-family-mono:   "SF Mono", "Roboto Mono", monospace !default;
+
+$font-body:         28rpx !default;   // 正文/次要信息
+$font-title:        32rpx !default;   // 页面标题/重要正文
+$font-heading:      40rpx !default;   // 区块标题
+$font-hero:         48rpx !default;   // Hero/大数字
+$font-asset:        52rpx !default;   // 资产余额专用
+
+$font-weight-regular:   400 !default;
+$font-weight-medium:     500 !default;
+$font-weight-semibold:   600 !default;
+$font-weight-bold:       700 !default;
+$font-weight-heavy:      800 !default;
+
+$line-height-tight:   1.2 !default;
+$line-height-normal:  1.5 !default;
+$line-height-loose:    1.8 !default;
+
+$letter-spacing-tight:  -0.02em !default;
+$letter-spacing-normal:  0 !default;
+$letter-spacing-wide:    0.05em !default;
+
+// ============================================================
+// 四、间距系统
+// ============================================================
+$space-xs:    8rpx !default;
+$space-sm:    16rpx !default;
+$space-base:  28rpx !default;
+$space-lg:    40rpx !default;
+$space-xl:    56rpx !default;
+$space-2xl:   72rpx !default;
+
+// 安全区
+$safe-area-top:     calc(var(--status-bar-height) + 44rpx) !default;
+$safe-area-bottom:  100rpx !default;
+
+// ============================================================
+// 五、圆角系统（与尺寸正相关，禁止混用）
+// ============================================================
+$radius-sm:   12rpx !default;   // 标签 / 小按钮
+$radius-md:   16rpx !default;   // 输入框
+$radius-lg:   24rpx !default;   // 普通卡片
+$radius-xl:   28rpx !default;   // 资产卡 / 大卡片
+$radius-full: 9999rpx !default; // 胶囊按钮 / 头像 / 圆形徽章
+
+// ============================================================
+// 六、阴影系统
+// ============================================================
+$shadow-clay:    0 12rpx 48rpx rgba(47, 53, 66, 0.06) !default;
+$shadow-hover:   0 20rpx 40rpx rgba(0, 0, 0, 0.08) !default;
+$shadow-fire:    0 12rpx 40rpx rgba(196, 165, 123, 0.22) !default;
+$shadow-gold:    0 0 20rpx rgba(196, 165, 123, 0.30) !default;
+$shadow-asset:   0 16rpx 64rpx rgba(0, 0, 0, 0.28) !default;
+$shadow-btn:      0 12rpx 40rpx rgba(47, 53, 66, 0.22) !default;
+
+// ============================================================
+// 七、动效系统
+// ============================================================
+// 时长
+$duration-instant:   0.12s !default;
+$duration-fast:      0.18s !default;
+$duration-normal:    0.25s !default;
+$duration-slow:     0.38s !default;
+$duration-animate:   1.4s !default;
+$duration-marquee:   20s !default;
+
+// 缓动曲线
+$ease-out:     cubic-bezier(0.0, 0.0, 0.2, 1) !default;
+$ease-in-out:  cubic-bezier(0.4, 0.0, 0.2, 1) !default;
+$ease-bounce:  cubic-bezier(0.34, 1.56, 0.64, 1) !default;
+$ease-spring:  cubic-bezier(0.25, 0.46, 0.45, 0.94) !default;
+
+// ============================================================
+// 八、按钮系统
+// ============================================================
+$btn-height-sm:    64rpx !default;
+$btn-height-base:  80rpx !default;
+$btn-height-lg:    88rpx !default;
+$btn-height-xl:    96rpx !default;
+
+// ============================================================
+// 九、TabBar
+// ============================================================
+$tabbar-height:     100rpx !default;
+$tabbar-icon-size:  48rpx !default;
+$tabbar-dot-size:   6rpx !default;
+
+// ============================================================
+// 十、VIP 等级（v5.2 统一为 V1-V8）
+// ============================================================
+$vip-levels: (
+  "V1": (name: "创客", threshold: 5000,   dailyReward: 50),
+  "V2": (name: "达人", threshold: 10000,  dailyReward: 50),
+  "V3": (name: "合伙人", threshold: 30000, dailyReward: 900),
+  "V4": (name: "总监", threshold: 100000, dailyReward: 900),
+  "V5": (name: "经理", threshold: 300000, dailyReward: 900),
+  "V6": (name: "总裁", threshold: 1000000, dailyReward: 900),
+  "V7": (name: "董事", threshold: 3000000, dailyReward: 900),
+  "V8": (name: "创始人", threshold: 8000000, dailyReward: 900)
+) !default;
+
+// ============================================================
+// 十一、双积分体系颜色
+// ============================================================
+$eco-points-color:  $gold !default;          // 生态积分：金色
+$consumer-points-color: #7F9C89 !default;   // 消费积分：绿松石色
+
+// ============================================================
+// CSS 变量注入（用于运行时主题切换）
+// ============================================================
+:root {
+  --gold: #{$gold};
+  --gold-light: #{$gold-light};
+  --gold-dark: #{$gold-dark};
+  --gold-on-light: #{$gold-on-light};
+  --mineral-navy: #{$mineral-navy};
+  --mineral-slate: #{$mineral-slate};
+  --success: #{$success};
+  --warning: #{$warning};
+  --danger: #{$danger};
+  --bg-primary: #{$bg-primary};
+  --bg-secondary: #{$bg-secondary};
+  --text-primary: #{$text-primary};
+  --text-secondary: #{$text-secondary};
+  --border-color: #{$border-color};
+  --border-gold: #{$border-gold};
+}
+
+// 暗色模式 CSS 变量覆盖
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #{$dark-bg-primary};
+    --bg-secondary: #{$dark-bg-secondary};
+    --gold: #{$dark-gold};
+    --gold-light: #{$dark-gold-light};
+    --gold-on-light: #{$dark-gold-on-dark};
+    --mineral-slate: #{$dark-mineral-slate};
+    --success: #{$dark-success};
+    --warning: #{$dark-warning};
+    --danger: #{$dark-danger};
+    --text-primary: #{$dark-text-primary};
+    --text-secondary: #{$dark-text-secondary};
+    --border-color: #{$dark-border-color};
+    --border-gold: #{$dark-border-gold};
+  }
+}

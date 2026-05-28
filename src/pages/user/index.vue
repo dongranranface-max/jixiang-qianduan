@@ -76,7 +76,7 @@
       </view>
       <view class="energy-orbs">
         <view
-          v-for="i in 9"
+          v-for="i in 8"
           :key="i"
           class="energy-orb"
           :class="{ active: (userInfo.level || 1) >= i }"
@@ -92,7 +92,7 @@
           <text v-if="(userInfo.level || 1) >= 3" class="perk-tag">每日分红</text>
           <text v-if="(userInfo.level || 1) >= 5" class="perk-tag">专属客服</text>
           <text v-if="(userInfo.level || 1) >= 7" class="perk-tag">优先发货</text>
-          <text v-if="(userInfo.level || 1) >= 9" class="perk-tag">最高权益</text>
+          <text v-if="(userInfo.level || 1) >= 8" class="perk-tag">最高权益</text>
         </view>
       </view>
     </view>
@@ -179,10 +179,10 @@ const shortId = computed(() => {
 
 const vipProgress = computed(() => {
   const level = userInfo.value.level || 1
-  return Math.min(((level - 1) / 9) * 100, 100)
+  return Math.min(((level - 1) / 7) * 100, 100)  // 8级会员，分母为7
 })
 
-const nextLevel = computed(() => Math.min((userInfo.value.level || 1) + 1, 9))
+const nextLevel = computed(() => Math.min((userInfo.value.level || 1) + 1, 8))
 
 const remainingPerformance = computed(() => {
   const need = userInfo.value.nextLevelPerformance || 0

@@ -166,4 +166,38 @@ page {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+/* ============================================
+   暗色模式（v5.2 新增）
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  page {
+    background-color: #121212;
+    background-image: none;
+    color: #F5F5F5;
+  }
+
+  .glass-card,
+  .glass,
+  .clay {
+    background-color: #1E1E1E;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* 用户手动切换暗色模式（可通过 JS 控制 body[data-theme="dark"]）*/
+body[data-theme="dark"] page {
+  background-color: #121212;
+  background-image: none;
+  color: #F5F5F5;
+}
+
+body[data-theme="dark"] .glass-card,
+body[data-theme="dark"] .glass,
+body[data-theme="dark"] .clay {
+  background-color: #1E1E1E;
+}
 </style>

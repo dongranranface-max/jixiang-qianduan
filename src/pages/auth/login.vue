@@ -400,7 +400,7 @@ function nextTick(fn: () => void) { setTimeout(fn, 0) }
   overflow: visible;
   transition: border-color 0.25s ease;
 
-  &.is-focused { border-bottom-color: #D4B483; }
+  &.is-focused { border-bottom-color: $auth-gold; }
 
   &--with-action { padding-right: 72rpx; }
 
@@ -446,7 +446,7 @@ function nextTick(fn: () => void) { setTimeout(fn, 0) }
     flex-shrink: 0;
     transition: color 0.2s ease;
 
-    &:active { color: #D4B483; }
+    &:active { color: $auth-gold; }
   }
 
   &__forget {
@@ -459,7 +459,7 @@ function nextTick(fn: () => void) { setTimeout(fn, 0) }
 
   &__forget-text {
     font-size: 24rpx;
-    color: #D4B483;
+    color: $auth-gold;
     font-weight: 600;
     letter-spacing: 0.5rpx;
     transition: opacity 0.2s;
@@ -643,7 +643,7 @@ function nextTick(fn: () => void) { setTimeout(fn, 0) }
   }
 
   &__link {
-    color: #D4B483;
+    color: $auth-gold;
     font-weight: 500;
   }
 }

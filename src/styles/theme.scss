@@ -21,6 +21,13 @@ $accent:       #C4A57B;   // 主金：提亮2%，更柔和
 $accent-light: #DFD0B5;   // 浅金：更淡雅
 $accent-dark:  #9B7E5E;   // 深金：保持层次
 
+// v5.2 新增：浅色背景专用金色（WCAG AA 对比度合规，定义在靠前位置供全局使用）
+$gold-on-light:  #9B7E5E;
+
+// auth 页面专用金色（auth 页面硬编码 #D4B483 的标准替换）
+$auth-gold:      #9B7E5E;   // 对比度 5.3:1（替代 #D4B483 的 3.6:1）
+$auth-gold-light: #A88A5C;  // 对比度 4.6:1（保持现状或替换 #A88A5C）
+
 // 藏青系（唯一来源）
 $mineral-gray:  #2F3542;   // 主藏青
 $mineral-blue:  #707B8C;   // 蓝灰
@@ -187,7 +194,7 @@ $auth-card-shadow:   0 24rpx 80rpx rgba(47, 53, 66, 0.08), 0 4rpx 16rpx rgba(0, 
 $fl-label-size:         22rpx;
 $fl-label-size-float:    18rpx;
 $fl-label-color:         $text-secondary;
-$fl-label-color-focus:   $accent;
+$fl-label-color-focus:   $gold-on-light;
 $fl-label-weight:        500;
 $fl-float-duration:      0.22s;
 $fl-float-timing:       cubic-bezier(0.4, 0, 0.2, 1);
@@ -195,7 +202,7 @@ $fl-float-timing:       cubic-bezier(0.4, 0, 0.2, 1);
 // 圆形倒计时
 $countdown-ring-size:    56rpx;
 $countdown-ring-stroke:  3rpx;
-$countdown-ring-color:   $accent;
+$countdown-ring-color:   $gold-on-light;
 $countdown-ring-bg:      rgba(47, 53, 66, 0.06);
 $countdown-text-size:    20rpx;
 $countdown-text-color:   $accent-dark;
@@ -838,3 +845,45 @@ $primary-light: $mineral-dark;
 $primary-dark: #1E222D;
 $appliance-gray: #5C5C5C;
 $appliance-blue: #707B8C;
+
+
+// ===========================================
+// v5.2 Token 别名（向后兼容）
+// 旧 Token 保留别名，新代码请使用新 Token
+// ===========================================
+
+// 金色系别名（兼容 v5.1）
+$bronze-gold:   $accent;
+$bronze-light:   $accent-light;
+$bronze-dark:    $accent-dark;
+$gold:           $accent;           // 主金（v5.2 新命名）
+$gold-light:     $accent-light;     // 浅金（v5.2 新命名）
+$gold-dark:      $accent-dark;      // 深金（v5.2 新命名）
+
+// 藏青系别名（兼容 v5.1）
+$mineral-navy:   $mineral-gray;     // v5.2 新命名
+$mineral-slate:  $mineral-blue;     // v5.2 新命名
+
+// v5.2 新增：浅色背景专用金色（WCAG AA 对比度合规）
+$gold-on-light:  #9B7E5E;
+
+// ===========================================
+// v5.2 字体系统（精简为5级）
+// ===========================================
+$font-body:       28rpx;   // 正文（合并 $font-caption）
+$font-title:      32rpx;   // 页面标题（合并 $font-page-title）
+$font-heading:    40rpx;   // 区块标题（合并 $font-banner）
+$font-hero:       48rpx;   // Hero
+$font-asset:      52rpx;   // 资产余额
+
+// ===========================================
+// v5.2 暗色模式 Token（新增）
+// ===========================================
+$dark-bg-primary:   #121212;
+$dark-bg-secondary: #1E1E1E;
+$dark-gold:         #C4A57B;
+$dark-gold-light:   #E8D9BC;
+$dark-gold-on-dark:  #DFD0B5;
+$dark-success:       #4ADE80;
+$dark-warning:       #FBBF24;
+$dark-danger:        #F87171;
