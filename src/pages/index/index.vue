@@ -70,7 +70,7 @@
         <view v-for="p in products" :key="p.id" class="product-card" @click="goProduct(p)">
           <view class="product-card__img-wrap">
             <image class="product-card__img" :src="resolveCover(p)" mode="aspectFill" lazy-load />
-            <view class="product-card__badge" :class="`product-card__badge--${p.type || 1}`">
+            <view class="product-card__badge" :class="`product-card__badge--${p.type || 0}`">
               <text>{{ typeLabel(p.type) }}</text>
             </view>
             <view v-if="p.salesCount" class="product-card__sales">
@@ -127,14 +127,8 @@ const funcModules = [
 const categories = ref<Array<{ id: number; name: string; icon: string; bg: string }>>([])
 
 const products = ref<Array<{
-  id: number
-  name: string
-  price: number
-  requiredPoints?: number
-  type?: number
-  salesCount?: number
-  coverImage?: string
-  image?: string
+  id: number; name: string; price: number; requiredPoints?: number;
+  type?: number; salesCount?: number; coverImage?: string; image?: string
 }>>([])
 
 function typeLabel(type?: number) {
@@ -221,8 +215,7 @@ $gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx;
 .header {
   position: sticky; top: 0; z-index: 100; height: 120rpx;
   padding-top: env(safe-area-inset-top);
-  background: rgba(30, 36, 51, 0.97);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  background: rgba(47,53,66,0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
 }
 
 .header__inner {
@@ -243,21 +236,17 @@ $gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx;
 
 .header__search {
   display: flex; align-items: center; gap: $gap-8; height: 72rpx; padding: 0 $gap-16;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1rpx solid rgba(255, 255, 255, 0.12); border-radius: 36rpx; box-sizing: border-box;
-  cursor: pointer; &:active { background: rgba(255, 255, 255, 0.12); }
+  background: rgba(255,255,255,0.08); border: 1rpx solid rgba(255,255,255,0.12); border-radius: 36rpx; box-sizing: border-box;
+  cursor: pointer; &:active { background: rgba(255,255,255,0.12); }
 }
 
-.header__search-icon { font-size: 28rpx; color: rgba(255, 255, 255, 0.5); }
-.header__search-text { font-size: 26rpx; color: rgba(255, 255, 255, 0.45); white-space: nowrap; }
+.header__search-icon { font-size: 28rpx; color: rgba(255,255,255,0.5); }
+.header__search-text { font-size: 26rpx; color: rgba(255,255,255,0.45); white-space: nowrap; }
 
 // 通用区块
 .section { padding: $gap-24 $gap-16; }
 
-.section__head {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: $gap-16;
-}
-
+.section__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: $gap-16; }
 .section__title { font-size: 32rpx; font-weight: 700; color: $mineral-gray; letter-spacing: 0.5rpx; }
 .section__more { font-size: 26rpx; color: $text-muted; &:active { opacity: 0.6; } }
 
@@ -274,7 +263,7 @@ $gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx;
 .func-item__icon-wrap {
   width: 112rpx; height: 112rpx; border-radius: 28rpx;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: $clay-shadow; border: 1rpx solid rgba(255, 255, 255, 0.7); box-sizing: border-box;
+  box-shadow: $clay-shadow; border: 1rpx solid rgba(255,255,255,0.7); box-sizing: border-box;
 }
 
 .func-item__icon { font-size: 40rpx; font-weight: 800; color: $accent-dark; }
@@ -297,7 +286,7 @@ $gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx;
 .category-card__icon-wrap {
   width: 96rpx; height: 96rpx; border-radius: 24rpx;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: $clay-shadow; border: 1rpx solid rgba(255, 255, 255, 0.7); box-sizing: border-box;
+  box-shadow: $clay-shadow; border: 1rpx solid rgba(255,255,255,0.7); box-sizing: border-box;
 }
 
 .category-card__icon { font-size: 36rpx; }
@@ -311,7 +300,7 @@ $gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx;
 // 精品推荐
 .product-skeleton { display: grid; grid-template-columns: repeat(2, 1fr); gap: $gap-16; }
 .product-skeleton__item { display: flex; flex-direction: column; gap: $gap-8; }
-.product-skeleton__img { width: 100%; aspect-ratio: 1 / 1; border-radius: 16rpx; background: $bg-tertiary; animation: shim 1.4s ease-in-out infinite; }
+.product-skeleton__img { width: 100%; aspect-ratio: 1/1; border-radius: 16rpx; background: $bg-tertiary; animation: shim 1.4s ease-in-out infinite; }
 .product-skeleton__title { width: 100%; height: 32rpx; border-radius: 8rpx; background: $bg-tertiary; animation: shim 1.4s ease-in-out infinite; }
 .product-skeleton__price { width: 50%; height: 28rpx; border-radius: 8rpx; background: $bg-tertiary; animation: shim 1.4s ease-in-out infinite; }
 
@@ -323,26 +312,26 @@ $gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx;
   &:active { transform: scale(0.98); }
 }
 
-.product-card__img-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; }
+.product-card__img-wrap { position: relative; width: 100%; aspect-ratio: 1/1; overflow: hidden; }
 .product-card__img { width: 100%; height: 100%; display: block; background: $bg-tertiary; }
 
 .product-card__badge {
   position: absolute; top: 12rpx; left: 12rpx; min-width: 44rpx; height: 44rpx; padding: 0 12rpx;
   border-radius: 22rpx; font-size: 22rpx; font-weight: 800;
   display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  &--0 { background: rgba(196,165,123,0.15); color: $accent-dark; border: 1rpx solid $border-primary; }
   &--1 { background: $warm-yellow; color: $accent-dark; border: 1rpx solid $border-primary; }
-  &--2 { background: rgba(47, 53, 66, 0.88); color: $accent-light; border: 1rpx solid rgba(47, 53, 66, 0.3); }
-  &--3 { background: $mineral-gray; color: $accent-light; border: 1rpx solid rgba(47, 53, 66, 0.3); }
-  &--0 { background: rgba(196, 165, 123, 0.15); color: $accent-dark; border: 1rpx solid $border-primary; }
+  &--2 { background: rgba(47,53,66,0.88); color: $accent-light; border: 1rpx solid rgba(47,53,66,0.3); }
+  &--3 { background: $mineral-gray; color: $accent-light; border: 1rpx solid rgba(47,53,66,0.3); }
 }
 
 .product-card__sales {
   position: absolute; bottom: 12rpx; left: 12rpx; padding: 4rpx 12rpx;
-  background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); border-radius: 20rpx;
-  font-size: 18rpx; color: rgba(255, 255, 255, 0.85); box-sizing: border-box;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); border-radius: 20rpx;
+  font-size: 18rpx; color: rgba(255,255,255,0.85); box-sizing: border-box;
 }
 
-.product-card__info { padding: 16rpx; }
+.product-card__info { padding: $gap-16; }
 
 .product-card__name {
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
