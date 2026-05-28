@@ -56,7 +56,7 @@ function hideBanner() {
   visible.value = false
 }
 
-let unsubscribe: (() => void) | null = null
+const unsubscribe: (() => void) | null = null
 
 onMounted(() => {
   // 注册网络状态变化监听
