@@ -507,7 +507,7 @@ export const orderApi = {
   getDetail: (orderNo: string): Promise<OrderDetail> =>
     request<OrderDetail>({ url: `/orders/${orderNo}` }),
 
-  // 创建订单
+  // 创建订单（基础版）
   create: (data: {
     orderType: number
     addressId: string
@@ -518,6 +518,30 @@ export const orderApi = {
     }>
     remark?: string
     couponId?: string
+  }): Promise<CreateOrderResult> =>
+    request<CreateOrderResult>({ url: '/orders', method: 'POST', data }),
+
+  // 创建订单（完整版，支持积分抵扣/发票/购物车/立即购买）
+  createOrder: (data: {
+    orderType: number
+    addressId: string
+    items: Array<{
+      productId: string
+      skuId?: string
+      quantity: number
+    }>
+    remark?: string
+    couponId?: string
+    pointsDeducted?: boolean
+    invoice?: {
+      type: number
+      taxNo?: string
+    } | null
+    // 购物车下单
+    cartIds?: string
+    // 立即购买
+    productId?: string | number
+    quantity?: number
   }): Promise<CreateOrderResult> =>
     request<CreateOrderResult>({ url: '/orders', method: 'POST', data }),
 

@@ -1,9 +1,9 @@
-﻿<template>
+�<template>
   <view class="page-container">
     <!-- 搜索栏 -->
     <view class="search-header">
       <view class="search-bar">
-        <text class="search-icon">搜</text>
+        <text class="search-icon">🔍</text>
         <input
           class="search-input"
           v-model="keyword"
@@ -12,54 +12,87 @@
           confirm-type="search"
           @confirm="doSearch"
           @input="onInput"
-          focus
+          @focus="showDropdown = true"
+          @blur="onInputBlur"
         />
         <text v-if="keyword" class="clear-icon" @click="clearKeyword">×</text>
       </view>
       <text class="cancel-btn" @click="goBack">取消</text>
     </view>
 
-    <!-- 搜索历史（无关键词时） -->
-    <view v-if="!keyword && historyList.length > 0" class="history-section">
-      <view class="section-header">
-        <text class="section-title">搜索历史</text>
-        <text class="clear-history" @click="clearHistory">清空</text>
-      </view>
-      <view class="history-tags">
-        <text
-          v-for="(tag, index) in historyList"
-          :key="index"
-          class="history-tag"
-          @click="searchWithKeyword(tag)"
-        >
-          {{ tag }}
-        </text>
+    <!-- 搜索下拉面板（聚焦且有关键词时显示建议词） -->
+    <view v-if="showDropdown && inputValue && suggestList.length > 0" class="suggest-panel">
+      <view
+        v-for="(item, index) in suggestList"
+        :key="index"
+        class="suggest-item"
+        @click="searchWithKeyword(item.keyword)"
+      >
+        <text class="suggest-icon">🔍</text>
+        <text class="suggest-text">{{ item.keyword }}</text>
       </view>
     </view>
 
-    <!-- 热门搜索 -->
-    <view v-if="!keyword" class="hot-section">
-      <view class="section-header">
-        <text class="section-title">热门搜索</text>
+    <!-- 历史搜索 + 热门搜索（无关键词时） -->
+    <template v-if="!keyword">
+      <!-- 历史搜索 -->
+      <view v-if="historyList.length > 0" class="history-section">
+        <view class="section-header">
+          <text class="section-title">搜索历史</text>
+          <text class="clear-history" @click="clearHistory">清空</text>
+        </view>
+        <view class="history-tags">
+          <text
+            v-for="(tag, index) in historyList"
+            :key="index"
+            class="history-tag"
+            @click="searchWithKeyword(tag)"
+          >
+            {{ tag }}
+          </text>
+        </view>
       </view>
-      <view class="hot-list">
+
+      <!-- 热门搜索 -->
+      <view v-if="hotList.length > 0" class="hot-section">
+        <view class="section-header">
+          <text class="section-title">热门搜索</text>
+        </view>
+        <view class="hot-tags">
+          <text
+            v-for="(item, index) in hotList"
+            :key="index"
+            class="hot-tag"
+            :class="{ 'hot-tag--new': item.isNew }"
+            @click="searchWithKeyword(item.keyword)"
+          >
+            {{ item.keyword }}
+          </text>
+        </view>
+      </view>
+    </template>
+
+    <!-- 筛选栏（sticky，有关键词时显示） -->
+    <view v-if="keyword && !loading && searchResult.length > 0" class="filter-bar">
+      <view class="filter-tabs">
         <view
-          v-for="(item, index) in hotList"
-          :key="index"
-          class="hot-item"
-          @click="searchWithKeyword(item.keyword)"
+          v-for="tab in sortTabs"
+          :key="tab.key"
+          class="filter-tab"
+          :class="{ 'filter-tab--active': currentSort === tab.key }"
+          @click="toggleSort(tab.key)"
         >
-          <view class="hot-rank" :class="'rank-' + (index + 1)">{{ index + 1 }}</view>
-          <view class="hot-info">
-            <text class="hot-keyword">{{ item.keyword }}</text>
-            <text v-if="item.desc" class="hot-desc">{{ item.desc }}</text>
-          </view>
-          <view v-if="item.isNew" class="hot-tag">新</view>
+          <text>{{ tab.label }}</text>
+          <text v-if="tab.key === 'price'" class="sort-arrow">{{ currentSort === 'price_asc' ? '↑' : currentSort === 'price_desc' ? '↓' : '' }}</text>
+        </view>
+        <view class="filter-tab filter-tab--filter" @click="showFilterPanel = true">
+          <text>筛选</text>
+          <text class="filter-icon">☰</text>
         </view>
       </view>
     </view>
 
-    <!-- 搜索结果（有关键词时） -->
+    <!-- 搜索结果 -->
     <view v-if="keyword" class="result-section">
       <!-- 骨架屏 -->
       <view v-if="loading && !searchResult.length" class="result-grid">
@@ -74,9 +107,15 @@
 
       <!-- 空结果 -->
       <view v-else-if="!loading && !searchResult.length" class="empty-state">
-        <view class="empty-state__icon">未</view>
+        <view class="empty-illustration">🔍</view>
         <text class="empty-state__text">未找到"{{ keyword }}"相关商品</text>
         <text class="empty-state__sub">换个关键词试试吧</text>
+      </view>
+
+      <!-- 错误状态 -->
+      <view v-else-if="searchError" class="error-state">
+        <text class="error-state__text">加载失败，请稍后重试</text>
+        <view class="error-state__btn" @click="retrySearch">重新加载</view>
       </view>
 
       <!-- 结果列表 -->
@@ -90,43 +129,157 @@
         />
       </view>
 
-      <!-- 结果计数 -->
-      <view v-if="!loading && searchResult.length > 0" class="result-count">
-        <text>找到 {{ searchResult.length }} 个商品</text>
+      <!-- 加载更多 -->
+      <view v-if="!loading && searchResult.length > 0 && hasMore" class="load-more">
+        <text v-if="loadingMore">加载中...</text>
+        <text v-else @click="loadMore">加载更多</text>
+      </view>
+
+      <!-- 已无更多 -->
+      <view v-if="!loading && searchResult.length > 0 && !hasMore" class="no-more">
+        <text>— 已加载全部 —</text>
       </view>
     </view>
 
     <view class="safe-area-bottom" />
   </view>
+
+  <!-- 筛选面板（右侧弹出） -->
+  <view v-if="showFilterPanel" class="filter-overlay" @click="showFilterPanel = false" />
+  <view v-if="showFilterPanel" class="filter-panel" :class="{ 'filter-panel--open': showFilterPanel }">
+    <view class="filter-panel__header">
+      <text class="filter-panel__title">筛选</text>
+      <text class="filter-panel__close" @click="showFilterPanel = false">×</text>
+    </view>
+    <scroll-view class="filter-panel__body" scroll-y>
+      <!-- 品牌筛选 -->
+      <view class="filter-group">
+        <text class="filter-group__label">品牌</text>
+        <view class="filter-tags">
+          <text
+            v-for="brand in brandList"
+            :key="brand.id"
+            class="filter-tag"
+            :class="{ 'filter-tag--selected': selectedBrand === brand.id }"
+            @click="toggleBrand(brand.id)"
+          >
+            {{ brand.name }}
+          </text>
+        </view>
+      </view>
+
+      <!-- 分类筛选 -->
+      <view class="filter-group">
+        <text class="filter-group__label">分类</text>
+        <view class="filter-tags">
+          <text
+            v-for="cat in categoryList"
+            :key="cat.id"
+            class="filter-tag"
+            :class="{ 'filter-tag--selected': selectedCategory === cat.id }"
+            @click="toggleCategory(cat.id)"
+          >
+            {{ cat.name }}
+          </text>
+        </view>
+      </view>
+
+      <!-- 价格区间 -->
+      <view class="filter-group">
+        <text class="filter-group__label">价格区间</text>
+        <view class="price-range">
+          <input
+            v-model="priceMin"
+            class="price-input"
+            type="number"
+            placeholder="最低价"
+          />
+          <text class="price-sep">-</text>
+          <input
+            v-model="priceMax"
+            class="price-input"
+            type="number"
+            placeholder="最高价"
+          />
+        </view>
+      </view>
+    </scroll-view>
+    <view class="filter-panel__footer">
+      <view class="filter-btn filter-btn--reset" @click="resetFilter">重置</view>
+      <view class="filter-btn filter-btn--confirm" @click="applyFilter">确定</view>
+    </view>
+  </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { ref, computed, onMounted } from 'vue'
+import { onShow, onReachBottom } from '@dcloudio/uni-app'
 import { productApi, marketingApi } from '@/utils/api'
 import HomeProductCard from '@/components/HomeProductCard.vue'
 
+// ============ 类型定义 ============
 interface HotItem { keyword: string; desc?: string; isNew?: boolean }
-interface Product { id: string; name: string; coverImage?: string; image?: string; price: string | number; requiredPoints?: number; type?: number; salesCount?: number; [k: string]: unknown }
+interface SuggestItem { keyword: string }
+interface Product {
+  id: string
+  name: string
+  coverImage?: string
+  image?: string
+  price: string | number
+  requiredPoints?: number
+  type?: number
+  salesCount?: number
+  soldCount?: number
+  brandId?: string
+  categoryId?: string
+  [k: string]: unknown
+}
+interface Brand { id: string; name: string }
+interface Category { id: string; name: string }
 
+interface SortTab { key: string; label: string }
+
+// ============ 状态 ============
 const keyword = ref('')
+const inputValue = ref('')
 const searchResult = ref<Product[]>([])
-const statusBarHeight = ref(20)
 const loading = ref(false)
+const searchError = ref(false)
+const loadingMore = ref(false)
+const hasMore = ref(true)
 const currentType = ref(1)
 const historyList = ref<string[]>([])
-const DEFAULT_HOT: HotItem[] = [
-  { keyword: '手机', desc: '热门' },
-  { keyword: '电脑', desc: '办公' },
-  { keyword: '耳机', desc: '影音' },
-  { keyword: '积分', desc: '换购' },
-]
-const hotList = ref<HotItem[]>([...DEFAULT_HOT])
+const hotList = ref<HotItem[]>([])
+const suggestList = ref<SuggestItem[]>([])
+const showDropdown = ref(false)
+const showFilterPanel = ref(false)
 
+// 筛选相关
+const brandList = ref<Brand[]>([])
+const categoryList = ref<Category[]>([])
+const selectedBrand = ref('')
+const selectedCategory = ref('')
+const priceMin = ref('')
+const priceMax = ref('')
+
+// 排序
+const sortTabs: SortTab[] = [
+  { key: 'default', label: '综合' },
+  { key: 'sales', label: '销量' },
+  { key: 'price', label: '价格' },
+]
+const currentSort = ref('default')
+const priceAsc = ref(false)
+
+// 分页
+const currentPage = ref(1)
+const pageSize = 20
+
+// ============ 生命周期 ============
 onMounted(() => {
-  statusBarHeight.value = uni.getSystemInfoSync().statusBarHeight || 20
   loadHistory()
   loadHotKeywords()
+  loadFilterOptions()
 })
 
 onShow(() => {
@@ -139,23 +292,23 @@ onShow(() => {
   }
 })
 
+// 上拉加载
+onReachBottom(() => {
+  if (!loading.value && !loadingMore.value && hasMore.value && keyword.value) {
+    loadMore()
+  }
+})
+
+// ============ 历史搜索 ============
 function loadHistory() {
   try {
     const raw = uni.getStorageSync('search_history')
     if (raw) {
-      historyList.value = JSON.parse(raw)
-    }
-  } catch {}
-}
-
-async function loadHotKeywords() {
-  try {
-    const res = await marketingApi.getHotKeywords()
-    if (res && res.length > 0) {
-      hotList.value = res
+      const list: string[] = JSON.parse(raw)
+      historyList.value = list.slice(0, 10) // 限制10条
     }
   } catch {
-    // 使用默认热门词
+    historyList.value = []
   }
 }
 
@@ -163,7 +316,7 @@ function saveHistory(kw: string) {
   if (!kw.trim()) return
   const list = historyList.value.filter((h) => h !== kw)
   list.unshift(kw)
-  historyList.value = list.slice(0, 20)
+  historyList.value = list.slice(0, 10) // 限制10条
   try {
     uni.setStorageSync('search_history', JSON.stringify(historyList.value))
   } catch {}
@@ -178,57 +331,213 @@ function clearHistory() {
 
 function clearKeyword() {
   keyword.value = ''
+  inputValue.value = ''
   searchResult.value = []
+  suggestList.value = []
+  hasMore.value = true
+  currentPage.value = 1
+  showDropdown.value = false
 }
 
+// ============ 热门搜索 ============
+async function loadHotKeywords() {
+  try {
+    const res = await marketingApi.getHotKeywords()
+    if (res && res.length > 0) {
+      hotList.value = res
+    }
+  } catch {
+    hotList.value = []
+  }
+}
+
+// ============ 搜索建议词 ============
+async function loadSuggest(kw: string) {
+  if (!kw.trim()) {
+    suggestList.value = []
+    return
+  }
+  try {
+    // 模拟建议词（实际可调用 searchApi.suggest）
+    // const res = await searchApi.suggest(kw)
+    // suggestList.value = res
+    // 暂时使用过滤后的热门词作为建议
+    suggestList.value = hotList.value
+      .filter((h) => h.keyword.includes(kw))
+      .map((h) => ({ keyword: h.keyword }))
+  } catch {
+    suggestList.value = []
+  }
+}
+
+// ============ 筛选选项 ============
+async function loadFilterOptions() {
+  try {
+    const [brands, categories] = await Promise.all([
+      productApi.getCategories(),
+      productApi.getCategories(),
+    ])
+    brandList.value = (brands || []).map((c) => ({ id: c.id, name: c.name }))
+    categoryList.value = (categories || []).map((c) => ({ id: c.id, name: c.name }))
+  } catch {
+    brandList.value = []
+    categoryList.value = []
+  }
+}
+
+function toggleBrand(id: string) {
+  selectedBrand.value = selectedBrand.value === id ? '' : id
+}
+
+function toggleCategory(id: string) {
+  selectedCategory.value = selectedCategory.value === id ? '' : id
+}
+
+function resetFilter() {
+  selectedBrand.value = ''
+  selectedCategory.value = ''
+  priceMin.value = ''
+  priceMax.value = ''
+}
+
+function applyFilter() {
+  showFilterPanel.value = false
+  currentPage.value = 1
+  searchResult.value = []
+  performSearch(keyword.value, true)
+}
+
+// ============ 排序 ============
+function toggleSort(key: string) {
+  if (key === 'price') {
+    if (currentSort.value === 'price') {
+      priceAsc.value = !priceAsc.value
+      currentSort.value = priceAsc.value ? 'price_asc' : 'price_desc'
+    } else {
+      currentSort.value = 'price'
+      priceAsc.value = false
+      currentSort.value = 'price_desc'
+    }
+  } else {
+    currentSort.value = key
+  }
+  currentPage.value = 1
+  searchResult.value = []
+  performSearch(keyword.value, true)
+}
+
+// ============ 搜索逻辑 ============
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 
 function onInput() {
+  inputValue.value = keyword.value
   if (!keyword.value.trim()) {
     searchResult.value = []
+    suggestList.value = []
     return
   }
-  // 防抖：500ms 后自动搜索
+  // 防抖 300ms
   if (searchTimer) clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
-    performSearch(keyword.value.trim())
-  }, 500)
+    loadSuggest(keyword.value.trim())
+  }, 300)
+}
+
+function onInputBlur() {
+  // 延迟隐藏下拉，避免点击穿透
+  setTimeout(() => {
+    showDropdown.value = false
+  }, 200)
 }
 
 function doSearch() {
-  // 取消待执行的防抖搜索
   if (searchTimer) {
     clearTimeout(searchTimer)
     searchTimer = null
   }
   const kw = keyword.value.trim()
   if (!kw) return
+  showDropdown.value = false
   saveHistory(kw)
-  performSearch(kw)
+  currentPage.value = 1
+  searchResult.value = []
+  performSearch(kw, true)
 }
 
 function searchWithKeyword(kw: string) {
   keyword.value = kw
+  inputValue.value = kw
+  showDropdown.value = false
   saveHistory(kw)
-  performSearch(kw)
+  currentPage.value = 1
+  searchResult.value = []
+  performSearch(kw, true)
 }
 
-async function performSearch(kw: string) {
+async function performSearch(kw: string, reset = false) {
   if (!kw) return
-  loading.value = true
+  loading.value = reset
+  if (!reset) loadingMore.value = true
+  searchError.value = false
+
   try {
-    const res = await productApi.getList({
+    const params: {
+      type: number
+      keyword: string
+      page: number
+      limit: number
+      categoryId?: string
+      brandId?: string
+      minPrice?: number
+      maxPrice?: number
+      sort?: string
+    } = {
       type: currentType.value,
       keyword: kw,
-      page: 1,
-      limit: 40,
-    })
-    searchResult.value = res.list || []
+      page: currentPage.value,
+      limit: pageSize,
+    }
+
+    if (selectedCategory.value) params.categoryId = selectedCategory.value
+    if (selectedBrand.value) params.brandId = selectedBrand.value
+    if (priceMin.value) params.minPrice = Number(priceMin.value)
+    if (priceMax.value) params.maxPrice = Number(priceMax.value)
+
+    // 排序参数映射
+    if (currentSort.value === 'sales') params.sort = 'sales_desc'
+    else if (currentSort.value === 'price_asc') params.sort = 'price_asc'
+    else if (currentSort.value === 'price_desc') params.sort = 'price_desc'
+
+    const res = await productApi.getList(params)
+
+    if (reset) {
+      searchResult.value = res.list || []
+    } else {
+      searchResult.value = [...searchResult.value, ...(res.list || [])]
+    }
+
+    hasMore.value = searchResult.value.length < res.total
   } catch {
-    searchResult.value = []
+    searchError.value = true
+    if (reset) searchResult.value = []
   } finally {
     loading.value = false
+    loadingMore.value = false
   }
+}
+
+function loadMore() {
+  if (!hasMore.value || loadingMore.value) return
+  loadingMore.value = true
+  currentPage.value++
+  performSearch(keyword.value)
+}
+
+function retrySearch() {
+  searchError.value = false
+  currentPage.value = 1
+  searchResult.value = []
+  performSearch(keyword.value, true)
 }
 
 function goBack() {
@@ -247,8 +556,6 @@ function goProduct(p: Product) {
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
 
-.status-bar { width: 100%; }
-
 .page-container {
   min-height: 100vh;
   @include page-bg;
@@ -257,13 +564,15 @@ function goProduct(p: Product) {
 
 // ========== 搜索栏 ==========
 .search-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   gap: 16rpx;
   padding: 12rpx $spacing-base;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(16px);
-  border-bottom: 1rpx solid $border-light;
+  background: #ffffff;
+  border-bottom: 1rpx solid $border-color;
 }
 
 .search-bar {
@@ -280,8 +589,6 @@ function goProduct(p: Product) {
 
   .search-icon {
     font-size: 24rpx;
-    font-weight: 700;
-    color: $text-muted;
     flex-shrink: 0;
   }
 
@@ -312,6 +619,43 @@ function goProduct(p: Product) {
   flex-shrink: 0;
 }
 
+// ========== 搜索建议下拉 ==========
+.suggest-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: #ffffff;
+  border-bottom: 1rpx solid $border-light;
+  border-radius: 0 0 $radius-lg $radius-lg;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 20rpx $spacing-base;
+  border-bottom: 1rpx solid $border-light;
+  transition: background 0.15s ease;
+
+  &:last-child { border-bottom: none; }
+  &:active { background: rgba(47, 53, 66, 0.04); }
+
+  .suggest-icon {
+    font-size: 24rpx;
+    color: $text-muted;
+    flex-shrink: 0;
+  }
+
+  .suggest-text {
+    font-size: 28rpx;
+    color: $text-primary;
+  }
+}
+
 // ========== 历史记录 ==========
 .history-section,
 .hot-section {
@@ -336,94 +680,83 @@ function goProduct(p: Product) {
   color: $text-muted;
 }
 
-.history-tags {
+.history-tags,
+.hot-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 12rpx;
 }
 
-.history-tag {
-  padding: 10rpx 24rpx;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(12px);
-  border: 1rpx solid rgba(20, 20, 20, 0.06);
-  border-radius: $radius-full;
+.history-tag,
+.hot-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  background: #F5F5F5;
+  border-radius: 24rpx;
   font-size: 26rpx;
   color: $text-secondary;
   font-weight: 500;
   transition: all 0.2s ease;
 
   &:active {
-    background: rgba(47, 53, 66, 0.04);
+    background: rgba(47, 53, 66, 0.08);
     transform: scale(0.97);
   }
 }
 
-// ========== 热门搜索 ==========
-.hot-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2rpx;
+.hot-tag--new {
+  background: rgba(184, 152, 118, 0.12);
+  color: $accent-dark;
+  border: 1rpx solid rgba(184, 152, 118, 0.25);
 }
 
-.hot-item {
+// ========== 筛选栏 ==========
+.filter-bar {
+  position: sticky;
+  top: 97rpx; // search-header height + border
+  z-index: 50;
+  background: #ffffff;
+  border-bottom: 1rpx solid $border-light;
+}
+
+.filter-tabs {
   display: flex;
   align-items: center;
-  gap: $spacing-base;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid $border-light;
-  transition: all 0.2s ease;
+  padding: 0 $spacing-base;
+  gap: 0;
+}
 
-  &:last-child { border-bottom: none; }
-  &:active { opacity: 0.7; }
+.filter-tab {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  padding: 24rpx 20rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: $text-secondary;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
 
-  .hot-rank {
-    width: 44rpx;
-    height: 44rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24rpx;
-    font-weight: 700;
-    border-radius: 50%;
-    background: $bg-tertiary;
-    color: $text-muted;
-    flex-shrink: 0;
-
-    &.rank-1, &.rank-2, &.rank-3 {
-      background: $warm-yellow;
-      color: $accent-dark;
-      border: 1rpx solid $border-primary;
-    }
-  }
-
-  .hot-info {
-    flex: 1;
-
-    .hot-keyword {
-      display: block;
-      font-size: 28rpx;
-      font-weight: 600;
-      color: $text-primary;
-      margin-bottom: 4rpx;
-    }
-
-    .hot-desc {
-      display: block;
-      font-size: 22rpx;
-      color: $text-muted;
-    }
-  }
-
-  .hot-tag {
-    font-size: 20rpx;
-    padding: 4rpx 12rpx;
-    background: rgba(184, 152, 118, 0.10);
+  &--active {
     color: $accent-dark;
-    border-radius: 20rpx;
-    border: 1rpx solid rgba(184, 152, 118, 0.25);
-    font-weight: 600;
+    font-weight: 700;
   }
+
+  &--filter {
+    margin-left: auto;
+    font-size: 26rpx;
+    color: $text-muted;
+
+    .filter-icon {
+      font-size: 22rpx;
+      margin-left: 4rpx;
+    }
+  }
+}
+
+.sort-arrow {
+  font-size: 20rpx;
 }
 
 // ========== 搜索结果 ==========
@@ -465,13 +798,34 @@ function goProduct(p: Product) {
   }
 }
 
-// 骨架屏扫光动画已全局定义在 page-shell.scss
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.72) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer-sweep 1.4s ease-in-out infinite;
+  }
+}
 
-.result-count {
+@keyframes shimmer-sweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.load-more,
+.no-more {
   text-align: center;
   padding: $spacing-base 0;
   font-size: 24rpx;
   color: $text-muted;
+}
+
+.load-more text {
+  &:active { color: $accent-dark; }
 }
 
 // ========== 空状态 ==========
@@ -483,17 +837,15 @@ function goProduct(p: Product) {
   padding: 160rpx 40rpx;
   text-align: center;
 
-  &__icon {
+  .empty-illustration {
     width: 120rpx;
     height: 120rpx;
     line-height: 120rpx;
     text-align: center;
-    font-size: 48rpx;
-    font-weight: 800;
+    font-size: 64rpx;
     background: $warm-yellow;
     border: 1rpx solid $border-primary;
     border-radius: 50%;
-    color: $accent-dark;
     margin-bottom: 24rpx;
   }
 
@@ -508,5 +860,205 @@ function goProduct(p: Product) {
     font-size: 26rpx;
     color: $text-muted;
   }
+}
+
+// ========== 错误状态 ==========
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 40rpx;
+  text-align: center;
+  gap: 24rpx;
+
+  &__text {
+    font-size: 28rpx;
+    color: $text-muted;
+  }
+
+  &__btn {
+    padding: 16rpx 48rpx;
+    background: $warm-yellow;
+    border: 1rpx solid $border-primary;
+    border-radius: $radius-full;
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $accent-dark;
+
+    &:active {
+      opacity: 0.8;
+      transform: scale(0.97);
+    }
+  }
+}
+
+// ========== 筛选面板 ==========
+.filter-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.4);
+  animation: fade-in 0.2s ease;
+}
+
+.filter-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  width: 600rpx;
+  max-width: 80vw;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: $radius-xl 0 0 $radius-xl;
+
+  &--open {
+    transform: translateX(0);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-base $spacing-base;
+    border-bottom: 1rpx solid $border-light;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: 32rpx;
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  &__close {
+    font-size: 48rpx;
+    color: $text-muted;
+    line-height: 1;
+    padding: 8rpx;
+
+    &:active { color: $text-primary; }
+  }
+
+  &__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: $spacing-base;
+  }
+
+  &__footer {
+    display: flex;
+    gap: 16rpx;
+    padding: $spacing-base;
+    border-top: 1rpx solid $border-light;
+    flex-shrink: 0;
+  }
+}
+
+.filter-group {
+  margin-bottom: $spacing-lg;
+
+  &__label {
+    display: block;
+    font-size: 28rpx;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: $spacing-base;
+  }
+}
+
+.filter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 10rpx 24rpx;
+  background: #F5F5F5;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  color: $text-secondary;
+  transition: all 0.2s ease;
+
+  &--selected {
+    background: rgba(184, 152, 118, 0.15);
+    color: $accent-dark;
+    border: 1rpx solid rgba(184, 152, 118, 0.35);
+    font-weight: 600;
+  }
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.97);
+  }
+}
+
+.price-range {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+
+  .price-sep {
+    font-size: 28rpx;
+    color: $text-muted;
+    flex-shrink: 0;
+  }
+}
+
+.price-input {
+  flex: 1;
+  height: 72rpx;
+  padding: 0 20rpx;
+  background: #F5F5F5;
+  border-radius: $radius-md;
+  font-size: 28rpx;
+  color: $text-primary;
+  text-align: center;
+}
+
+.filter-btn {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-full;
+  font-size: 28rpx;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+
+  &--reset {
+    background: #F5F5F5;
+    color: $text-secondary;
+    border: 1rpx solid $border-light;
+  }
+
+  &--confirm {
+    background: $mineral-gray;
+    color: $text-inverse;
+    box-shadow: $btn-brand-shadow;
+  }
+}
+
+.safe-area-bottom {
+  height: env(safe-area-inset-bottom);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>
