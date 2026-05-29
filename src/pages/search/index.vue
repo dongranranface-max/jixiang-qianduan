@@ -556,10 +556,13 @@ function goProduct(p: Product) {
 <style lang="scss" scoped>
 @import '@/styles/theme.scss';
 
+$gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx; $gap-32: 32rpx;
+
 .page-container {
   min-height: 100vh;
   @include page-bg;
   padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
 }
 
 // ========== 搜索栏 ==========
@@ -569,10 +572,12 @@ function goProduct(p: Product) {
   z-index: 100;
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  padding: 12rpx $spacing-base;
-  background: #ffffff;
-  border-bottom: 1rpx solid $border-color;
+  gap: $gap-16;
+  padding: 12rpx $gap-16;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(16px);
+  border-bottom: 1rpx solid rgba(20,20,20,0.06);
+  box-sizing: border-box;
 }
 
 .search-bar {
@@ -582,10 +587,11 @@ function goProduct(p: Product) {
   gap: 12rpx;
   height: 72rpx;
   padding: 0 24rpx;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1rpx solid rgba(20, 20, 20, 0.06);
+  background: rgba(255,255,255,0.92);
+  border: 1rpx solid rgba(20,20,20,0.06);
   border-radius: $radius-full;
   box-shadow: $clay-shadow;
+  box-sizing: border-box;
 
   .search-icon {
     font-size: 24rpx;
@@ -597,6 +603,8 @@ function goProduct(p: Product) {
     font-size: 28rpx;
     color: $text-primary;
     height: 100%;
+    background: transparent;
+    box-sizing: border-box;
   }
 
   .search-placeholder {
@@ -621,16 +629,16 @@ function goProduct(p: Product) {
 
 // ========== 搜索建议下拉 ==========
 .suggest-panel {
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: 96rpx;
   left: 0;
   right: 0;
   z-index: 99;
-  background: #ffffff;
+  background: #fff;
   border-bottom: 1rpx solid $border-light;
-  border-radius: 0 0 $radius-lg $radius-lg;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8rpx 32rpx rgba(47,53,66,0.10);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .suggest-item {
@@ -692,15 +700,16 @@ function goProduct(p: Product) {
   display: inline-flex;
   align-items: center;
   padding: 12rpx 24rpx;
-  background: #F5F5F5;
-  border-radius: 24rpx;
+  background: $bg-tertiary;
+  border-radius: $radius-full;
   font-size: 26rpx;
   color: $text-secondary;
   font-weight: 500;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 
   &:active {
-    background: rgba(47, 53, 66, 0.08);
+    background: rgba(47,53,66,0.08);
     transform: scale(0.97);
   }
 }
@@ -898,7 +907,7 @@ function goProduct(p: Product) {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(47,53,66,0.40);
   animation: fade-in 0.2s ease;
 }
 
@@ -910,7 +919,7 @@ function goProduct(p: Product) {
   z-index: 201;
   width: 600rpx;
   max-width: 80vw;
-  background: #ffffff;
+  background: #fff;
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
@@ -982,16 +991,17 @@ function goProduct(p: Product) {
   display: inline-flex;
   align-items: center;
   padding: 10rpx 24rpx;
-  background: #F5F5F5;
-  border-radius: 24rpx;
+  background: $bg-tertiary;
+  border-radius: $radius-full;
   font-size: 26rpx;
   color: $text-secondary;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 
   &--selected {
-    background: rgba(184, 152, 118, 0.15);
+    background: rgba(184,152,118,0.15);
     color: $accent-dark;
-    border: 1rpx solid rgba(184, 152, 118, 0.35);
+    border: 1rpx solid rgba(184,152,118,0.35);
     font-weight: 600;
   }
 
@@ -1017,11 +1027,12 @@ function goProduct(p: Product) {
   flex: 1;
   height: 72rpx;
   padding: 0 20rpx;
-  background: #F5F5F5;
+  background: $bg-tertiary;
   border-radius: $radius-md;
   font-size: 28rpx;
   color: $text-primary;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .filter-btn {
@@ -1034,6 +1045,7 @@ function goProduct(p: Product) {
   font-size: 28rpx;
   font-weight: 600;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 
   &:active {
     opacity: 0.85;
@@ -1041,14 +1053,14 @@ function goProduct(p: Product) {
   }
 
   &--reset {
-    background: #F5F5F5;
+    background: $bg-tertiary;
     color: $text-secondary;
     border: 1rpx solid $border-light;
   }
 
   &--confirm {
     background: $mineral-gray;
-    color: $text-inverse;
+    color: #fff;
     box-shadow: $btn-brand-shadow;
   }
 }
