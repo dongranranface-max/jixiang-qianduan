@@ -38,7 +38,8 @@
         <view class="empty-state__btn" @click="goCatalog"><text>去逛逛</text></view>
       </view>
 
-      <view v-else class="cart-list">
+      <!-- 普通列表（<50项） -->
+      <view v-else-if="!useVirtual" class="cart-list">
         <view v-for="item in filteredItems" :key="item.id" class="cart-item" :class="{ selected: item.selected }">
           <view class="cart-item__check" @click="toggleSelect(item)">
             <view class="check-circle" :class="{ 'is-selected': item.selected }"><text v-if="item.selected" class="check-mark">✓</text></view>
@@ -68,6 +69,46 @@
           <view class="cart-item__del" @click="removeItem(item)"><text>×</text></view>
         </view>
       </view>
+
+      <!-- 虚拟列表（≥50项） -->
+      <VirtualList
+        v-else
+        :items="filteredItems"
+        :itemHeight="220"
+        :buffer="5"
+        keyField="id"
+      >
+        <template #default="{ item }">
+          <view class="cart-item cart-item--virtual" :class="{ selected: item.selected }">
+            <view class="cart-item__check" @click="toggleSelect(item)">
+              <view class="check-circle" :class="{ 'is-selected': item.selected }"><text v-if="item.selected" class="check-mark">✓</text></view>
+            </view>
+            <image class="cart-item__img" :src="item.product?.coverImage || item.coverImage" mode="aspectFill" lazy-load />
+            <view class="cart-item__info">
+              <text class="cart-item__name">{{ item.product?.name || item.name }}</text>
+              <view class="cart-item__price-row">
+                <template v-if="item.type === 1">
+                  <text class="cart-item__cash">¥{{ item.price }}</text>
+                  <view class="cart-item__tag">返积分</view>
+                </template>
+                <template v-else-if="item.type === 2">
+                  <text class="cart-item__cash">¥{{ item.price }}</text>
+                  <view class="cart-item__tag cart-item__tag--gold">+{{ item.requiredPoints || 0 }}积分</view>
+                </template>
+                <template v-else>
+                  <text class="cart-item__points">{{ item.requiredPoints }}积分</text>
+                </template>
+              </view>
+              <view class="cart-item__stepper">
+                <view class="stepper-btn" @click="changeQty(item, -1)"><text>−</text></view>
+                <text class="stepper-num">{{ item.quantity }}</text>
+                <view class="stepper-btn" @click="changeQty(item, 1)"><text>+</text></view>
+              </view>
+            </view>
+            <view class="cart-item__del" @click="removeItem(item)"><text>×</text></view>
+          </view>
+        </template>
+      </VirtualList>
     </scroll-view>
 
     <!-- 底部结算栏 -->
@@ -99,6 +140,7 @@ import { cartApi } from '@/utils/api'
 import { checkAuth } from '@/utils/auth'
 import { assetStore } from '@/store/asset'
 import LuxuryTabbar from '@/components/LuxuryTabbar.vue'
+import VirtualList from '@/components/VirtualList.vue'
 import { useToast } from '@/composables/useToast'
 
 const toast = useToast()
@@ -119,6 +161,7 @@ const groups = [
 ]
 
 const filteredItems = computed(() => cartItems.value.filter(item => item.type === currentGroup.value))
+const useVirtual = computed(() => filteredItems.value.length > 50)
 function getGroupCount(type: number) { return cartItems.value.filter(item => item.type === type).length }
 const allSelected = computed(() => filteredItems.value.length > 0 && filteredItems.value.every((i: CartItem) => i.selected))
 const selectedItems = computed(() => filteredItems.value.filter((i: CartItem) => i.selected))
@@ -250,6 +293,11 @@ $gap-4: 4rpx; $gap-8: 8rpx; $gap-16: 16rpx; $gap-24: 24rpx; $gap-base: 16rpx; $g
 .cart-scroll { height: calc(100vh - 400rpx); }
 
 .cart-list { padding: 0 $gap-16 $gap-16; display: flex; flex-direction: column; gap: $gap-16; }
+
+// VirtualList 容器：提供与 cart-list 相同的水平 padding
+:deep(.vl-visible) { padding: 0 $gap-16 $gap-16; box-sizing: border-box; }
+
+.cart-item--virtual { margin-bottom: $gap-16; &:last-child { margin-bottom: 0; } }
 
 .sk-item { display: flex; align-items: center; gap: $gap-16; padding: $gap-16; background: rgba(255,255,255,0.7); border-radius: $radius-lg; }
 .sk-check { width: 44rpx; height: 44rpx; border-radius: 50%; background: $bg-tertiary; flex-shrink: 0; }
