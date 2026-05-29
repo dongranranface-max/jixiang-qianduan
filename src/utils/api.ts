@@ -16,25 +16,136 @@ function getToken(): string {
   return uni.getStorageSync('token') || ''
 }
 
-function setToken(token: string) {
-  uni.setStorageSync('token', token)
-}
 
 function clearToken() {
   uni.removeStorageSync('token')
+  uni.removeStorageSync('tokenIssueTime')
   uni.removeStorageSync('userId')
-}
-
-// getUserId kept for future use-cases; not currently called internally
-function _getUserId(): string {
-  return uni.getStorageSync('userId') || ''
 }
 
 function setUserInfo(user: { id: string; phone: string; nickname?: string; avatar?: string; level?: number }) {
   uni.setStorageSync('userId', user.id)
+  uni.setStorageSync('phone', user.phone)
   if (user.nickname) uni.setStorageSync('nickname', user.nickname)
   if (user.avatar) uni.setStorageSync('avatar', user.avatar)
   if (user.level !== undefined) uni.setStorageSync('level', user.level)
+}
+
+// --------------------------------------------
+//  Token 静默刷新（30分钟过期机制）
+// --------------------------------------------
+const TOKEN_EXPIRY_MS = 30 * 60 * 1000   // 30分钟
+const REFRESH_BEFORE_MS = 5 * 60 * 1000 // 过期前5分钟主动刷新
+
+function getTokenIssueTime(): number {
+  return uni.getStorageSync('tokenIssueTime') || 0
+}
+function setTokenIssueTime(ts: number) {
+  uni.setStorageSync('tokenIssueTime', ts)
+}
+function isTokenExpiringSoon(): boolean {
+  const t = getTokenIssueTime()
+  if (!t) return false
+  return (Date.now() - t) >= (TOKEN_EXPIRY_MS - REFRESH_BEFORE_MS)
+}
+function isTokenExpired(): boolean {
+  const t = getTokenIssueTime()
+  if (!t) return false
+  return (Date.now() - t) >= TOKEN_EXPIRY_MS
+}
+
+// 增强 setToken：记录签发时间
+const _origSetToken = setToken
+function setToken(token: string) {
+  _origSetToken(token)
+  setTokenIssueTime(Date.now())
+}
+
+// 待刷新队列 + 刷新锁
+let refreshLock: Promise<string> | null = null
+const pendingQueue: Array<{ opts: RequestOptions; resolve: (v: unknown) => void; reject: (e: unknown) => void }> = []
+
+async function tryRefreshToken(): Promise<string> {
+  if (refreshLock) return refreshLock
+  refreshLock = _doRefresh().finally(() => { refreshLock = null })
+  return refreshLock
+}
+
+async function _doRefresh(): Promise<string> {
+  // 优先使用静默刷新接口（需后端提供 /auth/refresh）
+  // fallback: 读本地 phone 重新登录
+  const phone = uni.getStorageSync('phone')
+  if (!phone) throw new Error('no_refresh_credential')
+  try {
+    const data = await _rawRequest<{ token: string }>({ url: '/auth/refresh', method: 'POST', data: { phone }, __bypassRefresh: true })
+    if (data?.token) {
+      setToken(data.token)
+      return data.token
+    }
+  } catch {}
+  throw new Error('refresh_failed')
+}
+
+// 原生请求（不触发刷新逻辑）
+interface RawRequestOptions {
+  url: string; method?: string; data?: unknown; header?: Record<string, string>; __bypassRefresh?: boolean
+}
+
+function _rawRequest<T>(opts: RawRequestOptions): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const header: Record<string, string> = { 'Content-Type': 'application/json', ...opts.header }
+    const tok = getToken()
+    if (tok) header['Authorization'] = `Bearer ${tok}`
+    const cleanUrl = (opts.url || '').replace(/[<>'"`;]/g, '')
+    uni.request({
+      url: `${BASE_URL}${cleanUrl}`, method: opts.method || 'GET', data: opts.data, header,
+      success: (res: { data: unknown; statusCode: number }) => {
+        const body = res.data as unknown
+        if (body && typeof (body as { code?: number }).code !== 'undefined') {
+          if ((body as { code: number }).code === 0 || (body as { code: number }).code === 200) {
+            resolve((body as { data: T }).data as T); return
+          }
+        }
+        if (res.statusCode >= 200 && res.statusCode < 300) { resolve(body as T); return }
+        reject(new Error(`HTTP ${res.statusCode}`))
+      },
+      fail: (err: unknown) => reject(new Error((err as { errMsg?: string }).errMsg || '网络请求失败')),
+    })
+  })
+}
+
+function flushQueue(success: boolean, newToken?: string) {
+  pendingQueue.splice(0).forEach(item => {
+    if (success && newToken) {
+      _rawRequest(item.opts)
+        .then(item.resolve)
+        .catch(item.reject)
+    } else {
+      item.reject(new Error('登录已过期'))
+    }
+  })
+}
+
+async function handleUnauthorized<T>(
+  opts: RequestOptions,
+  resolve: (v: T) => void,
+  reject: (e: unknown) => void,
+) {
+  if (refreshLock) {
+    // 已有刷新中的请求，入队等待
+    pendingQueue.push({ opts, resolve: resolve as (v: unknown) => void, reject: reject as (e: unknown) => void })
+    return
+  }
+  pendingQueue.push({ opts, resolve: resolve as (v: unknown) => void, reject: reject as (e: unknown) => void })
+  try {
+    const newToken = await tryRefreshToken()
+    flushQueue(true, newToken)
+  } catch {
+    clearToken()
+    uni.showToast({ title: '登录已过期，请重新登录', icon: 'none' })
+    setTimeout(() => uni.reLaunch({ url: '/pages/auth/login' }), 1200)
+    flushQueue(false)
+  }
 }
 
 // --------------------------------------------
@@ -83,10 +194,7 @@ function request<T = unknown>(options: RequestOptions): Promise<T> {
             return
           }
           if (res.statusCode === 401 || body.code === 401) {
-            clearToken()
-            uni.showToast({ title: '请重新登录', icon: 'none' })
-            setTimeout(() => uni.navigateTo({ url: '/pages/auth/login' }), 1200)
-            reject(new Error(errMsg))
+            handleUnauthorized(options, resolve, reject)
             return
           }
           if (body.code === 422) {
