@@ -79,7 +79,7 @@
               <text class="timer-unit__sep">:</text>
             </view>
             <view class="timer-unit">
-              <text class="timer-unit__num">{{ String(countdown.d).padStart(2, '0') }}</text>
+              <text class="timer-unit__num">{{ String(countdown.m).padStart(2, '0') }}</text>
               <text class="timer-unit__sep">:</text>
             </view>
             <view class="timer-unit">

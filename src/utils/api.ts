@@ -131,11 +131,12 @@ async function handleUnauthorized<T>(
   resolve: (v: T) => void,
   reject: (e: unknown) => void,
 ) {
+  // 已有刷新中的请求：入队等待
   if (refreshLock) {
-    // 已有刷新中的请求，入队等待
     pendingQueue.push({ opts, resolve: resolve as (v: unknown) => void, reject: reject as (e: unknown) => void })
     return
   }
+  // 第一个触发刷新的请求：先入队，再开始刷新
   pendingQueue.push({ opts, resolve: resolve as (v: unknown) => void, reject: reject as (e: unknown) => void })
   try {
     const newToken = await tryRefreshToken()
