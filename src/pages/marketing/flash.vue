@@ -102,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { marketingApi } from '@/utils/api'
 import type { Product } from '@/utils/api'
 
@@ -110,6 +110,7 @@ type FlashProduct = Product & {
   flashPrice?: string | number
   discount?: number
   totalStock?: number
+  flashEndAt?: string // ISO8601 秒杀结束时间
 }
 
 const statusBarHeight = ref(20)
@@ -119,9 +120,23 @@ const fetchError = ref<string | null>(null)
 const products = ref<FlashProduct[]>([])
 const page = ref(1)
 const hasMore = ref(true)
-const flashStatus = ref<'upcoming' | 'ongoing' | 'ended'>('ongoing')
-const countdown = ref({ d: 0, h: 0, m: 0, s: 0 })
+// 倒计时总秒数（由API flashEndAt驱动）
+const countdownSec = ref(0)
 let countdownTimer: ReturnType<typeof setInterval> | null = null
+
+// 秒杀状态：根据倒计时秒数动态计算
+const flashStatus = computed((): 'upcoming' | 'ongoing' | 'ended' => {
+  if (countdownSec.value > 0) return 'ongoing'
+  return 'ended'
+})
+
+// 格式化倒计时 components
+const countdown = computed(() => ({
+  d: Math.floor(countdownSec.value / 86400),
+  h: Math.floor((countdownSec.value % 86400) / 3600),
+  m: Math.floor((countdownSec.value % 3600) / 60),
+  s: countdownSec.value % 60,
+}))
 
 const STATUS_CONFIG = {
   upcoming: { title: '即将开始', sub: '秒杀即将开始，敬请期待' },
@@ -141,31 +156,28 @@ onUnmounted(() => {
   if (countdownTimer) clearInterval(countdownTimer)
 })
 
-function startCountdown() {
-  // 模拟倒计时：距离秒杀结束还有 2小时 34分 12秒
-  // 正式环境应由后端返回 flashEndAt 并据此计算
-  let totalSec = 2 * 3600 + 34 * 60 + 12
+function startCountdown(flashEndAt?: string) {
+  if (countdownTimer) {
+    clearInterval(countdownTimer)
+    countdownTimer = null
+  }
+
+  // 计算距 flashEndAt 的秒数
+  const calcSec = (): number => {
+    if (!flashEndAt) return 0
+    const diff = new Date(flashEndAt).getTime() - Date.now()
+    return diff > 0 ? Math.floor(diff / 1000) : 0
+  }
+
+  countdownSec.value = calcSec()
+
   countdownTimer = setInterval(() => {
-    if (totalSec <= 0) {
-      countdown.value = { d: 0, h: 0, m: 0, s: 0 }
+    const sec = calcSec()
+    countdownSec.value = sec
+    if (sec <= 0) {
       if (countdownTimer) clearInterval(countdownTimer)
-      flashStatus.value = 'ended'
-      return
-    }
-    totalSec--
-    countdown.value = {
-      d: Math.floor(totalSec / 86400),
-      h: Math.floor((totalSec % 86400) / 3600),
-      m: Math.floor((totalSec % 3600) / 60),
-      s: totalSec % 60,
     }
   }, 1000)
-  countdown.value = {
-    d: Math.floor(totalSec / 86400),
-    h: Math.floor((totalSec % 86400) / 3600),
-    m: Math.floor((totalSec % 3600) / 60),
-    s: totalSec % 60,
-  }
 }
 
 async function loadProducts() {
@@ -181,6 +193,10 @@ async function loadProducts() {
       products.value.push(...(data ?? []))
     }
     hasMore.value = false
+
+    // 用首个商品的 flashEndAt 驱动全局倒计时（所有商品共享同一秒杀场次）
+    const firstEndAt = products.value.find(p => p.flashEndAt)?.flashEndAt
+    startCountdown(firstEndAt)
   } catch (err: unknown) {
     fetchError.value = (err as Error).message ?? '加载失败，请重试'
     uni.showToast({ title: fetchError.value, icon: 'none' })

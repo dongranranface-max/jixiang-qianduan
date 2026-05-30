@@ -159,11 +159,22 @@ interface RequestOptions {
 }
 
 function request<T = unknown>(options: RequestOptions): Promise<T> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const header: Record<string, string> = {
       'Content-Type': 'application/json',
       ...options.header,
     }
+
+    // 主动刷新：token即将过期（30分钟内，剩5分钟时触发）先刷新再发请求
+    if (isTokenExpiringSoon()) {
+      try {
+        await tryRefreshToken()
+      } catch {
+        // 刷新失败继续使用现有token，可能401由handleUnauthorized处理
+      }
+    }
+
+    // 重新获取token（可能被刷新更新了）
     const token = getToken()
     if (token) {
       header['Authorization'] = `Bearer ${token}`
